@@ -5,7 +5,7 @@ import Button from '../components/common/Button.jsx';
 import FinalCta from '../components/common/FinalCta.jsx';
 import ReviewCard from '../components/common/ReviewCard.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
-import { airlines, imagery, reviews, timeline, values } from '../data/siteData.js';
+import { airlines, imagery, reviews, siteBackdrops, timeline, values } from '../data/siteData.js';
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
@@ -147,7 +147,11 @@ export default function About() {
           </div>
         </div>
       </section>
-      <FinalCta title="Ready to Work With Derek?" text="Get in touch today and receive your personalized quote within hours." />
+      <FinalCta
+        backdrop={siteBackdrops.aboutFinalCta}
+        title="Ready to Work With Derek?"
+        text="Get in touch today and receive your personalized quote within hours."
+      />
     </div>
   );
 }

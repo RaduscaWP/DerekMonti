@@ -21,19 +21,55 @@ export const imagery = {
   lounge: image('photo-1519671482749-fd09be7ccebf', 1400),
 };
 
-export const homeBackdrops = {
-  savings: {
+export const homeHeroVideo = {
+  src: 'https://videos.pexels.com/video-files/29053716/12559029_2336_1080_30fps.mp4',
+  poster: imagery.hero,
+  alt: 'Aircraft wing flying above clouds',
+};
+
+export const siteBackdrops = {
+  homeSavings: {
     src: dealImage('5645180', 2200),
     alt: 'Aircraft wing above clouds at dusk',
   },
-  methodology: {
+  homeMethodology: {
     src: dealImage('11757933', 2200),
     alt: 'Modern aircraft cabin with rows of passenger seats',
   },
-  finalCta: {
+  homeFinalCta: {
     src: dealImage('23522837', 2200),
     alt: 'Commercial airplane preparing for departure on an airport runway',
   },
+  servicesSteps: {
+    src: dealImage('5645180', 2200),
+    alt: 'Aircraft wing above a calm cloud layer',
+  },
+  servicesSavings: {
+    src: dealImage('11757933', 2200),
+    alt: 'Premium aircraft cabin prepared for boarding',
+  },
+  servicesFinalCta: {
+    src: dealImage('23522837', 2200),
+    alt: 'Commercial jet on an airport runway',
+  },
+  blogHero: {
+    src: dealImage('11757933', 2200),
+    alt: 'Premium aircraft cabin interior',
+  },
+  aboutFinalCta: {
+    src: dealImage('23522837', 2200),
+    alt: 'Airplane flying through a sunset sky',
+  },
+  articleCta: {
+    src: dealImage('5645180', 2200),
+    alt: 'Aircraft wing over clouds during a long-haul flight',
+  },
+};
+
+export const homeBackdrops = {
+  savings: siteBackdrops.homeSavings,
+  methodology: siteBackdrops.homeMethodology,
+  finalCta: siteBackdrops.homeFinalCta,
 };
 
 export const airlines = [

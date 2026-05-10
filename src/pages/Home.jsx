@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BadgeCheck,
@@ -20,16 +20,17 @@ import FinalCta from '../components/common/FinalCta.jsx';
 import QuoteForm from '../components/common/QuoteForm.jsx';
 import ReviewCard from '../components/common/ReviewCard.jsx';
 import RouteCarousel from '../components/common/RouteCarousel.jsx';
+import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
 import {
   blogPosts,
   contactConfig,
-  homeBackdrops,
+  homeHeroVideo,
   homeFaqs,
-  imagery,
   methodology,
   reviews,
   routeDeals,
+  siteBackdrops,
   steps,
   whyDerek,
 } from '../data/siteData.js';
@@ -136,8 +137,18 @@ const trustItems = [
 function Hero() {
   const canvasRef = useRef(null);
   const heroRef = useRef(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoUsable, setVideoUsable] = useState(true);
 
   useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 901px)');
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateVideoState = () => setShowVideo(desktopQuery.matches && !motionQuery.matches);
+
+    updateVideoState();
+    desktopQuery.addEventListener('change', updateVideoState);
+    motionQuery.addEventListener('change', updateVideoState);
+
     const cleanup = initParticles(canvasRef.current);
     const ctx = gsap.context(() => {
       const timeline = gsap.timeline({ delay: 0.15 });
@@ -152,6 +163,8 @@ function Hero() {
     }, heroRef);
 
     return () => {
+      desktopQuery.removeEventListener('change', updateVideoState);
+      motionQuery.removeEventListener('change', updateVideoState);
       cleanup();
       ctx.revert();
     };
@@ -159,7 +172,22 @@ function Hero() {
 
   return (
     <section className="hero" ref={heroRef}>
-      <img className="hero__image" src={imagery.hero} alt="Aircraft wing above clouds" />
+      <img className="hero__image hero__poster" src={homeHeroVideo.poster} alt={homeHeroVideo.alt} />
+      {showVideo && videoUsable && (
+        <video
+          className="hero__video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={homeHeroVideo.poster}
+          aria-hidden="true"
+          onError={() => setVideoUsable(false)}
+        >
+          <source src={homeHeroVideo.src} type="video/mp4" />
+        </video>
+      )}
       <div className="hero__overlay" />
       <canvas className="hero__particles" ref={canvasRef} aria-hidden="true" />
       <div className="hero__content">
@@ -216,47 +244,56 @@ function Methodology() {
 
   return (
     <section className="methodology scenic-section scenic-section--methodology">
-      <img className="scenic-section__image" src={homeBackdrops.methodology.src} alt={homeBackdrops.methodology.alt} />
-      <div className="scenic-section__overlay" aria-hidden="true" />
-      <div className="container">
-        <SectionHeader
-          eyebrow="How it Works"
-          title="Methodology"
-          text="Derek audits the public fare, private quote channels, route quality, and date flexibility before recommending an itinerary."
-          light
-        />
-        <div className="methodology__panel" data-reveal>
-          <aside className="methodology__audit" aria-label="Example fare audit">
-            <p className="eyebrow">Fare Audit</p>
-            <h3>{exampleDeal.from} to {exampleDeal.to}</h3>
-            <p>{exampleDeal.cabin} class example with a {flexibleLabel} search window.</p>
-            <dl>
-              <div>
-                <dt>Published fare</dt>
-                <dd>{exampleDeal.published}</dd>
-              </div>
-              <div>
-                <dt>Derek's quote</dt>
-                <dd>{exampleDeal.derek}</dd>
-              </div>
-              <div>
-                <dt>Estimated savings</dt>
-                <dd>${savings.toLocaleString()}</dd>
-              </div>
-            </dl>
-            <small>Example only. Final fares depend on availability and ticketing deadline.</small>
-          </aside>
-          <div className="methodology__flow">
-            {methodology.map((item, index) => (
-              <article key={item.title}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </div>
-              </article>
-            ))}
+      <ScenicBackdrop backdrop={siteBackdrops.homeMethodology} />
+      <div className="container methodology__inner">
+        <div className="methodology__intro" data-reveal>
+          <p className="eyebrow">How Derek Works</p>
+          <h2>Fare method, not guesswork.</h2>
+          <p>
+            Derek compares the public fare, private quote channels, aircraft quality, ticket rules, and date flexibility
+            before recommending the cleanest premium itinerary.
+          </p>
+        </div>
+        <aside className="methodology__ticket" aria-label="Example fare audit" data-reveal>
+          <div className="methodology__ticket-top">
+            <span>Fare Audit</span>
+            <small>{flexibleLabel} search</small>
           </div>
+          <div className="methodology__route">
+            <div>
+              <strong>{exampleDeal.fromCode}</strong>
+              <span>{exampleDeal.from}</span>
+            </div>
+            <PlaneTakeoff aria-hidden="true" size={28} strokeWidth={1.7} />
+            <div>
+              <strong>{exampleDeal.toCode}</strong>
+              <span>{exampleDeal.to}</span>
+            </div>
+          </div>
+          <dl className="methodology__fares">
+            <div>
+              <dt>Published fare</dt>
+              <dd>{exampleDeal.published}</dd>
+            </div>
+            <div>
+              <dt>Derek's quote</dt>
+              <dd>{exampleDeal.derek}</dd>
+            </div>
+            <div>
+              <dt>Client keeps</dt>
+              <dd>${savings.toLocaleString()}</dd>
+            </div>
+          </dl>
+          <p>Example only. Final fares depend on live inventory and ticketing deadline.</p>
+        </aside>
+        <div className="methodology__rail" data-reveal>
+          {methodology.map((item, index) => (
+            <article key={item.title}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -439,8 +476,7 @@ export default function Home() {
       <Hero />
       <TrustBar />
       <section className="savings-section scenic-section scenic-section--savings">
-        <img className="scenic-section__image" src={homeBackdrops.savings.src} alt={homeBackdrops.savings.alt} />
-        <div className="scenic-section__overlay" aria-hidden="true" />
+        <ScenicBackdrop backdrop={siteBackdrops.homeSavings} />
         <div className="container">
           <SectionHeader
             eyebrow="Smart Savings"
@@ -468,7 +504,7 @@ export default function Home() {
       </section>
       <AirlineMarquee />
       <BlogPreview />
-      <FinalCta backdrop={homeBackdrops.finalCta} />
+      <FinalCta backdrop={siteBackdrops.homeFinalCta} />
     </div>
   );
 }

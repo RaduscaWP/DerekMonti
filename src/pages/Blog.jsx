@@ -4,8 +4,9 @@ import { CalendarDays, Mail, Search } from 'lucide-react';
 import { gsap } from 'gsap';
 import Button from '../components/common/Button.jsx';
 import QuoteForm from '../components/common/QuoteForm.jsx';
+import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
-import { blogPosts } from '../data/siteData.js';
+import { blogPosts, siteBackdrops } from '../data/siteData.js';
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
@@ -79,7 +80,8 @@ export default function Blog() {
 
   return (
     <div ref={pageRef}>
-      <section className="blog-hero">
+      <section className="blog-hero scenic-section scenic-section--blog-hero">
+        <ScenicBackdrop backdrop={siteBackdrops.blogHero} loading="eager" />
         <div className="container">
           <p className="eyebrow">Current Articles</p>
           <h1>Travel Smarter. Read Better.</h1>

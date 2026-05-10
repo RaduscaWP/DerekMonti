@@ -5,8 +5,9 @@ import Button from '../components/common/Button.jsx';
 import FaqAccordion from '../components/common/FaqAccordion.jsx';
 import FinalCta from '../components/common/FinalCta.jsx';
 import RouteCarousel from '../components/common/RouteCarousel.jsx';
+import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
-import { imagery, serviceDeals, services, servicesFaqs, steps } from '../data/siteData.js';
+import { imagery, serviceDeals, services, servicesFaqs, siteBackdrops, steps } from '../data/siteData.js';
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
@@ -64,7 +65,8 @@ function ServicesHero() {
 
 function CompactSteps() {
   return (
-    <section className="steps-section steps-section--dark">
+    <section className="steps-section steps-section--dark scenic-section scenic-section--steps">
+      <ScenicBackdrop backdrop={siteBackdrops.servicesSteps} />
       <div className="container">
         <SectionHeader
           eyebrow="How It Works"
@@ -114,7 +116,8 @@ export default function Services() {
         </div>
       </section>
       <AirlineMarquee />
-      <section className="savings-section">
+      <section className="savings-section scenic-section scenic-section--services-savings">
+        <ScenicBackdrop backdrop={siteBackdrops.servicesSavings} />
         <div className="container">
           <SectionHeader
             eyebrow="Savings Proof"
@@ -142,7 +145,12 @@ export default function Services() {
           <FaqAccordion items={servicesFaqs} />
         </div>
       </section>
-      <FinalCta crimson title="Ready to Fly Better for Less?" text="Send Derek your travel details and receive options within hours - no commitment required." />
+      <FinalCta
+        crimson
+        backdrop={siteBackdrops.servicesFinalCta}
+        title="Ready to Fly Better for Less?"
+        text="Send Derek your travel details and receive options within hours - no commitment required."
+      />
     </div>
   );
 }

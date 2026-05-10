@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import Button from '../components/common/Button.jsx';
 import QuoteForm from '../components/common/QuoteForm.jsx';
-import { blogPosts, contactConfig } from '../data/siteData.js';
+import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
+import { blogPosts, contactConfig, siteBackdrops } from '../data/siteData.js';
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
@@ -72,7 +73,8 @@ export default function BlogArticle() {
         </div>
       </section>
 
-      <section className="article-cta" id="contact">
+      <section className="article-cta scenic-section scenic-section--article-cta" id="contact">
+        <ScenicBackdrop backdrop={siteBackdrops.articleCta} />
         <div className="container" data-reveal>
           <h2>Have a route in mind?</h2>
           <p>Derek can compare public fares against private premium cabin options.</p>

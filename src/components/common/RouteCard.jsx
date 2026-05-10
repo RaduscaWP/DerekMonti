@@ -7,9 +7,9 @@ export default function RouteCard({ deal }) {
     const rect = card.getBoundingClientRect();
     const x = event.clientX - rect.left - rect.width / 2;
     const y = event.clientY - rect.top - rect.height / 2;
-    const rotateX = Math.max(Math.min(-y * 0.015, 8), -8);
-    const rotateY = Math.max(Math.min(x * 0.015, 8), -8);
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    const rotateX = Math.max(Math.min(-y * 0.01, 5), -5);
+    const rotateY = Math.max(Math.min(x * 0.01, 5), -5);
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
   };
 
   const reset = (event) => {
@@ -17,28 +17,40 @@ export default function RouteCard({ deal }) {
   };
 
   return (
-    <article className="route-card" onMouseMove={handleMove} onMouseLeave={reset} data-reveal>
-      <div className="route-card__image">
-        <img src={deal.image} alt={`${deal.to} premium travel`} loading="lazy" />
-        <span>{deal.savings}</span>
+    <article
+      className="route-card"
+      onMouseMove={handleMove}
+      onMouseLeave={reset}
+      onBlur={reset}
+      tabIndex={0}
+      aria-label={`${deal.from} to ${deal.to} premium fare example`}
+      data-reveal
+    >
+      <div className="route-card__ticket-head">
+        <div className="route-card__image">
+          <img src={deal.image} alt={`${deal.to} premium travel`} loading="lazy" />
+        </div>
+        <span className="route-card__stamp">{deal.savings}</span>
       </div>
       <div className="route-card__body">
         <div className="route-card__route">
-          <div>
+          <div className="route-card__endpoint">
             <small>from</small>
-            <strong>{deal.from}</strong>
-            <b>{deal.fromCode}</b>
+            <strong>{deal.fromCode}</strong>
+            <span>{deal.from}</span>
           </div>
-          <ArrowRight aria-hidden="true" size={22} strokeWidth={1.8} />
-          <div>
+          <span className="route-card__arrow">
+            <ArrowRight aria-hidden="true" size={22} strokeWidth={1.8} />
+          </span>
+          <div className="route-card__endpoint">
             <small>to</small>
-            <strong>{deal.to}</strong>
-            <b>{deal.toCode}</b>
+            <strong>{deal.toCode}</strong>
+            <span>{deal.to}</span>
           </div>
         </div>
         <dl className="route-card__meta">
           <div>
-            <dt>Flexible dates</dt>
+            <dt>Dates</dt>
             <dd>{deal.flexibleWindow}</dd>
           </div>
           <div>
@@ -50,17 +62,21 @@ export default function RouteCard({ deal }) {
             <dd>{deal.carriers}</dd>
           </div>
         </dl>
+      </div>
+      <div className="route-card__stub">
+        <span className="route-card__notch route-card__notch--left" aria-hidden="true" />
+        <span className="route-card__notch route-card__notch--right" aria-hidden="true" />
         <div className="route-card__prices">
-          <div>
-            <span>Published Fare</span>
+          <div className="route-card__price-row">
+            <span>Published</span>
             <del>{deal.published}</del>
           </div>
-          <div className="route-card__highlight">
-            <span>Derek's Price</span>
+          <div className="route-card__price-row route-card__highlight">
+            <span>Derek's fare</span>
             <strong>{deal.derek}</strong>
           </div>
         </div>
-        <p>{deal.note}</p>
+        <p className="route-card__note">{deal.note}</p>
       </div>
     </article>
   );
