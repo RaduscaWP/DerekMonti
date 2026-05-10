@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"import\\('./api/_emailTemplate.js'\\).then\\(m => { const html = m.renderTicketHtml\\({ tripType: 'Round trip', from: 'JFK New York', to: 'LHR London', departure: '2026-05-10', returnDate: '2026-05-18', passengers: '2 Passengers', cabin: 'Business', name: 'Stefan', email: 'test@example.com', notes: 'Window seat preferred, vegetarian meals' }\\); console.log\\('Subject:', m.renderTicketSubject\\({ from: 'JFK', to: 'LHR' }\\)\\); console.log\\('HTML length:', html.length\\); console.log\\('Contains crimson:', html.includes\\('#8A194F'\\)\\); console.log\\('Contains JFK:', html.includes\\('JFK'\\)\\); console.log\\('Contains Stefan:', html.includes\\('Stefan'\\)\\); console.log\\('Contains notes:', html.includes\\('Window seat'\\)\\); }\\).catch\\(err => { console.error\\('FAIL:', err.message\\); process.exit\\(1\\); }\\);\")",
+      "Bash(node -e \"import\\('./api/quote.js'\\).then\\(m => { console.log\\('Default export type:', typeof m.default\\); }\\).catch\\(err => { console.error\\('FAIL:', err.message\\); process.exit\\(1\\); }\\);\")",
+      "Bash(node -e \"import\\('./api/_emailTemplate.js'\\).then\\(m => { const html = m.renderTicketHtml\\({ tripType: 'One way', from: 'Dubai \\(DXB\\)', to: 'Tokyo HND', departure: '2026-06-12', passengers: '1 Passenger', cabin: 'First', name: 'Maya', email: 'maya@gmail.com' }\\); require\\('fs'\\).writeFileSync\\('preview-ticket.html', html\\); console.log\\('Wrote preview-ticket.html'\\); }\\);\")",
+      "Bash(git check-ignore *)",
+      "Bash(vercel --version)",
+      "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"Round trip\",\"from\":\"JFK New York\",\"to\":\"LHR London\",\"departure\":\"2026-05-15\",\"returnDate\":\"2026-05-22\",\"passengers\":\"2 Passengers\",\"cabin\":\"Business\",\"name\":\"Stefan Test\",\"email\":\"grozavradustefan@gmail.com\",\"phone\":\"+40 700 000 000\",\"notes\":\"Window seat preferred, vegetarian meals\"}' -w \"\\\\n---\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(node --env-file=.env -e ' *)",
+      "Bash(node -e ' *)",
+      "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"Round trip\",\"from\":\"Chisinau\",\"to\":\"Philadelphia\",\"departure\":\"2026-05-27\",\"returnDate\":\"2026-05-31\",\"passengers\":\"1 Passenger\",\"cabin\":\"Business\",\"name\":\"Stefan\",\"email\":\"grozavradustefan@gmail.com\",\"phone\":\"+373 22 123 456\",\"notes\":\"Window seat preferred, vegetarian meals on long legs.\"}' -w \"\\\\n---\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"Round trip\",\"from\":\"Chisinau\",\"to\":\"Philadelphia\",\"departure\":\"2026-05-27\",\"returnDate\":\"2026-05-31\",\"passengers\":\"1 Passenger\",\"cabin\":\"Business\",\"name\":\"Stefan\",\"email\":\"grozavradustefan@gmail.com\",\"notes\":\"Window seat preferred, vegetarian meals.\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"One way\",\"from\":\"Zürich\",\"to\":\"São Paulo\",\"departure\":\"2026-06-15\",\"passengers\":\"2 Passengers\",\"cabin\":\"First\",\"name\":\"Test\",\"email\":\"grozavradustefan@gmail.com\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")"
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CalendarDays, MapPin, Plane, Search, Users } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Mail, MapPin, Plane, Search, Send, Users } from 'lucide-react';
 import { getMailto, getWhatsappUrl } from '../../utils/message.js';
 import Button from './Button.jsx';
 import DatePicker from './DatePicker.jsx';
@@ -19,9 +19,11 @@ const initialFields = {
   notes: '',
 };
 
-function Field({ icon: Icon, label, children, compact = false }) {
+function Field({ icon: Icon, label, children, compact = false, wide = false }) {
   return (
-    <div className={`quote-field ${compact ? 'quote-field--compact' : ''}`}>
+    <div
+      className={`quote-field ${compact ? 'quote-field--compact' : ''} ${wide ? 'quote-field--wide' : ''}`}
+    >
       <span className="quote-field__label">
         {Icon && <Icon aria-hidden="true" size={16} strokeWidth={2} />}
         {label}
@@ -33,6 +35,8 @@ function Field({ icon: Icon, label, children, compact = false }) {
 
 export default function QuoteForm({ variant = 'hero', full = false }) {
   const [fields, setFields] = useState(initialFields);
+  const [status, setStatus] = useState('idle');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const mailto = useMemo(() => getMailto(fields), [fields]);
   const whatsapp = useMemo(() => getWhatsappUrl(fields), [fields]);
@@ -42,9 +46,35 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
     setFields((current) => ({ ...current, [name]: value }));
   };
 
-  const submit = (event) => {
+  const reset = () => {
+    setFields(initialFields);
+    setStatus('idle');
+    setErrorMsg('');
+  };
+
+  const submit = async (event) => {
     event.preventDefault();
-    window.location.href = mailto;
+    if (status === 'submitting') return;
+
+    setStatus('submitting');
+    setErrorMsg('');
+
+    try {
+      const response = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fields),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || 'We could not send your boarding pass right now.');
+      }
+      setStatus('success');
+    } catch (err) {
+      setStatus('error');
+      setErrorMsg(err.message || 'Network error. Please try again.');
+    }
   };
 
   const isOneWay = fields.tripType === 'One way';
@@ -53,8 +83,30 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
     return `${count} ${count === 1 ? 'Passenger' : 'Passengers'}`;
   });
 
+  if (status === 'success') {
+    return (
+      <div className={`quote-form quote-form--${variant} quote-form--success`} role="status" aria-live="polite">
+        <div className="quote-success">
+          <div className="quote-success__icon" aria-hidden="true">
+            <CheckCircle2 size={32} strokeWidth={2.2} />
+          </div>
+          <div className="quote-success__copy">
+            <h3>Your boarding pass is on its way</h3>
+            <p>
+              Check <strong>{fields.email}</strong> in a moment — Derek's branded ticket has been sent and
+              he&rsquo;ll personally reply with options within hours.
+            </p>
+            <button type="button" className="quote-success__reset" onClick={reset}>
+              Send another request
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <form className={`quote-form quote-form--${variant}`} onSubmit={submit}>
+    <form className={`quote-form quote-form--${variant}`} onSubmit={submit} noValidate>
       <div className="quote-form__tabs" role="tablist" aria-label="Trip type">
         {['Round trip', 'One way'].map((type) => (
           <button
@@ -70,14 +122,9 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
 
       <div className="quote-form__grid">
         {full && (
-          <>
-            <Field label="Name">
-              <input name="name" value={fields.name} onChange={update} placeholder="Your name" />
-            </Field>
-            <Field label="Email">
-              <input name="email" value={fields.email} onChange={update} placeholder="you@example.com" />
-            </Field>
-          </>
+          <Field label="Name">
+            <input name="name" value={fields.name} onChange={update} placeholder="Your name" />
+          </Field>
         )}
 
         <Field icon={Plane} label="From" compact={!full}>
@@ -103,6 +150,17 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
             ariaLabel="Passenger count"
           />
         </Field>
+        <Field icon={Mail} label="Your email" compact={!full}>
+          <input
+            name="email"
+            type="email"
+            value={fields.email}
+            onChange={update}
+            placeholder="you@gmail.com"
+            required
+            autoComplete="email"
+          />
+        </Field>
 
         {full && (
           <>
@@ -118,8 +176,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
             <Field label="Phone / WhatsApp">
               <input name="phone" value={fields.phone} onChange={update} placeholder="+1 ..." />
             </Field>
-            <label className="quote-field quote-field--wide">
-              <span className="quote-field__label">Notes</span>
+            <Field label="Notes" wide>
               <textarea
                 name="notes"
                 value={fields.notes}
@@ -127,17 +184,45 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
                 placeholder="Airline preference, budget, timing, or anything Derek should know."
                 rows={4}
               />
-            </label>
+            </Field>
           </>
         )}
 
-        <button className="quote-form__submit" type="submit" aria-label="Request quote">
-          <Search aria-hidden="true" size={20} />
-          <span>Request</span>
+        <button
+          className="quote-form__submit"
+          type="submit"
+          aria-label="Request quote"
+          disabled={status === 'submitting'}
+        >
+          {status === 'submitting' ? (
+            <>
+              <Send aria-hidden="true" size={18} />
+              <span>Sending&hellip;</span>
+            </>
+          ) : (
+            <>
+              <Search aria-hidden="true" size={20} />
+              <span>Request</span>
+            </>
+          )}
         </button>
       </div>
 
-      {full && (
+      {status === 'error' && (
+        <div className="quote-form__error" role="alert">
+          <p>{errorMsg}</p>
+          <div className="quote-form__error-actions">
+            <Button href={whatsapp} variant="primary" icon={false}>
+              Message Derek on WhatsApp
+            </Button>
+            <a href={mailto} className="quote-form__error-mailto">
+              Or open your email app
+            </a>
+          </div>
+        </div>
+      )}
+
+      {full && status !== 'error' && (
         <div className="quote-form__actions">
           <Button href={whatsapp} variant="outline-dark" icon={false}>
             Chat on WhatsApp

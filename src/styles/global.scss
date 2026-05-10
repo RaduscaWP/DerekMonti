@@ -515,7 +515,7 @@ p {
 
 .quote-form__grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
   align-items: stretch;
   gap: 0.15rem;
 }
@@ -573,6 +573,112 @@ p {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   box-shadow: 0 18px 35px rgba(138, 25, 79, 0.28);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  &:disabled {
+    opacity: 0.78;
+    cursor: progress;
+    transform: none;
+  }
+}
+
+.quote-form--success {
+  display: block;
+}
+
+.quote-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  padding: 1.3rem 1.45rem;
+}
+
+.quote-success__icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  color: white;
+  background: $gradient-crimson;
+  box-shadow: 0 12px 28px rgba(138, 25, 79, 0.32);
+}
+
+.quote-success__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  h3 {
+    margin: 0 0 0.35rem;
+    color: $color-text-primary;
+    font-family: $font-display;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 0;
+    color: $color-text-secondary;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  strong {
+    color: $color-text-primary;
+  }
+}
+
+.quote-success__reset {
+  margin-top: 0.65rem;
+  padding: 0;
+  border: 0;
+  color: $color-accent;
+  background: transparent;
+  font-family: $font-body;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-accent-hover;
+  }
+}
+
+.quote-form__error {
+  margin: 0.7rem 0.4rem 0.2rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 3px solid #dc2626;
+
+  p {
+    margin: 0 0 0.6rem;
+    color: #991b1b;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+}
+
+.quote-form__error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.quote-form__error-mailto {
+  color: $color-text-secondary;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: $color-text-primary;
+  }
 }
 
 .custom-select {
