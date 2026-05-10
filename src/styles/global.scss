@@ -1678,6 +1678,141 @@ p {
   padding-top: clamp(3rem, 6vw, 5rem);
 }
 
+.guidance-section {
+  @include section-padding(clamp(4.5rem, 8vw, 6.5rem), clamp(4.5rem, 8vw, 6.5rem));
+  background:
+    linear-gradient(180deg, white 0%, $color-bg-light 100%);
+}
+
+.guidance-section__inner {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.guidance-section__copy {
+  position: sticky;
+  top: calc(var(--header-total) + 2rem);
+  padding-top: 1.1rem;
+  border-top: 2px solid $color-accent;
+
+  h2 {
+    max-width: 560px;
+    font-size: clamp(2.2rem, 5vw, 4.6rem);
+  }
+
+  > p:not(.eyebrow) {
+    margin-top: 1rem;
+    color: $color-text-secondary;
+    font-size: 1.06rem;
+  }
+
+  .btn {
+    margin-top: 1.5rem;
+  }
+}
+
+.guidance-section__tags,
+.guidance-teaser__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.35rem;
+
+  span {
+    border: 1px solid rgba(138, 25, 79, 0.16);
+    border-radius: 6px;
+    padding: 0.48rem 0.65rem;
+    color: $color-accent;
+    background: white;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+}
+
+.guidance-notes {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.guidance-notes article {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: start;
+  border: 1px solid rgba(11, 25, 41, 0.1);
+  border-left: 3px solid $color-accent;
+  border-radius: 7px;
+  padding: clamp(1rem, 2vw, 1.25rem);
+  background:
+    linear-gradient(90deg, rgba(138, 25, 79, 0.06), rgba(255, 255, 255, 0) 34%),
+    rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 44px rgba(11, 25, 41, 0.06);
+  transition:
+    border-color 0.24s ease,
+    transform 0.24s ease,
+    box-shadow 0.24s ease;
+
+  &:nth-child(2) {
+    margin-left: clamp(0.5rem, 3vw, 2rem);
+  }
+
+  &:nth-child(3) {
+    margin-left: clamp(1rem, 5vw, 4rem);
+  }
+
+  &:hover {
+    border-color: rgba(138, 25, 79, 0.34);
+    box-shadow: 0 20px 54px rgba(11, 25, 41, 0.09);
+    transform: translateX(5px);
+  }
+
+  strong {
+    display: inline-flex;
+    color: $color-accent;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.09em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin-top: 0.45rem;
+    font-size: clamp(1.28rem, 2.2vw, 1.8rem);
+    line-height: 1.04;
+  }
+
+  p {
+    margin-top: 0.55rem;
+    color: $color-text-secondary;
+    font-size: 0.98rem;
+  }
+
+  small {
+    display: block;
+    margin-top: 0.8rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed rgba(11, 25, 41, 0.14);
+    color: rgba(74, 85, 104, 0.88);
+    font-weight: 700;
+  }
+}
+
+.guidance-notes__number {
+  color: rgba(138, 25, 79, 0.26);
+  font-family: $font-display;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 0.9;
+}
+
 .why-showcase {
   display: grid;
   grid-template-columns: minmax(280px, 0.75fr) minmax(0, 1.25fr);
@@ -1802,6 +1937,38 @@ p {
     color 0.24s ease,
     background 0.24s ease,
     box-shadow 0.24s ease;
+}
+
+.guidance-teaser {
+  @include section-padding(clamp(3rem, 6vw, 4.5rem), clamp(3rem, 6vw, 4.5rem));
+  background: white;
+}
+
+.guidance-teaser__inner {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(220px, 0.72fr) auto;
+  gap: clamp(1.25rem, 4vw, 2.75rem);
+  align-items: center;
+  padding-block: clamp(1.5rem, 3vw, 2.25rem);
+  border-block: 1px solid rgba(11, 25, 41, 0.12);
+
+  h2 {
+    max-width: 620px;
+    font-size: clamp(1.9rem, 4vw, 3.35rem);
+  }
+
+  > p {
+    color: $color-text-secondary;
+    font-size: 1rem;
+  }
+
+  .btn {
+    white-space: nowrap;
+  }
+}
+
+.guidance-teaser__tags {
+  margin-top: 0;
 }
 
 .bio-teaser {
@@ -3212,6 +3379,8 @@ p {
 
   .trust-bar__inner,
   .why-showcase,
+  .guidance-section__inner,
+  .guidance-teaser__inner,
   .bio-teaser__inner,
   .steps,
   .review-grid,
@@ -3235,6 +3404,25 @@ p {
 
   .why-showcase__brief {
     position: static;
+  }
+
+  .guidance-section__copy {
+    position: static;
+  }
+
+  .guidance-notes article,
+  .guidance-notes article:nth-child(2),
+  .guidance-notes article:nth-child(3) {
+    margin-left: 0;
+    transform: none !important;
+  }
+
+  .guidance-teaser__inner {
+    align-items: start;
+
+    .btn {
+      justify-self: start;
+    }
   }
 
   .why-list article {

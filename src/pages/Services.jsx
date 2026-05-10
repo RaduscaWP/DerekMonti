@@ -7,7 +7,7 @@ import FinalCta from '../components/common/FinalCta.jsx';
 import RouteCarousel from '../components/common/RouteCarousel.jsx';
 import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
-import { imagery, serviceDeals, services, servicesFaqs, siteBackdrops, steps } from '../data/siteData.js';
+import { extraServices, imagery, serviceDeals, services, servicesFaqs, siteBackdrops, steps } from '../data/siteData.js';
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
@@ -90,6 +90,44 @@ function CompactSteps() {
   );
 }
 
+function ExtraServices() {
+  return (
+    <section className="guidance-section" id="guidance">
+      <div className="container guidance-section__inner">
+        <aside className="guidance-section__copy" data-reveal>
+          <p className="eyebrow">Extra Services</p>
+          <h2>Book Smarter With Derek's Guidance</h2>
+          <p>
+            For travelers who want the strategy behind premium fares, not just the final quote. Derek turns fare logic
+            into practical next steps before you commit.
+          </p>
+          <div className="guidance-section__tags" aria-label="Guidance focus areas">
+            <span>Private fare logic</span>
+            <span>Route audit</span>
+            <span>Booking confidence</span>
+          </div>
+          <Button href="#contact" variant="outline-dark">
+            Ask for guidance
+          </Button>
+        </aside>
+        <div className="guidance-notes" aria-label="Derek guidance services">
+          {extraServices.map((service, index) => (
+            <article key={service.title} data-reveal>
+              <span className="guidance-notes__number">{String(index + 1).padStart(2, '0')}</span>
+              <div>
+                <strong>{service.label}</strong>
+                <h3>{service.title}</h3>
+                <p>{service.body}</p>
+                <small>{service.outcome}</small>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Services() {
   const pageRef = useRef(null);
   useDocumentMeta(
@@ -115,6 +153,7 @@ export default function Services() {
           </div>
         </div>
       </section>
+      <ExtraServices />
       <AirlineMarquee />
       <section className="savings-section scenic-section scenic-section--services-savings">
         <ScenicBackdrop backdrop={siteBackdrops.servicesSavings} />

@@ -264,6 +264,30 @@ export const services = [
   },
 ];
 
+export const extraServices = [
+  {
+    label: 'Private fare logic',
+    title: 'Private Fare Playbook',
+    body:
+      'Derek explains date windows, airline tradeoffs, routing choices, and fare rules before you spend time searching or committing.',
+    outcome: 'Best for travelers who want the strategy behind the quote.',
+  },
+  {
+    label: 'Route audit',
+    title: 'Route & Aircraft Audit',
+    body:
+      'Send Derek an option you found online. He checks the aircraft, cabin quality, connection risk, ticket rules, and better alternatives.',
+    outcome: 'Useful before paying for a premium fare that may not feel premium.',
+  },
+  {
+    label: 'Booking confidence',
+    title: 'Self-Booking Guidance',
+    body:
+      'For clients who prefer to book themselves, Derek gives a clear path so you avoid weak routings, hidden fees, or cabin surprises.',
+    outcome: 'Guidance first. Booking support if you want Derek to take over.',
+  },
+];
+
 export const methodology = [
   {
     title: 'Published Fare',

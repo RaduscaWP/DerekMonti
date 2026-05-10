@@ -25,6 +25,7 @@ import SectionHeader from '../components/common/SectionHeader.jsx';
 import {
   blogPosts,
   contactConfig,
+  extraServices,
   homeHeroVideo,
   homeFaqs,
   methodology,
@@ -354,6 +355,31 @@ function WhyDerek() {
   );
 }
 
+function GuidanceTeaser() {
+  return (
+    <section className="guidance-teaser">
+      <div className="container guidance-teaser__inner" data-reveal>
+        <div>
+          <p className="eyebrow">Derek's Playbook</p>
+          <h2>Want to book yourself? Start with Derek's playbook.</h2>
+        </div>
+        <p>
+          Bring Derek the fare, route, or airline you are considering. He will help you understand the tradeoffs before
+          you lock in the ticket.
+        </p>
+        <div className="guidance-teaser__tags" aria-label="Private fare playbook topics">
+          {extraServices.map((service) => (
+            <span key={service.title}>{service.label}</span>
+          ))}
+        </div>
+        <Button href="#contact" variant="outline-dark">
+          Ask for guidance
+        </Button>
+      </div>
+    </section>
+  );
+}
+
 function BioTeaser() {
   return (
     <section className="bio-teaser">
@@ -493,6 +519,7 @@ export default function Home() {
       </section>
       <Methodology />
       <WhyDerek />
+      <GuidanceTeaser />
       <BioTeaser />
       <HowItWorks />
       <Testimonials />
