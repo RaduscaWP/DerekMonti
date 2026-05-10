@@ -1,0 +1,16 @@
+@mixin container {
+  width: min(100% - 2 * clamp(1.5rem, 5vw, 5rem), 1280px);
+  margin-inline: auto;
+}
+
+@mixin section-padding($top: clamp(5rem, 10vw, 8rem), $bottom: clamp(5rem, 10vw, 8rem)) {
+  padding-block: $top $bottom;
+}
+
+@mixin label {
+  color: #8a194f;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
