@@ -359,22 +359,26 @@ function GuidanceTeaser() {
   return (
     <section className="guidance-teaser">
       <div className="container guidance-teaser__inner" data-reveal>
-        <div>
-          <p className="eyebrow">Derek's Playbook</p>
-          <h2>Want to book yourself? Start with Derek's playbook.</h2>
+        <div className="guidance-teaser__copy">
+          <p className="eyebrow">Derek's Desk</p>
+          <h2>Found a fare? Let Derek pressure-test it before you book.</h2>
+          <p>
+            Send the route, aircraft, or airline you are considering. Derek reads the parts most travelers never see:
+            rules, cabin quality, connection risk, and whether the savings are worth it.
+          </p>
+          <Button href="#contact" variant="outline-dark">
+            Ask for guidance
+          </Button>
         </div>
-        <p>
-          Bring Derek the fare, route, or airline you are considering. He will help you understand the tradeoffs before
-          you lock in the ticket.
-        </p>
-        <div className="guidance-teaser__tags" aria-label="Private fare playbook topics">
-          {extraServices.map((service) => (
-            <span key={service.title}>{service.label}</span>
+        <div className="guidance-teaser__sequence" aria-label="Private fare playbook flow">
+          {extraServices.map((service, index) => (
+            <article key={service.title}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{service.storyLabel}</strong>
+              <p>{service.activeSummary}</p>
+            </article>
           ))}
         </div>
-        <Button href="#contact" variant="outline-dark">
-          Ask for guidance
-        </Button>
       </div>
     </section>
   );

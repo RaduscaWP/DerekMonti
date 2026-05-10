@@ -13,8 +13,8 @@ export const contactConfig = {
 };
 
 export const imagery = {
-  hero: image('photo-1436491865332-7a61a109cc05', 2400),
-  servicesHero: image('photo-1436491865332-7a61a109cc05', 2400),
+  hero: dealImage('5645180', 2400),
+  servicesHero: dealImage('23522837', 2400),
   aboutHero: image('photo-1569154941061-e231b4725ef1', 2400),
   cabin: image('photo-1540339832862-474599807836', 1800),
   concierge: image('photo-1551836022-d5d88e9218df', 1400),
@@ -102,6 +102,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 2 days',
     note: 'Based on a recent quote',
     image: dealImage('460672'),
+    advisorNote: {
+      title: 'Why Derek would audit it',
+      points: ['Check nonstop vs. one-stop tradeoff', 'Compare aircraft and seat layout', 'Confirm fare rules before ticketing'],
+      cta: 'Ask Derek to audit this route',
+    },
   },
   {
     from: 'Chicago',
@@ -116,6 +121,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 4 days',
     note: 'Flexible dates shown',
     image: dealImage('2064827'),
+    advisorNote: {
+      title: 'Where the value usually appears',
+      points: ['Test nearby date windows', 'Compare Lufthansa and ITA routing', 'Avoid weak overnight connections'],
+      cta: 'Have Derek review the options',
+    },
   },
   {
     from: 'San Francisco',
@@ -130,6 +140,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 1 day',
     note: 'Comparable itinerary',
     image: dealImage('109629'),
+    advisorNote: {
+      title: 'What Derek checks first',
+      points: ['Verify the operating aircraft', 'Protect the long-haul cabin quality', 'Compare rules against public fares'],
+      cta: 'Ask for a fare audit',
+    },
   },
   {
     from: 'Boston',
@@ -144,6 +159,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 5 days',
     note: 'Recent client quote',
     image: dealImage('3787839'),
+    advisorNote: {
+      title: 'How Derek keeps it practical',
+      points: ['Balance savings against travel time', 'Check Emirates and Qatar options', 'Review change and refund rules'],
+      cta: 'Get Derek to compare it',
+    },
   },
   {
     from: 'Los Angeles',
@@ -158,6 +178,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 4 days',
     note: 'Sample routing',
     image: dealImage('2506923'),
+    advisorNote: {
+      title: 'What matters on this route',
+      points: ['Check Japan Airlines and ANA aircraft', 'Avoid unnecessary domestic positioning', 'Compare arrival time comfort'],
+      cta: 'Ask Derek about this fare',
+    },
   },
   {
     from: 'Miami',
@@ -172,6 +197,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 6 days',
     note: 'Premium cabin sample',
     image: dealImage('777059'),
+    advisorNote: {
+      title: 'First class needs extra scrutiny',
+      points: ['Confirm true first class availability', 'Check lounge and ground benefits', 'Protect the long-haul experience'],
+      cta: 'Have Derek qualify it',
+    },
   },
   {
     from: 'New York',
@@ -186,6 +216,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 2 days',
     note: 'Subject to inventory',
     image: dealImage('1058759'),
+    advisorNote: {
+      title: 'Where Derek adds judgement',
+      points: ['Compare connection risk', 'Check partner airline consistency', 'Watch ticketing deadlines closely'],
+      cta: 'Ask for route guidance',
+    },
   },
   {
     from: 'Washington',
@@ -200,6 +235,11 @@ export const routeDeals = [
     flexibleWindow: '+/- 5 days',
     note: 'Based on real booking logic',
     image: dealImage('262786'),
+    advisorNote: {
+      title: 'How to avoid a weak fare',
+      points: ['Confirm mixed-cabin exposure', 'Review EgyptAir and partner options', 'Check stop length against savings'],
+      cta: 'Let Derek audit the fare',
+    },
   },
 ];
 
@@ -267,24 +307,33 @@ export const services = [
 export const extraServices = [
   {
     label: 'Private fare logic',
+    storyLabel: 'Traveler finds a fare',
     title: 'Private Fare Playbook',
+    activeSummary: 'Derek turns a confusing premium fare search into a clear decision path.',
     body:
       'Derek explains date windows, airline tradeoffs, routing choices, and fare rules before you spend time searching or committing.',
     outcome: 'Best for travelers who want the strategy behind the quote.',
+    checklist: ['Date windows that actually matter', 'Airline and routing tradeoffs', 'Fare rules worth reading twice'],
   },
   {
     label: 'Route audit',
+    storyLabel: 'Derek audits the details',
     title: 'Route & Aircraft Audit',
+    activeSummary: 'Send the option you found and Derek checks whether it is truly worth booking.',
     body:
       'Send Derek an option you found online. He checks the aircraft, cabin quality, connection risk, ticket rules, and better alternatives.',
     outcome: 'Useful before paying for a premium fare that may not feel premium.',
+    checklist: ['Aircraft and seat quality', 'Connection risk and timing', 'Cleaner alternatives if the fare is weak'],
   },
   {
     label: 'Booking confidence',
+    storyLabel: 'You decide with confidence',
     title: 'Self-Booking Guidance',
+    activeSummary: 'If you prefer to book yourself, Derek gives you the practical guardrails first.',
     body:
       'For clients who prefer to book themselves, Derek gives a clear path so you avoid weak routings, hidden fees, or cabin surprises.',
     outcome: 'Guidance first. Booking support if you want Derek to take over.',
+    checklist: ['Steps before final checkout', 'Rules and fees to verify', 'When to let Derek take over'],
   },
 ];
 

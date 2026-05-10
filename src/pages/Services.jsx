@@ -91,6 +91,9 @@ function CompactSteps() {
 }
 
 function ExtraServices() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeService = extraServices[activeIndex];
+
   return (
     <section className="guidance-section" id="guidance">
       <div className="container guidance-section__inner">
@@ -101,27 +104,79 @@ function ExtraServices() {
             For travelers who want the strategy behind premium fares, not just the final quote. Derek turns fare logic
             into practical next steps before you commit.
           </p>
-          <div className="guidance-section__tags" aria-label="Guidance focus areas">
-            <span>Private fare logic</span>
-            <span>Route audit</span>
-            <span>Booking confidence</span>
+          <div className="guidance-story" aria-label="Guidance flow">
+            {extraServices.map((service, index) => (
+              <button
+                key={service.title}
+                type="button"
+                className={activeIndex === index ? 'active' : ''}
+                onClick={() => setActiveIndex(index)}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{service.storyLabel}</strong>
+              </button>
+            ))}
           </div>
           <Button href="#contact" variant="outline-dark">
             Ask for guidance
           </Button>
         </aside>
-        <div className="guidance-notes" aria-label="Derek guidance services">
-          {extraServices.map((service, index) => (
-            <article key={service.title} data-reveal>
-              <span className="guidance-notes__number">{String(index + 1).padStart(2, '0')}</span>
-              <div>
-                <strong>{service.label}</strong>
-                <h3>{service.title}</h3>
-                <p>{service.body}</p>
-                <small>{service.outcome}</small>
-              </div>
-            </article>
-          ))}
+        <div className="guidance-folio" data-reveal>
+          <div className="guidance-folio__tabs" role="tablist" aria-label="Derek guidance services">
+            {extraServices.map((service, index) => (
+              <button
+                key={service.title}
+                id={`guidance-tab-${index}`}
+                type="button"
+                role="tab"
+                aria-selected={activeIndex === index}
+                aria-controls={`guidance-panel-${index}`}
+                tabIndex={activeIndex === index ? 0 : -1}
+                onClick={() => setActiveIndex(index)}
+              >
+                <span>{service.label}</span>
+                <strong>{service.title}</strong>
+              </button>
+            ))}
+          </div>
+          <article
+            className="guidance-folio__panel"
+            id={`guidance-panel-${activeIndex}`}
+            role="tabpanel"
+            aria-labelledby={`guidance-tab-${activeIndex}`}
+          >
+            <span>{activeService.storyLabel}</span>
+            <h3>{activeService.title}</h3>
+            <p>{activeService.activeSummary}</p>
+            <ul>
+              {activeService.checklist.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <small>{activeService.outcome}</small>
+          </article>
+        </div>
+        <div className="guidance-accordion" data-reveal aria-label="Derek guidance services">
+          {extraServices.map((service, index) => {
+            const isActive = activeIndex === index;
+            return (
+              <article className={isActive ? 'active' : ''} key={service.title}>
+                <button type="button" aria-expanded={isActive} onClick={() => setActiveIndex(index)}>
+                  <span>{service.label}</span>
+                  <strong>{service.title}</strong>
+                </button>
+                <div aria-hidden={!isActive}>
+                  <p>{service.activeSummary}</p>
+                  <ul>
+                    {service.checklist.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                  <small>{service.outcome}</small>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
