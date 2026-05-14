@@ -138,8 +138,10 @@ const trustItems = [
 function Hero() {
   const canvasRef = useRef(null);
   const heroRef = useRef(null);
+  const videoRef = useRef(null);
   const [showVideo, setShowVideo] = useState(false);
   const [videoUsable, setVideoUsable] = useState(true);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     const desktopQuery = window.matchMedia('(min-width: 901px)');
@@ -171,12 +173,33 @@ function Hero() {
     };
   }, []);
 
+  useEffect(() => {
+    setVideoReady(false);
+    setVideoUsable(true);
+
+    if (!showVideo) return undefined;
+
+    const timer = window.setTimeout(() => {
+      const video = videoRef.current;
+      if (!video || video.readyState < 2 || video.paused) {
+        setVideoUsable(false);
+      }
+    }, 5000);
+
+    return () => window.clearTimeout(timer);
+  }, [showVideo]);
+
+  const activateVideo = () => {
+    setVideoReady(true);
+  };
+
   return (
     <section className="hero" ref={heroRef}>
       <img className="hero__image hero__poster" src={homeHeroVideo.poster} alt={homeHeroVideo.alt} />
       {showVideo && videoUsable && (
         <video
-          className="hero__video"
+          ref={videoRef}
+          className={`hero__video ${videoReady ? 'hero__video--ready' : ''}`}
           autoPlay
           muted
           loop
@@ -185,6 +208,8 @@ function Hero() {
           poster={homeHeroVideo.poster}
           aria-hidden="true"
           onError={() => setVideoUsable(false)}
+          onLoadedData={activateVideo}
+          onPlaying={() => setVideoReady(true)}
         >
           <source src={homeHeroVideo.src} type="video/mp4" />
         </video>

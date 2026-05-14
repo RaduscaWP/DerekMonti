@@ -17,7 +17,27 @@ const initialFields = {
   email: '',
   phone: '',
   notes: '',
+  companyWebsite: '',
 };
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function validateQuote(fields) {
+  if (!fields.from.trim() || !fields.to.trim()) {
+    return 'Please add both origin and destination.';
+  }
+
+  if (!ISO_DATE_RE.test(fields.departure)) {
+    return 'Please choose a departure date.';
+  }
+
+  if (!EMAIL_RE.test(fields.email.trim())) {
+    return 'Please enter a valid email address, for example name@example.com.';
+  }
+
+  return '';
+}
 
 function Field({ icon: Icon, label, children, compact = false, wide = false }) {
   return (
@@ -37,6 +57,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
   const [fields, setFields] = useState(initialFields);
   const [status, setStatus] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [ticketMeta, setTicketMeta] = useState(null);
 
   const mailto = useMemo(() => getMailto(fields), [fields]);
   const whatsapp = useMemo(() => getWhatsappUrl(fields), [fields]);
@@ -50,11 +71,19 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
     setFields(initialFields);
     setStatus('idle');
     setErrorMsg('');
+    setTicketMeta(null);
   };
 
   const submit = async (event) => {
     event.preventDefault();
     if (status === 'submitting') return;
+
+    const validationError = validateQuote(fields);
+    if (validationError) {
+      setStatus('error');
+      setErrorMsg(validationError);
+      return;
+    }
 
     setStatus('submitting');
     setErrorMsg('');
@@ -70,10 +99,15 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
       if (!response.ok) {
         throw new Error(data.error || 'We could not send your boarding pass right now.');
       }
+      setTicketMeta({ reference: data.reference, issued: data.issued });
       setStatus('success');
     } catch (err) {
       setStatus('error');
-      setErrorMsg(err.message || 'Network error. Please try again.');
+      setErrorMsg(
+        err instanceof TypeError
+          ? 'The request service is not reachable from this page right now. Please use WhatsApp or email Derek directly.'
+          : err.message || 'Network error. Please try again.',
+      );
     }
   };
 
@@ -91,11 +125,16 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
             <CheckCircle2 size={32} strokeWidth={2.2} />
           </div>
           <div className="quote-success__copy">
-            <h3>Your boarding pass is on its way</h3>
+            <h3>Request received</h3>
             <p>
-              Check <strong>{fields.email}</strong> in a moment — Derek's branded ticket has been sent and
-              he&rsquo;ll personally reply with options within hours.
+              Reference <strong>{ticketMeta?.reference || 'DM request'}</strong> has been sent to{' '}
+              <strong>{fields.email}</strong>. Derek will audit the route, cabin, fare rules, and private availability
+              before replying with options.
             </p>
+            <div className="quote-success__meta">
+              <span>Next step</span>
+              <strong>Derek replies personally within hours.</strong>
+            </div>
             <button type="button" className="quote-success__reset" onClick={reset}>
               Send another request
             </button>
@@ -107,6 +146,19 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
 
   return (
     <form className={`quote-form quote-form--${variant}`} onSubmit={submit} noValidate>
+      <div className="quote-form__honeypot" aria-hidden="true">
+        <label>
+          Company website
+          <input
+            name="companyWebsite"
+            value={fields.companyWebsite}
+            onChange={update}
+            tabIndex={-1}
+            autoComplete="off"
+            maxLength={120}
+          />
+        </label>
+      </div>
       <div className="quote-form__tabs" role="tablist" aria-label="Trip type">
         {['Round trip', 'One way'].map((type) => (
           <button
@@ -123,15 +175,15 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
       <div className="quote-form__grid">
         {full && (
           <Field label="Name">
-            <input name="name" value={fields.name} onChange={update} placeholder="Your name" />
+            <input name="name" value={fields.name} onChange={update} placeholder="Your name" maxLength={80} />
           </Field>
         )}
 
         <Field icon={Plane} label="From" compact={!full}>
-          <input name="from" value={fields.from} onChange={update} placeholder="Flying from?" />
+          <input name="from" value={fields.from} onChange={update} placeholder="Flying from?" maxLength={80} />
         </Field>
         <Field icon={MapPin} label="To" compact={!full}>
-          <input name="to" value={fields.to} onChange={update} placeholder="Where to?" />
+          <input name="to" value={fields.to} onChange={update} placeholder="Where to?" maxLength={80} />
         </Field>
         <Field icon={CalendarDays} label="Departure" compact={!full}>
           <DatePicker name="departure" value={fields.departure} onChange={update} ariaLabel="Departure date" />
@@ -159,6 +211,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
             placeholder="you@gmail.com"
             required
             autoComplete="email"
+            maxLength={120}
           />
         </Field>
 
@@ -174,7 +227,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
               />
             </Field>
             <Field label="Phone / WhatsApp">
-              <input name="phone" value={fields.phone} onChange={update} placeholder="+1 ..." />
+              <input name="phone" value={fields.phone} onChange={update} placeholder="+1 ..." maxLength={40} />
             </Field>
             <Field label="Notes" wide>
               <textarea
@@ -183,6 +236,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
                 onChange={update}
                 placeholder="Airline preference, budget, timing, or anything Derek should know."
                 rows={4}
+                maxLength={600}
               />
             </Field>
           </>

@@ -36,7 +36,7 @@ const ENTRIES = [
   ['AMS', 'Amsterdam'],
   ['MAD', 'Madrid'],
   ['BCN', 'Barcelona'],
-  ['FCO', 'Rome'],
+  ['FCO', 'Rome', 'roma'],
   ['MXP', 'Milan'],
   ['MUC', 'Munich'],
   ['ZRH', 'Zurich', 'zürich'],

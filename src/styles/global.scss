@@ -52,12 +52,15 @@ h2,
 h3 {
   font-family: $font-display;
   letter-spacing: 0;
-  line-height: 0.96;
+  line-height: 0.98;
   margin: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
 
 p {
   margin: 0;
+  overflow-wrap: break-word;
 }
 
 .btn {
@@ -118,7 +121,7 @@ p {
 }
 
 .btn--sm {
-  min-height: 38px;
+  min-height: 44px;
   padding: 0.65rem 0.95rem;
   font-size: 0.76rem;
 }
@@ -231,7 +234,8 @@ p {
 .navbar__brand,
 .footer__logo {
   display: inline-flex;
-  align-items: baseline;
+  min-height: 44px;
+  align-items: center;
   gap: 0.32rem;
   font-family: $font-display;
   font-size: clamp(1.35rem, 2vw, 1.8rem);
@@ -258,6 +262,11 @@ p {
 
   a {
     position: relative;
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
     padding: 0.25rem 0;
     color: rgba(255, 255, 255, 0.82);
     transition: color 0.2s ease;
@@ -361,6 +370,9 @@ p {
   }
 
   nav a {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
     font-family: $font-display;
     font-size: clamp(2rem, 10vw, 4rem);
     font-weight: 700;
@@ -369,6 +381,9 @@ p {
 }
 
 .mobile-menu__phone {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   color: $color-text-muted;
   font-size: 1.2rem;
 }
@@ -402,6 +417,13 @@ p {
 
 .hero__video {
   background: $color-bg-dark;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease;
+}
+
+.hero__video--ready {
+  opacity: 1;
 }
 
 .hero__overlay {
@@ -497,6 +519,7 @@ p {
   padding: 0.2rem 0.4rem 0.45rem;
 
   button {
+    min-height: 44px;
     border-radius: 8px;
     padding: 0.42rem 0.82rem;
     color: $color-text-secondary;
@@ -510,6 +533,25 @@ p {
       color: white;
       background: $color-accent;
     }
+  }
+}
+
+.quote-form__honeypot {
+  position: absolute;
+  top: 0;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  input {
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    padding: 0;
   }
 }
 
@@ -533,6 +575,7 @@ p {
   select,
   textarea {
     width: 100%;
+    min-height: 44px;
     min-width: 0;
     border: 0;
     outline: 0;
@@ -544,6 +587,27 @@ p {
   input::placeholder,
   textarea::placeholder {
     color: rgba(74, 85, 104, 0.68);
+  }
+}
+
+.quote-success__meta {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid $color-accent;
+  background: rgba(138, 25, 79, 0.08);
+
+  span {
+    @include label;
+    margin: 0;
+    color: $color-accent;
+    font-size: 0.62rem;
+  }
+
+  strong {
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 }
 
@@ -632,6 +696,7 @@ p {
 
 .quote-success__reset {
   margin-top: 0.65rem;
+  min-height: 44px;
   padding: 0;
   border: 0;
   color: $color-accent;
@@ -689,7 +754,7 @@ p {
 .custom-select__button {
   display: flex;
   width: 100%;
-  min-height: 28px;
+  min-height: 44px;
   align-items: center;
   justify-content: space-between;
   gap: 0.7rem;
@@ -726,7 +791,7 @@ p {
 .date-picker__button {
   display: flex;
   width: 100%;
-  min-height: 28px;
+  min-height: 44px;
   align-items: center;
   justify-content: space-between;
   gap: 0.7rem;
@@ -766,7 +831,7 @@ p {
   top: calc(100% + 0.72rem);
   right: 0;
   z-index: 70;
-  width: 340px;
+  width: 370px;
   padding: 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
@@ -797,8 +862,8 @@ p {
 
   button {
     display: grid;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     place-items: center;
     border-radius: 8px;
     color: rgba(255, 255, 255, 0.72);
@@ -843,6 +908,7 @@ p {
   button {
     display: grid;
     aspect-ratio: 1;
+    min-height: 44px;
     min-width: 0;
     place-items: center;
     border: 1px solid transparent;
@@ -891,6 +957,7 @@ p {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    min-height: 44px;
     border-radius: 8px;
     padding: 0.5rem 0.65rem;
     color: rgba(255, 255, 255, 0.76);
@@ -930,7 +997,7 @@ p {
     align-items: center;
     justify-content: space-between;
     gap: 0.8rem;
-    min-height: 42px;
+    min-height: 44px;
     padding: 0.65rem 0.75rem;
     border-radius: 7px;
     color: $color-text-primary;
@@ -1281,10 +1348,12 @@ p {
   position: relative;
   scroll-snap-align: start;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(8, 16, 26, 0.55);
   border-radius: 8px;
   background: #fbfbfc;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  box-shadow:
+    0 24px 58px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
   transition:
     transform 0.35s $ease-smooth,
     box-shadow 0.35s $ease-smooth;
@@ -1478,11 +1547,6 @@ p {
   box-shadow: 0 -12px 22px rgba(11, 25, 41, 0.06);
 }
 
-.route-card--open .route-card__stub {
-  transform: translateY(8px) rotate(-0.7deg);
-  box-shadow: 0 16px 34px rgba(11, 25, 41, 0.1);
-}
-
 .route-card__notch {
   position: absolute;
   top: -11px;
@@ -1551,126 +1615,6 @@ p {
   border-top: 1px solid rgba(11, 25, 41, 0.08);
   color: $color-text-secondary;
   font-size: 0.78rem;
-}
-
-.route-card__tear {
-  display: flex;
-  width: 100%;
-  min-height: 42px;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-  border: 1px solid rgba(138, 25, 79, 0.16);
-  border-radius: 6px;
-  padding: 0.65rem 0.75rem;
-  color: $color-accent;
-  background: rgba(138, 25, 79, 0.045);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.07em;
-  line-height: 1;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    color 0.22s ease,
-    background 0.22s ease,
-    border-color 0.22s ease;
-
-  svg {
-    flex: 0 0 auto;
-    transition: transform 0.28s $ease-smooth;
-  }
-
-  &:hover,
-  &:focus-visible {
-    color: white;
-    border-color: $color-accent;
-    background: $color-accent;
-    outline: 0;
-  }
-}
-
-.route-card--open .route-card__tear svg {
-  transform: rotate(180deg);
-}
-
-.route-card__advisor {
-  position: relative;
-  z-index: 1;
-  max-height: 0;
-  overflow: hidden;
-  padding: 0 1.2rem;
-  color: $color-text-primary;
-  background:
-    linear-gradient(180deg, rgba(138, 25, 79, 0.08), rgba(255, 255, 255, 0) 34%),
-    #ffffff;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition:
-    max-height 0.38s $ease-smooth,
-    padding 0.38s $ease-smooth,
-    opacity 0.25s ease,
-    transform 0.38s $ease-smooth;
-
-  > span {
-    color: $color-accent;
-    font-size: 0.66rem;
-    font-weight: 900;
-    letter-spacing: 0.12em;
-    line-height: 1;
-    text-transform: uppercase;
-  }
-
-  h4 {
-    margin-top: 0.38rem;
-    color: $color-text-primary;
-    font-size: 1.02rem;
-    line-height: 1.08;
-  }
-
-  ul {
-    display: grid;
-    gap: 0.42rem;
-    margin: 0.75rem 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  li {
-    position: relative;
-    padding-left: 1rem;
-    color: $color-text-secondary;
-    font-size: 0.82rem;
-    line-height: 1.35;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0.55em;
-      left: 0;
-      width: 5px;
-      height: 5px;
-      border-radius: 999px;
-      background: $color-accent;
-    }
-  }
-
-  small {
-    display: block;
-    margin-top: 0.8rem;
-    border-top: 1px dashed rgba(11, 25, 41, 0.13);
-    padding-top: 0.72rem;
-    color: $color-text-primary;
-    font-weight: 800;
-  }
-}
-
-.route-card--open .route-card__advisor {
-  max-height: 380px;
-  padding: 1.2rem 1.2rem 1.25rem;
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .savings-section__fineprint {
@@ -3581,6 +3525,7 @@ p {
 
 .article-hero__back {
   display: inline-flex;
+  min-height: 44px;
   align-items: center;
   gap: 0.45rem;
   margin-bottom: 1.4rem;
@@ -3851,7 +3796,7 @@ p {
   .date-picker__panel {
     right: auto;
     left: 0;
-    width: min(340px, calc(100vw - 2.4rem));
+    width: min(370px, calc(100vw - 2.4rem));
   }
 
   .quote-form--hero .date-picker__panel {

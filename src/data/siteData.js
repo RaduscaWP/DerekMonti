@@ -15,10 +15,10 @@ export const contactConfig = {
 export const imagery = {
   hero: dealImage('5645180', 2400),
   servicesHero: dealImage('23522837', 2400),
-  aboutHero: image('photo-1569154941061-e231b4725ef1', 2400),
-  cabin: image('photo-1540339832862-474599807836', 1800),
-  concierge: image('photo-1551836022-d5d88e9218df', 1400),
-  lounge: image('photo-1519671482749-fd09be7ccebf', 1400),
+  aboutHero: dealImage('23522837', 2400),
+  cabin: dealImage('11757933', 1800),
+  concierge: dealImage('5645180', 1400),
+  lounge: dealImage('11757933', 1400),
 };
 
 export const homeHeroVideo = {
@@ -398,7 +398,7 @@ export const reviews = [
 
 export const homeFaqs = [
   {
-    question: 'How does Derek find lower business class fares?',
+    question: 'How does Derek find lower premium cabin fares?',
     answer:
       'Derek searches consolidator fare channels, unpublished fare classes, and flexible routing options that are not always visible on public booking engines.',
   },
@@ -503,7 +503,7 @@ export const blogPosts = [
     date: 'May 5, 2026',
     readTime: '15 min read',
     excerpt: 'The public fare is only one version of the market. Here is why premium cabin pricing moves differently.',
-    image: image('photo-1500530855697-b586d89ba3ee', 1100),
+    image: dealImage('5645180', 1100),
     body: [
       {
         heading: 'Public prices are not the whole market',
@@ -526,7 +526,7 @@ export const blogPosts = [
     date: 'May 2, 2026',
     readTime: '11 min read',
     excerpt: 'Comfort begins before boarding. Better booking support can change the entire trip.',
-    image: image('photo-1519671482749-fd09be7ccebf', 1100),
+    image: dealImage('11757933', 1100),
     body: [
       {
         heading: 'The seat is only one layer',
@@ -545,7 +545,7 @@ export const blogPosts = [
     date: 'April 27, 2026',
     readTime: '9 min read',
     excerpt: 'Unpublished options are not magic. They come from fare access, timing, routing, and experience.',
-    image: image('photo-1529074963764-98f45c47344b', 1100),
+    image: dealImage('23522837', 1100),
     body: [
       {
         heading: 'Hidden does not mean risky',
@@ -564,7 +564,7 @@ export const blogPosts = [
     date: 'April 21, 2026',
     readTime: '13 min read',
     excerpt: 'Two iconic premium routes, very different expectations. Here is how to think about the value.',
-    image: image('photo-1540959733332-eab4deabeeaf', 1100),
+    image: dealImage('2506923', 1100),
     body: [
       {
         heading: 'Value depends on the whole routing',
@@ -583,7 +583,7 @@ export const blogPosts = [
     date: 'April 18, 2026',
     readTime: '7 min read',
     excerpt: 'Sometimes yes, sometimes no. The answer depends on inventory, rules, and how fast you can decide.',
-    image: image('photo-1569154941061-e231b4725ef1', 1100),
+    image: dealImage('5645180', 1100),
     body: [
       {
         heading: 'Last minute does not always mean impossible',
@@ -602,7 +602,7 @@ export const blogPosts = [
     date: 'April 10, 2026',
     readTime: '10 min read',
     excerpt: 'Derek looks at seat, service, routing, lounge access, and fare value together.',
-    image: image('photo-1512453979798-5ea266f8880c', 1100),
+    image: dealImage('11757933', 1100),
     body: [
       {
         heading: 'A great airline still needs the right aircraft',
@@ -621,7 +621,7 @@ export const blogPosts = [
     date: 'April 4, 2026',
     readTime: '12 min read',
     excerpt: 'Private suites, service style, lounges, and fare access all matter.',
-    image: image('photo-1512453979798-5ea266f8880c', 1100),
+    image: dealImage('3787839', 1100),
     body: [
       {
         heading: 'The brand is only the beginning',
@@ -640,7 +640,7 @@ export const blogPosts = [
     date: 'March 29, 2026',
     readTime: '8 min read',
     excerpt: 'A simple explanation of the private fare channels behind many premium cabin savings.',
-    image: image('photo-1540339832862-474599807836', 1100),
+    image: dealImage('23522837', 1100),
     body: [
       {
         heading: 'Consolidator fares are relationship driven',

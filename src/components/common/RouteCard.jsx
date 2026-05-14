@@ -1,17 +1,6 @@
-import { useId, useState } from 'react';
-import { ArrowRight, ChevronDown } from 'lucide-react';
-
-const fallbackAdvisorNote = {
-  title: 'What Derek checks',
-  points: ['Aircraft and cabin quality', 'Fare rules before ticketing', 'Cleaner routing alternatives'],
-  cta: 'Ask Derek to audit this route',
-};
+import { ArrowRight } from 'lucide-react';
 
 export default function RouteCard({ deal }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const noteId = useId();
-  const advisorNote = deal.advisorNote || fallbackAdvisorNote;
-
   const handleMove = (event) => {
     const card = event.currentTarget;
     if (window.innerWidth < 900) return;
@@ -29,7 +18,7 @@ export default function RouteCard({ deal }) {
 
   return (
     <article
-      className={`route-card ${isOpen ? 'route-card--open' : ''}`}
+      className="route-card"
       onMouseMove={handleMove}
       onMouseLeave={reset}
       onBlur={reset}
@@ -87,26 +76,6 @@ export default function RouteCard({ deal }) {
           </div>
         </div>
         <p className="route-card__note">{deal.note}</p>
-        <button
-          className="route-card__tear"
-          type="button"
-          aria-expanded={isOpen}
-          aria-controls={noteId}
-          onClick={() => setIsOpen((current) => !current)}
-        >
-          <span>{isOpen ? "Hide Derek's note" : "Open Derek's note"}</span>
-          <ChevronDown aria-hidden="true" size={17} strokeWidth={2.1} />
-        </button>
-      </div>
-      <div className="route-card__advisor" id={noteId} aria-hidden={!isOpen}>
-        <span>Derek's notes</span>
-        <h4>{advisorNote.title}</h4>
-        <ul>
-          {advisorNote.points.map((point) => (
-            <li key={point}>{point}</li>
-          ))}
-        </ul>
-        <small>{advisorNote.cta}</small>
       </div>
     </article>
   );
