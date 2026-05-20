@@ -26,6 +26,7 @@ import {
   blogPosts,
   contactConfig,
   extraServices,
+  imagery,
   homeHeroVideo,
   homeFaqs,
   methodology,
@@ -423,8 +424,15 @@ function BioTeaser() {
           <Button href="#contact">Contact Derek</Button>
         </div>
         <div className="bio-teaser__portrait" data-reveal>
-          <div className="portrait-placeholder">
-            <span>DM</span>
+          <div className="derek-portrait">
+            <img
+              src={imagery.derekPortrait}
+              alt="Derek Monti smiling in a navy blazer"
+              loading="lazy"
+              decoding="async"
+              width="1122"
+              height="1402"
+            />
           </div>
         </div>
         <div className="bio-teaser__support" data-reveal>

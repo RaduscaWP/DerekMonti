@@ -16,6 +16,7 @@ export const imagery = {
   hero: dealImage('5645180', 2400),
   servicesHero: dealImage('23522837', 2400),
   aboutHero: dealImage('23522837', 2400),
+  derekPortrait: '/images/derek-monti.jpg',
   cabin: dealImage('11757933', 1800),
   concierge: dealImage('5645180', 1400),
   lounge: dealImage('11757933', 1400),

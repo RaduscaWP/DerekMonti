@@ -453,10 +453,10 @@ p {
 
 .hero__title {
   display: grid;
-  max-width: 780px;
-  font-size: clamp(3.6rem, 10vw, 8rem);
-  font-weight: 800;
-  line-height: 0.82;
+  max-width: 560px;
+  font-size: clamp(2.8rem, 6vw, 5.1rem);
+  font-weight: 700;
+  line-height: 0.92;
 
   .line {
     display: block;
@@ -2434,7 +2434,7 @@ p {
   }
 }
 
-.portrait-placeholder {
+.derek-portrait {
   position: relative;
   display: grid;
   min-height: 430px;
@@ -2451,20 +2451,38 @@ p {
     content: '';
     position: absolute;
     inset: 1rem;
+    z-index: 2;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
+    pointer-events: none;
   }
 
-  span {
-    position: relative;
-    font-family: $font-display;
-    font-size: clamp(4rem, 10vw, 7rem);
-    font-weight: 800;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(8, 16, 26, 0) 48%, rgba(8, 16, 26, 0.2) 100%);
+    pointer-events: none;
+  }
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 36%;
+    transform: scale(1.01);
   }
 }
 
-.portrait-placeholder--large {
+.derek-portrait--large {
   min-height: 620px;
+
+  img {
+    object-position: 50% 34%;
+  }
 }
 
 .steps {
@@ -3774,7 +3792,7 @@ p {
   }
 
   .hero__title {
-    font-size: clamp(3.4rem, 17vw, 6rem);
+    font-size: clamp(2.7rem, 12vw, 4.1rem);
   }
 
   .quote-form--hero {
@@ -4042,7 +4060,7 @@ p {
     border-radius: 12px;
   }
 
-  .portrait-placeholder {
+  .derek-portrait {
     min-height: 360px;
   }
 

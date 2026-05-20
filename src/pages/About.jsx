@@ -34,8 +34,15 @@ export default function About() {
       <section className="about-bio">
         <div className="container about-bio__inner">
           <div className="about-bio__portrait" data-reveal>
-            <div className="portrait-placeholder portrait-placeholder--large">
-              <span>DM</span>
+            <div className="derek-portrait derek-portrait--large">
+              <img
+                src={imagery.derekPortrait}
+                alt="Derek Monti smiling in a navy blazer"
+                loading="lazy"
+                decoding="async"
+                width="1122"
+                height="1402"
+              />
             </div>
           </div>
           <div className="about-bio__copy" data-reveal>
