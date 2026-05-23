@@ -13,11 +13,17 @@ function loadDotEnv() {
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
       const value = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
-      if (key && !(key in process.env)) process.env[key] = value;
+      const existing = process.env[key];
+      if (key && (existing === undefined || existing === '')) {
+        process.env[key] = value;
+      }
     }
   } catch {
     // .env is optional in dev
   }
+  const key = process.env.RESEND_API_KEY;
+  const masked = key ? `${key.slice(0, 5)}...${key.slice(-4)}` : 'NOT SET';
+  console.log('[vercel-api-dev] RESEND_API_KEY:', masked);
 }
 
 function vercelApiDev() {
