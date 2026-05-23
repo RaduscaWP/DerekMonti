@@ -7,8 +7,8 @@ export default function RouteCard({ deal }) {
     const rect = card.getBoundingClientRect();
     const x = event.clientX - rect.left - rect.width / 2;
     const y = event.clientY - rect.top - rect.height / 2;
-    const rotateX = Math.max(Math.min(-y * 0.01, 5), -5);
-    const rotateY = Math.max(Math.min(x * 0.01, 5), -5);
+    const rotateX = Math.max(Math.min(-y * 0.015, 8), -8);
+    const rotateY = Math.max(Math.min(x * 0.015, 8), -8);
     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
   };
 
@@ -22,12 +22,12 @@ export default function RouteCard({ deal }) {
       onMouseMove={handleMove}
       onMouseLeave={reset}
       onBlur={reset}
-      aria-label={`${deal.from} to ${deal.to} premium fare example`}
+      aria-label={`${deal.from} to ${deal.to} business and first class fare example`}
       data-reveal
     >
       <div className="route-card__ticket-head">
         <div className="route-card__image">
-          <img src={deal.image} alt={`${deal.to} premium travel`} loading="lazy" />
+          <img src={deal.image} alt={`${deal.to} business and first class travel`} loading="lazy" />
         </div>
         <span className="route-card__stamp">{deal.savings}</span>
       </div>

@@ -23,7 +23,7 @@ export const imagery = {
 };
 
 export const homeHeroVideo = {
-  src: 'https://videos.pexels.com/video-files/29053716/12559029_2336_1080_30fps.mp4',
+  src: '/videos/hero-flight.mp4',
   poster: imagery.hero,
   alt: 'Aircraft wing flying above clouds',
 };
@@ -196,7 +196,7 @@ export const routeDeals = [
     derek: '$7,200',
     savings: 'Saved up to 42%',
     flexibleWindow: '+/- 6 days',
-    note: 'Premium cabin sample',
+    note: 'Business and first class sample',
     image: dealImage('777059'),
     advisorNote: {
       title: 'First class needs extra scrutiny',
@@ -254,7 +254,7 @@ export const serviceDeals = [
 export const whyDerek = [
   {
     title: 'Exclusive Deals',
-    body: 'Derek accesses insider fares through consolidator partners, often 15-60% below published premium cabin pricing.',
+    body: 'Derek accesses insider fares through consolidator partners, often 15-60% below published business and first class pricing.',
   },
   {
     title: 'Last Minute Bookings',
@@ -310,7 +310,7 @@ export const extraServices = [
     label: 'Private fare logic',
     storyLabel: 'Traveler finds a fare',
     title: 'Private Fare Playbook',
-    activeSummary: 'Derek turns a confusing premium fare search into a clear decision path.',
+    activeSummary: 'Derek turns a confusing business and first class fare search into a clear decision path.',
     body:
       'Derek explains date windows, airline tradeoffs, routing choices, and fare rules before you spend time searching or committing.',
     outcome: 'Best for travelers who want the strategy behind the quote.',
@@ -323,7 +323,7 @@ export const extraServices = [
     activeSummary: 'Send the option you found and Derek checks whether it is truly worth booking.',
     body:
       'Send Derek an option you found online. He checks the aircraft, cabin quality, connection risk, ticket rules, and better alternatives.',
-    outcome: 'Useful before paying for a premium fare that may not feel premium.',
+    outcome: 'Useful before paying for a business or first class fare that may not match the experience.',
     checklist: ['Aircraft and seat quality', 'Connection risk and timing', 'Cleaner alternatives if the fare is weak'],
   },
   {
@@ -341,7 +341,7 @@ export const extraServices = [
 export const methodology = [
   {
     title: 'Published Fare',
-    body: 'A snapshot of publicly available premium cabin fares for comparable dates and routings.',
+    body: 'A snapshot of publicly available business and first class fares for comparable dates and routings.',
   },
   {
     title: "Derek's Fare",
@@ -399,7 +399,7 @@ export const reviews = [
 
 export const homeFaqs = [
   {
-    question: 'How does Derek find lower premium cabin fares?',
+    question: 'How does Derek find lower business and first class fares?',
     answer:
       'Derek searches consolidator fare channels, unpublished fare classes, and flexible routing options that are not always visible on public booking engines.',
   },
@@ -417,6 +417,11 @@ export const homeFaqs = [
     question: 'How quickly will I receive options?',
     answer:
       'Most quote requests receive an initial response within hours. Urgent requests should be sent through WhatsApp.',
+  },
+  {
+    question: 'Why do I need to provide a phone number?',
+    answer:
+      'Derek uses your phone number only to clarify trip details or send time-sensitive quote updates. Your request can still be handled by email when preferred.',
   },
 ];
 

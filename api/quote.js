@@ -12,6 +12,7 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 8;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const PHONE_ALLOWED_RE = /^[+()\d\s.-]+$/;
 
 const rateBuckets = globalThis.__derekQuoteRateBuckets || new Map();
 globalThis.__derekQuoteRateBuckets = rateBuckets;
@@ -59,6 +60,12 @@ function cleanText(value, max, { multiline = false } = {}) {
   return text.slice(0, max);
 }
 
+function isValidPhone(value) {
+  const trimmed = String(value || '').trim();
+  const digits = trimmed.replace(/\D/g, '');
+  return trimmed.length > 0 && PHONE_ALLOWED_RE.test(trimmed) && digits.length >= 7 && digits.length <= 20;
+}
+
 function normalizeFields(raw) {
   const tripType = raw.tripType === 'One way' ? 'One way' : 'Round trip';
 
@@ -74,6 +81,8 @@ function normalizeFields(raw) {
     email: cleanText(raw.email, 120).toLowerCase(),
     phone: cleanText(raw.phone, 40),
     notes: cleanText(raw.notes, 600, { multiline: true }),
+    source: cleanText(raw.source, 80),
+    requestTitle: cleanText(raw.requestTitle, 120) || 'Business & First Class Flight Quote Request',
     companyWebsite: cleanText(raw.companyWebsite || raw.website || raw.url, 120),
   };
 }
@@ -87,6 +96,14 @@ function validateFields(fields) {
     return 'Please fill in From, To, and Departure date.';
   }
 
+  if (fields.source === 'Home Page quote form' && !isValidPhone(fields.phone)) {
+    return 'Please enter a valid phone number so Derek can follow up quickly.';
+  }
+
+  if (fields.phone && !isValidPhone(fields.phone)) {
+    return 'Please provide a valid phone number.';
+  }
+
   if (fields.tripType !== 'One way' && fields.returnDate && !ISO_DATE_RE.test(fields.returnDate)) {
     return 'Please use a valid return date.';
   }
@@ -96,8 +113,10 @@ function validateFields(fields) {
 
 function buildPlainSummary(fields, meta) {
   const lines = [
-    `New premium flight quote request - ${meta.reference}`,
+    `${fields.requestTitle || 'Business & First Class Flight Quote Request'} - ${meta.reference}`,
     `Issued: ${meta.issued}`,
+    meta.submittedAt ? `Timestamp: ${meta.submittedAt}` : null,
+    fields.source ? `Source: ${fields.source}` : null,
     '',
     `Trip type:   ${fields.tripType}`,
     `From:        ${fields.from || 'Not provided'}`,
@@ -186,7 +205,7 @@ export default async function handler(req, res) {
   }
 
   const fields = normalizeFields(rawFields || {});
-  const meta = { reference: generateReference(), issued: todayFormatted() };
+  const meta = { reference: generateReference(), issued: todayFormatted(), submittedAt: new Date().toISOString() };
 
   if (fields.companyWebsite) {
     return res.status(200).json({ ok: true, reference: meta.reference, issued: meta.issued });
@@ -223,7 +242,9 @@ export default async function handler(req, res) {
         from: FROM_ADDRESS,
         to: [DEREK_EMAIL],
         replyTo: fields.email,
-        subject: `Quote ${meta.reference} - ${fields.from} to ${fields.to}${fields.name ? ` (${fields.name})` : ''}`,
+        subject: `Business & First Class Quote ${meta.reference} - ${fields.from} to ${fields.to}${
+          fields.name ? ` (${fields.name})` : ''
+        }`,
         text: plain,
       }),
     ]);

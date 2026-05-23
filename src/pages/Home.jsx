@@ -18,7 +18,6 @@ import Button from '../components/common/Button.jsx';
 import FaqAccordion from '../components/common/FaqAccordion.jsx';
 import FinalCta from '../components/common/FinalCta.jsx';
 import QuoteForm from '../components/common/QuoteForm.jsx';
-import ReviewCard from '../components/common/ReviewCard.jsx';
 import RouteCarousel from '../components/common/RouteCarousel.jsx';
 import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
@@ -30,7 +29,6 @@ import {
   homeHeroVideo,
   homeFaqs,
   methodology,
-  reviews,
   routeDeals,
   siteBackdrops,
   steps,
@@ -42,6 +40,8 @@ import { initParticles } from '../utils/threeParticles.js';
 
 const reasonIcons = [CircleDollarSign, CalendarClock, Route, ConciergeBell, Headphones, BadgeCheck];
 const stepIcons = [PlaneTakeoff, BriefcaseBusiness, Sparkles, Gem];
+const HOME_REQUEST_TITLE = 'Business & First Class Flight Quote Request';
+const HOME_REQUEST_SOURCE = 'Home Page quote form';
 
 function GoogleMark() {
   return (
@@ -108,7 +108,7 @@ const trustItems = [
     brand: <GoogleMark />,
     title: 'Google Reviews',
     value: '4.9 / 5',
-    body: 'Clients consistently rate Derek highly for premium service.',
+    body: 'Clients consistently rate Derek highly for business and first class service.',
     href: 'https://search.google.com/local/reviews',
     stars: true,
   },
@@ -116,7 +116,7 @@ const trustItems = [
     brand: <TrustpilotMark />,
     title: 'Trustpilot',
     value: 'Excellent',
-    body: 'Independent reviews for TravelBusinessClass service quality.',
+    body: 'Independent reviews reflect Derek\'s Business Class and First Class support.',
     href: contactConfig.trustpilotUrl,
     stars: true,
   },
@@ -131,10 +131,37 @@ const trustItems = [
     brand: <ArcMark />,
     title: 'ARC',
     value: 'Accredited Agency',
-    body: 'Secure, compliant ticketing through established premium travel channels.',
+    body: 'Secure, compliant ticketing through established business and first class travel channels.',
     href: 'https://www2.arccorp.com/',
   },
 ];
+
+const expectationCards = [
+  {
+    label: 'Business Class route audit',
+    title: 'A cleaner view of the fare',
+    body: 'Derek reviews aircraft, cabin quality, timing, and fare rules before recommending a Business Class option.',
+  },
+  {
+    label: 'First Class availability check',
+    title: 'Luxury only when it makes sense',
+    body: 'For First Class requests, Derek checks whether the product, route, and price justify the upgrade.',
+  },
+  {
+    label: 'Last-minute itinerary support',
+    title: 'A human follow-up path',
+    body: 'When timing matters, Derek can clarify details by phone or WhatsApp and keep the request moving.',
+  },
+];
+
+const homeBlogExcerpts = {
+  'why-travelers-overpay-business-class':
+    'The public fare is only one version of the Business Class market. Here is why cabin pricing moves differently.',
+  'business-class-service-beyond-seat':
+    'Comfort begins before boarding. Better booking support can change the entire Business Class trip.',
+  'hidden-business-class-deals':
+    'Unpublished Business Class options come from fare access, timing, routing, and experience.',
+};
 
 function Hero() {
   const canvasRef = useRef(null);
@@ -162,6 +189,7 @@ function Hero() {
         .from('.hero__headline', { y: 22, opacity: 0, duration: 0.42, ease: 'power3.out' }, '-=0.32')
         .from('.hero__copy', { y: 20, opacity: 0, duration: 0.42, ease: 'power3.out' }, '-=0.28')
         .from('.hero__airlines', { y: 16, opacity: 0, duration: 0.36, ease: 'power3.out' }, '-=0.22')
+        .from('.hero__advisor-card', { y: 28, opacity: 0, duration: 0.52, ease: 'power3.out' }, '-=0.2')
         .from('.hero .quote-form', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.22')
         .from('.hero__proof', { opacity: 0, duration: 0.35 }, '-=0.16');
     }, heroRef);
@@ -175,23 +203,68 @@ function Hero() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     setVideoReady(false);
     setVideoUsable(true);
 
     if (!showVideo) return undefined;
 
-    const timer = window.setTimeout(() => {
-      const video = videoRef.current;
-      if (!video || video.readyState < 2 || video.paused) {
+    const video = videoRef.current;
+    if (!video) return undefined;
+
+    video.muted = true;
+    video.playsInline = true;
+
+    const startPlayback = async () => {
+      try {
+        await video.play();
+        if (!cancelled && video.readyState >= 2) {
+          setVideoReady(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setVideoReady(false);
+        }
+      }
+    };
+
+    const loadTimer = window.setTimeout(() => {
+      if (!cancelled && video.readyState === 0) {
         setVideoUsable(false);
       }
-    }, 5000);
+    }, 9000);
 
-    return () => window.clearTimeout(timer);
+    void startPlayback();
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(loadTimer);
+    };
   }, [showVideo]);
 
   const activateVideo = () => {
+    const video = videoRef.current;
+    if (!video || video.paused || video.readyState < 2) return;
     setVideoReady(true);
+  };
+
+  const requestVideoPlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    void video
+      .play()
+      .then(() => {
+        if (video.readyState >= 2) {
+          setVideoReady(true);
+        }
+      })
+      .catch(() => setVideoReady(false));
+  };
+
+  const disableVideo = () => {
+    setVideoReady(false);
+    setVideoUsable(false);
   };
 
   return (
@@ -205,12 +278,14 @@ function Hero() {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           poster={homeHeroVideo.poster}
           aria-hidden="true"
-          onError={() => setVideoUsable(false)}
-          onLoadedData={activateVideo}
-          onPlaying={() => setVideoReady(true)}
+          onCanPlay={requestVideoPlayback}
+          onError={disableVideo}
+          onLoadedData={requestVideoPlayback}
+          onPlaying={activateVideo}
+          onStalled={() => setVideoReady(false)}
         >
           <source src={homeHeroVideo.src} type="video/mp4" />
         </video>
@@ -218,25 +293,53 @@ function Hero() {
       <div className="hero__overlay" />
       <canvas className="hero__particles" ref={canvasRef} aria-hidden="true" />
       <div className="hero__content">
-        <p className="hero__eyebrow">Personal Aviation Advisor</p>
-        <h1 className="hero__title">
-          <span className="line">Derek</span>
-          <span className="line">Monti</span>
-        </h1>
-        <p className="hero__headline">Business Class. Remarkable Prices.</p>
-        <p className="hero__copy">
-          Premium seats sourced personally by Derek - private fare access, calmer support, and quotes within hours.
-        </p>
-        <div className="hero__airlines">
-          <span>Flying with</span>
-          <b>Qatar</b>
-          <b>Emirates</b>
-          <b>Turkish</b>
-          <b>Singapore</b>
-          <b>Cathay Pacific</b>
+        <div className="hero__layout">
+          <div className="hero__intro">
+            <p className="hero__eyebrow">Personal Aviation Advisor</p>
+            <h1 className="hero__title">
+              <span className="line">Derek</span>
+              <span className="line">Monti</span>
+            </h1>
+            <p className="hero__headline">Business Class. Remarkable Prices.</p>
+            <p className="hero__copy">
+              Business and first class seats sourced personally by Derek - private fare access, calmer support, and
+              quotes within hours.
+            </p>
+            <div className="hero__airlines">
+              <span>Flying with</span>
+              <b>Qatar</b>
+              <b>Emirates</b>
+              <b>Turkish</b>
+              <b>Singapore</b>
+              <b>Cathay Pacific</b>
+            </div>
+          </div>
+
+          <aside className="hero__advisor-card" aria-label="Derek Monti advisor profile">
+            <div className="hero__advisor-image">
+              <img
+                src={imagery.derekPortrait}
+                alt="Derek Monti smiling in a navy blazer"
+                loading="eager"
+                decoding="async"
+                width="1122"
+                height="1402"
+              />
+            </div>
+            <div className="hero__advisor-meta">
+              <span>Personal Aviation Advisor</span>
+              <strong>Derek Monti</strong>
+              <p>Business & First Class Fare Specialist</p>
+            </div>
+          </aside>
+
+          <div className="hero__form-panel">
+            <QuoteForm requirePhone source={HOME_REQUEST_SOURCE} requestTitle={HOME_REQUEST_TITLE} />
+            <p className="hero__proof">
+              Sample route scenarios show meaningful savings versus public Business Class and First Class fares.
+            </p>
+          </div>
         </div>
-        <QuoteForm />
-        <p className="hero__proof">Last month Derek's clients saved an average of $1,800 per ticket.</p>
       </div>
     </section>
   );
@@ -278,7 +381,7 @@ function Methodology() {
           <h2>Fare method, not guesswork.</h2>
           <p>
             Derek compares the public fare, private quote channels, aircraft quality, ticket rules, and date flexibility
-            before recommending the cleanest premium itinerary.
+            before recommending the cleanest business and first class itinerary.
           </p>
         </div>
         <aside className="methodology__ticket" aria-label="Example fare audit" data-reveal>
@@ -334,12 +437,12 @@ function WhyDerek() {
         <SectionHeader
           eyebrow="Six Good Reasons"
           title="Book With Derek"
-          text="A premium fare is only useful if the service around it is equally considered."
+          text="Business and first class fares are only useful when the service around them is equally considered."
         />
         <div className="why-showcase">
           <aside className="why-showcase__brief" data-reveal>
             <p className="eyebrow">Derek's Difference</p>
-            <h3>Premium fares deserve a human eye.</h3>
+            <h3>Business class fares deserve a human eye.</h3>
             <p>
               Derek checks the fare, aircraft, routing, rules, and support path before you commit. The result feels
               less like searching and more like having someone in your corner.
@@ -347,7 +450,7 @@ function WhyDerek() {
             <div className="why-showcase__metrics" aria-label="Derek Monti service highlights">
               <div>
                 <strong>15-60%</strong>
-                <span>premium cabin savings</span>
+                <span>business and first class savings</span>
               </div>
               <div>
                 <strong>24/7</strong>
@@ -419,7 +522,7 @@ function BioTeaser() {
           <h2>Derek places every client at the center of his attention.</h2>
           <p>
             You get a personal travel advisor entirely dedicated to understanding your needs, building long-term
-            relationships, and finding the highest value for each premium journey.
+            relationships, and finding the highest value for each business and first class journey.
           </p>
           <Button href="#contact">Contact Derek</Button>
         </div>
@@ -482,13 +585,17 @@ function Testimonials() {
     <section className="testimonials">
       <div className="container">
         <div className="testimonials__intro" data-reveal>
-          <p className="eyebrow">Social Proof</p>
-          <h2>97% of Travelers Recommend Derek Monti</h2>
-          <p>Review placeholders are ready to be replaced with Derek's real Trustpilot entries.</p>
+          <p className="eyebrow">Advisor Support</p>
+          <h2>What Travelers Can Expect From Derek</h2>
+          <p>Clear Business Class and First Class fare guidance before you commit to the ticket.</p>
         </div>
         <div className="review-grid">
-          {reviews.map((review) => (
-            <ReviewCard review={review} key={review.name} />
+          {expectationCards.map((item) => (
+            <article className="proof-card" key={item.title} data-reveal>
+              <span className="proof-card__label">{item.label}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
           ))}
         </div>
       </div>
@@ -503,7 +610,7 @@ function BlogPreview() {
         <SectionHeader
           eyebrow="Current Articles"
           title="Travel Smarter. Read Better."
-          text="Premium cabin strategy, destination guidance, and Derek's practical travel notes."
+          text="Business Class strategy, destination guidance, and Derek's practical travel notes."
         />
         <div className="blog-preview__grid">
           {blogPosts.slice(0, 3).map((post) => (
@@ -515,7 +622,7 @@ function BlogPreview() {
               <div className="blog-card__body">
                 <time>{post.date}</time>
                 <h3>{post.title}</h3>
-                <p>{post.excerpt}</p>
+                <p>{homeBlogExcerpts[post.slug] || post.excerpt}</p>
                 <small>{post.readTime}</small>
               </div>
             </Link>
@@ -537,14 +644,13 @@ export default function Home() {
   return (
     <div ref={pageRef}>
       <Hero />
-      <TrustBar />
       <section className="savings-section scenic-section scenic-section--savings">
         <ScenicBackdrop backdrop={siteBackdrops.homeSavings} />
         <div className="container">
           <SectionHeader
             eyebrow="Smart Savings"
             title="Save More. Fly Better."
-            text="By uncovering hidden fares and private offers, Derek makes premium travel more accessible without compromising comfort."
+            text="By uncovering hidden fares and private offers, Derek makes business and first class travel more accessible without compromising comfort."
             light
           />
           <RouteCarousel deals={routeDeals} />
@@ -556,6 +662,7 @@ export default function Home() {
       </section>
       <Methodology />
       <WhyDerek />
+      <TrustBar />
       <GuidanceTeaser />
       <BioTeaser />
       <HowItWorks />
@@ -568,7 +675,11 @@ export default function Home() {
       </section>
       <AirlineMarquee />
       <BlogPreview />
-      <FinalCta backdrop={siteBackdrops.homeFinalCta} />
+      <FinalCta
+        backdrop={siteBackdrops.homeFinalCta}
+        title="Ready to Fly Business Class for Less?"
+        text="Send Derek your Business Class or First Class travel details and receive curated options within hours."
+      />
     </div>
   );
 }

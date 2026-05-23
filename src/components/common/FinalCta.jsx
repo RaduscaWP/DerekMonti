@@ -27,7 +27,7 @@ export default function FinalCta({
         <h2>{title}</h2>
         <p>{text}</p>
         <div className="final-cta__actions">
-          <Button href={`mailto:${contactConfig.email}?subject=Premium%20flight%20quote%20request`}>
+          <Button href={`mailto:${contactConfig.email}?subject=Business%20%26%20First%20Class%20Flight%20Quote%20Request`}>
             Request a Quote
           </Button>
           <Button href={getWhatsappUrl()} variant="outline" icon={false}>

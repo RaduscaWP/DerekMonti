@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, Mail, MapPin, Plane, Search, Send, Users } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Mail, MapPin, Phone, Plane, Search, Send, Users } from 'lucide-react';
 import { getMailto, getWhatsappUrl } from '../../utils/message.js';
 import Button from './Button.jsx';
 import DatePicker from './DatePicker.jsx';
@@ -22,8 +22,15 @@ const initialFields = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const PHONE_ALLOWED_RE = /^[+()\d\s.-]+$/;
 
-function validateQuote(fields) {
+function isValidPhone(value) {
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/g, '');
+  return trimmed.length > 0 && PHONE_ALLOWED_RE.test(trimmed) && digits.length >= 7 && digits.length <= 20;
+}
+
+function validateQuote(fields, { requirePhone = false } = {}) {
   if (!fields.from.trim() || !fields.to.trim()) {
     return 'Please add both origin and destination.';
   }
@@ -34,6 +41,10 @@ function validateQuote(fields) {
 
   if (!EMAIL_RE.test(fields.email.trim())) {
     return 'Please enter a valid email address, for example name@example.com.';
+  }
+
+  if (requirePhone && !isValidPhone(fields.phone)) {
+    return 'Please enter a valid phone number so Derek can follow up quickly.';
   }
 
   return '';
@@ -53,14 +64,28 @@ function Field({ icon: Icon, label, children, compact = false, wide = false }) {
   );
 }
 
-export default function QuoteForm({ variant = 'hero', full = false }) {
+export default function QuoteForm({
+  variant = 'hero',
+  full = false,
+  requirePhone = false,
+  source = '',
+  requestTitle = '',
+}) {
   const [fields, setFields] = useState(initialFields);
   const [status, setStatus] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [ticketMeta, setTicketMeta] = useState(null);
 
-  const mailto = useMemo(() => getMailto(fields), [fields]);
-  const whatsapp = useMemo(() => getWhatsappUrl(fields), [fields]);
+  const messageFields = useMemo(
+    () => ({
+      ...fields,
+      source,
+      requestTitle,
+    }),
+    [fields, source, requestTitle],
+  );
+  const mailto = useMemo(() => getMailto(messageFields), [messageFields]);
+  const whatsapp = useMemo(() => getWhatsappUrl(messageFields), [messageFields]);
 
   const update = (event) => {
     const { name, value } = event.target;
@@ -78,7 +103,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
     event.preventDefault();
     if (status === 'submitting') return;
 
-    const validationError = validateQuote(fields);
+    const validationError = validateQuote(fields, { requirePhone });
     if (validationError) {
       setStatus('error');
       setErrorMsg(validationError);
@@ -92,7 +117,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
       const response = await fetch('/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fields),
+        body: JSON.stringify(messageFields),
       });
       const data = await response.json().catch(() => ({}));
 
@@ -112,14 +137,16 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
   };
 
   const isOneWay = fields.tripType === 'One way';
+  const showPhone = requirePhone || full;
   const passengerOptions = Array.from({ length: 10 }, (_, index) => {
     const count = index + 1;
     return `${count} ${count === 1 ? 'Passenger' : 'Passengers'}`;
   });
+  const formClassName = `quote-form quote-form--${variant} ${showPhone ? 'quote-form--phone' : ''}`;
 
   if (status === 'success') {
     return (
-      <div className={`quote-form quote-form--${variant} quote-form--success`} role="status" aria-live="polite">
+      <div className={`${formClassName} quote-form--success`} role="status" aria-live="polite">
         <div className="quote-success">
           <div className="quote-success__icon" aria-hidden="true">
             <CheckCircle2 size={32} strokeWidth={2.2} />
@@ -145,7 +172,7 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
   }
 
   return (
-    <form className={`quote-form quote-form--${variant}`} onSubmit={submit} noValidate>
+    <form className={formClassName} onSubmit={submit} noValidate>
       <div className="quote-form__honeypot" aria-hidden="true">
         <label>
           Company website
@@ -214,6 +241,20 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
             maxLength={120}
           />
         </Field>
+        {showPhone && (
+          <Field icon={Phone} label="Phone Number" compact={!full}>
+            <input
+              name="phone"
+              type="tel"
+              value={fields.phone}
+              onChange={update}
+              placeholder="Your phone number"
+              required={requirePhone}
+              autoComplete="tel"
+              maxLength={40}
+            />
+          </Field>
+        )}
 
         {full && (
           <>
@@ -225,9 +266,6 @@ export default function QuoteForm({ variant = 'hero', full = false }) {
                 onChange={update}
                 ariaLabel="Cabin class"
               />
-            </Field>
-            <Field label="Phone / WhatsApp">
-              <input name="phone" value={fields.phone} onChange={update} placeholder="+1 ..." maxLength={40} />
             </Field>
             <Field label="Notes" wide>
               <textarea

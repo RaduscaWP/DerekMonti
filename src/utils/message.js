@@ -7,8 +7,10 @@ function formatDate(value) {
 }
 
 export function buildQuoteMessage(fields) {
+  const requestTitle = fields.requestTitle || 'Business & First Class Flight Quote Request';
   const lines = [
-    'New premium flight quote request',
+    requestTitle,
+    fields.source ? `Source: ${fields.source}` : null,
     `Trip type: ${fields.tripType || 'Round trip'}`,
     `From: ${fields.from || 'Not provided'}`,
     `To: ${fields.to || 'Not provided'}`,
@@ -18,7 +20,7 @@ export function buildQuoteMessage(fields) {
     `Cabin: ${fields.cabin || 'Business'}`,
     fields.name ? `Name: ${fields.name}` : null,
     fields.email ? `Email: ${fields.email}` : null,
-    fields.phone ? `Phone/WhatsApp: ${fields.phone}` : null,
+    fields.phone ? `Phone Number: ${fields.phone}` : null,
     fields.notes ? `Notes: ${fields.notes}` : null,
   ].filter(Boolean);
 
@@ -26,7 +28,7 @@ export function buildQuoteMessage(fields) {
 }
 
 export function getMailto(fields) {
-  const subject = encodeURIComponent('Premium flight quote request');
+  const subject = encodeURIComponent(fields.requestTitle || 'Business & First Class Flight Quote Request');
   const body = encodeURIComponent(buildQuoteMessage(fields));
   return `mailto:${contactConfig.email}?subject=${subject}&body=${body}`;
 }
