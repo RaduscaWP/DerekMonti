@@ -5,11 +5,10 @@ import { dirname, resolve } from 'node:path';
 const here = dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = resolve(here, '..', '.env');
 
-let loaded = false;
+let attempted = false;
 
-function loadOnce() {
-  if (loaded) return;
-  loaded = true;
+export function ensureEnv() {
+  if (process.env.RESEND_API_KEY) return;
   try {
     const raw = readFileSync(ENV_PATH, 'utf-8');
     let count = 0;
@@ -26,12 +25,18 @@ function loadOnce() {
         count += 1;
       }
     }
-    const k = process.env.RESEND_API_KEY;
-    const masked = k ? `${k.slice(0, 5)}...${k.slice(-4)}` : 'NOT SET';
-    console.log(`[api/_loadEnv] loaded ${count} key(s) from ${ENV_PATH} — RESEND_API_KEY=${masked}`);
+    if (!attempted) {
+      attempted = true;
+      const k = process.env.RESEND_API_KEY;
+      const masked = k ? `${k.slice(0, 5)}...${k.slice(-4)}` : 'NOT SET';
+      console.log(`[api/_loadEnv] loaded ${count} key(s) from ${ENV_PATH} — RESEND_API_KEY=${masked}`);
+    }
   } catch (err) {
-    console.log(`[api/_loadEnv] could not read ${ENV_PATH}:`, err.message);
+    if (!attempted) {
+      attempted = true;
+      console.log(`[api/_loadEnv] could not read ${ENV_PATH}:`, err.message);
+    }
   }
 }
 
-loadOnce();
+ensureEnv();

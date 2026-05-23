@@ -1,7 +1,7 @@
 // SECURITY: RESEND_API_KEY is server-only. Never expose it to the client.
 // Use .env for local dev and Vercel Sensitive Environment Variables in prod.
 
-import './_loadEnv.js';
+import { ensureEnv } from './_loadEnv.js';
 import { Resend } from 'resend';
 import { renderTicketHtml, renderTicketSubject, generateReference, todayFormatted } from './_emailTemplate.js';
 
@@ -217,6 +217,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: validationError });
   }
 
+  ensureEnv();
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     const isDev = process.env.NODE_ENV !== 'production';
@@ -251,9 +252,10 @@ export default async function handler(req, res) {
         from: FROM_ADDRESS,
         to: [DEREK_EMAIL],
         replyTo: fields.email,
-        subject: `Business & First Class Quote ${meta.reference} - ${fields.from} to ${fields.to}${
+        subject: `[NEW QUOTE] ${meta.reference} - ${fields.from} to ${fields.to}${
           fields.name ? ` (${fields.name})` : ''
         }`,
+        html,
         text: plain,
       }),
     ]);
