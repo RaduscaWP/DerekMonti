@@ -21,6 +21,8 @@ export const imagery = {
   cabin: dealImage('11757933', 1800),
   concierge: dealImage('5645180', 1400),
   lounge: dealImage('11757933', 1400),
+  johannesburg: dealImage('33702740', 1600),
+  cairo: dealImage('29678689', 1600),
 };
 
 export const homeHeroVideo = {
@@ -217,7 +219,7 @@ export const routeDeals = [
     savings: 'Saved up to 37%',
     flexibleWindow: '+/- 2 days',
     note: 'Subject to inventory',
-    image: imagery.cabin,
+    image: imagery.johannesburg,
     advisorNote: {
       title: 'Where Derek adds judgement',
       points: ['Compare connection risk', 'Check partner airline consistency', 'Watch ticketing deadlines closely'],
@@ -236,7 +238,7 @@ export const routeDeals = [
     savings: 'Saved up to 40%',
     flexibleWindow: '+/- 5 days',
     note: 'Based on real booking logic',
-    image: imagery.lounge,
+    image: imagery.cairo,
     advisorNote: {
       title: 'How to avoid a weak fare',
       points: ['Confirm mixed-cabin exposure', 'Review EgyptAir and partner options', 'Check stop length against savings'],

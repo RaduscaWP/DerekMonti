@@ -415,9 +415,8 @@ function Hero({ selectedService, onSelectService, promoCode, onPromoCodeChange, 
               />
             </div>
             <div className="hero__advisor-meta">
-              <span>Personal Aviation Advisor</span>
               <strong>Derek Monti</strong>
-              <p>Business & First Class Fare Specialist</p>
+              <p>Business & First Class Fare Advisor</p>
             </div>
           </aside>
 
