@@ -11,7 +11,9 @@
       "Bash(node -e ' *)",
       "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"Round trip\",\"from\":\"Chisinau\",\"to\":\"Philadelphia\",\"departure\":\"2026-05-27\",\"returnDate\":\"2026-05-31\",\"passengers\":\"1 Passenger\",\"cabin\":\"Business\",\"name\":\"Stefan\",\"email\":\"grozavradustefan@gmail.com\",\"phone\":\"+373 22 123 456\",\"notes\":\"Window seat preferred, vegetarian meals on long legs.\"}' -w \"\\\\n---\\\\nHTTP %{http_code}\\\\n\")",
       "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"Round trip\",\"from\":\"Chisinau\",\"to\":\"Philadelphia\",\"departure\":\"2026-05-27\",\"returnDate\":\"2026-05-31\",\"passengers\":\"1 Passenger\",\"cabin\":\"Business\",\"name\":\"Stefan\",\"email\":\"grozavradustefan@gmail.com\",\"notes\":\"Window seat preferred, vegetarian meals.\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
-      "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"One way\",\"from\":\"Zürich\",\"to\":\"São Paulo\",\"departure\":\"2026-06-15\",\"passengers\":\"2 Passengers\",\"cabin\":\"First\",\"name\":\"Test\",\"email\":\"grozavradustefan@gmail.com\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")"
+      "Bash(curl -sS -X POST http://127.0.0.1:5175/api/quote -H \"Content-Type: application/json\" -d '{\"tripType\":\"One way\",\"from\":\"Zürich\",\"to\":\"São Paulo\",\"departure\":\"2026-06-15\",\"passengers\":\"2 Passengers\",\"cabin\":\"First\",\"name\":\"Test\",\"email\":\"grozavradustefan@gmail.com\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\GZv0x00\\\\OneDrive\\\\Документы\\\\Codex-test Derek Monti\" -Recurse -Include \"*.jsx\", \"*.js\", \"*.tsx\", \"*.ts\")",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

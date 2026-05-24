@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  ArrowLeft,
+  ArrowRight,
   BadgeCheck,
   BriefcaseBusiness,
   CalendarClock,
@@ -96,7 +98,7 @@ function TravelAdvantageSelector({ selectedService, onSelectService, promoCode, 
                 <span className="travel-advantage__icon">
                   <card.Icon aria-hidden="true" size={20} />
                 </span>
-                <span className="travel-advantage__status">{selected ? 'Selected' : 'Add to request'}</span>
+                <span className="travel-advantage__status">{selected ? 'Selected' : 'Add'}</span>
               </div>
               <div className="travel-advantage__card-copy">
                 <strong>{card.title}</strong>
@@ -118,14 +120,12 @@ function TravelAdvantageSelector({ selectedService, onSelectService, promoCode, 
             type="text"
             value={promoCode}
             onChange={(event) => onPromoCodeChange(event.target.value)}
-            placeholder="Have a private code?"
+            placeholder="For returning clients or private referrals"
             autoComplete="off"
             maxLength={120}
           />
         </label>
-        <p className="travel-advantage__hint">
-          Leave both cards unselected if you want a standard flight request with no added support package.
-        </p>
+        <p className="travel-advantage__hint">No selection needed for a standard flight request.</p>
       </div>
     </section>
   );
@@ -278,8 +278,7 @@ function Hero({ selectedService, onSelectService, promoCode, onPromoCodeChange, 
         .from('.hero__copy', { y: 20, opacity: 0, duration: 0.42, ease: 'power3.out' }, '-=0.28')
         .from('.hero__airlines', { y: 16, opacity: 0, duration: 0.36, ease: 'power3.out' }, '-=0.22')
         .from('.hero__advisor-card', { y: 28, opacity: 0, duration: 0.52, ease: 'power3.out' }, '-=0.2')
-        .from('.hero .quote-form', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.22')
-        .from('.hero__proof', { opacity: 0, duration: 0.35 }, '-=0.16');
+        .from('.hero .quote-form', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.22');
     }, heroRef);
 
     return () => {
@@ -416,7 +415,7 @@ function Hero({ selectedService, onSelectService, promoCode, onPromoCodeChange, 
             </div>
             <div className="hero__advisor-meta">
               <strong>Derek Monti</strong>
-              <p>Business & First Class Fare Advisor</p>
+              <p>Business &amp; first class, sourced by hand.</p>
             </div>
           </aside>
 
@@ -439,9 +438,6 @@ function Hero({ selectedService, onSelectService, promoCode, onPromoCodeChange, 
               promoCode={promoCode}
               onPromoCodeChange={onPromoCodeChange}
             />
-            <p className="hero__proof">
-              Sample route scenarios show meaningful savings versus public Business Class and First Class fares.
-            </p>
           </div>
         </div>
       </div>
@@ -739,6 +735,7 @@ function BlogPreview() {
 
 export default function Home() {
   const pageRef = useRef(null);
+  const savingsCarouselRef = useRef(null);
   const [selectedService, setSelectedService] = useState(STANDARD_SERVICE_VALUE);
   const [promoCode, setPromoCode] = useState('');
   useDocumentMeta(
@@ -761,16 +758,35 @@ export default function Home() {
         onPromoCodeChange={setPromoCode}
         onResetExtras={resetHomeExtras}
       />
-      <section className="savings-section scenic-section scenic-section--savings">
+      <section className="savings-section savings-section--inline-controls scenic-section scenic-section--savings">
         <ScenicBackdrop backdrop={siteBackdrops.homeSavings} />
         <div className="container">
-          <SectionHeader
-            eyebrow="Smart Savings"
-            title="Save More. Fly Better."
-            text="By uncovering hidden fares and private offers, Derek makes business and first class travel more accessible without compromising comfort."
-            light
-          />
-          <RouteCarousel deals={routeDeals} />
+          <div className="savings-section__lead">
+            <SectionHeader
+              eyebrow="Smart Savings"
+              title="Save More. Fly Better."
+              text="By uncovering hidden fares and private offers, Derek makes business and first class travel more accessible without compromising comfort."
+              align="left"
+              light
+            />
+            <div className="route-carousel__controls savings-section__controls" aria-label="Route carousel controls">
+              <button
+                type="button"
+                onClick={() => savingsCarouselRef.current?.scroll(-1)}
+                aria-label="Previous deal"
+              >
+                <ArrowLeft aria-hidden="true" size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={() => savingsCarouselRef.current?.scroll(1)}
+                aria-label="Next deal"
+              >
+                <ArrowRight aria-hidden="true" size={18} />
+              </button>
+            </div>
+          </div>
+          <RouteCarousel ref={savingsCarouselRef} deals={routeDeals} showControls={false} />
           <p className="savings-section__fineprint">
             Sample fares are based on comparable recent quotes. Prices change quickly and are not guaranteed until
             ticketed.
