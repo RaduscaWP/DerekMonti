@@ -1,6 +1,14 @@
+import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { imagery } from '../../data/siteData.js';
 
 export default function RouteCard({ deal }) {
+  const [imageSrc, setImageSrc] = useState(deal.image || imagery.cabin);
+
+  useEffect(() => {
+    setImageSrc(deal.image || imagery.cabin);
+  }, [deal.image]);
+
   const handleMove = (event) => {
     const card = event.currentTarget;
     if (window.innerWidth < 900) return;
@@ -16,6 +24,12 @@ export default function RouteCard({ deal }) {
     event.currentTarget.style.transform = '';
   };
 
+  const handleImageError = () => {
+    if (imageSrc !== imagery.cabin) {
+      setImageSrc(imagery.cabin);
+    }
+  };
+
   return (
     <article
       className="route-card"
@@ -27,7 +41,13 @@ export default function RouteCard({ deal }) {
     >
       <div className="route-card__ticket-head">
         <div className="route-card__image">
-          <img src={deal.image} alt={`${deal.to} business and first class travel`} loading="lazy" />
+          <img
+            src={imageSrc}
+            alt={`${deal.to} business and first class travel`}
+            loading="eager"
+            decoding="async"
+            onError={handleImageError}
+          />
         </div>
         <span className="route-card__stamp">{deal.savings}</span>
       </div>

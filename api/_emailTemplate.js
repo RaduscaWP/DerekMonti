@@ -1,4 +1,5 @@
 import { resolveLocation } from './_iataLookup.js';
+import { getPrivateCodeLabel, getSelectedServiceLabel } from '../src/utils/quoteRequest.js';
 
 const DEREK_PHONE = '+1 (786) 706-4828';
 const DEREK_EMAIL = 'Derek@travelbusinessclass.com';
@@ -107,6 +108,8 @@ function renderTicketHtml(fields, meta) {
 
   const email = escape(fields.email || 'Not provided');
   const phone = escape(fields.phone || 'Not provided');
+  const selectedService = escape(getSelectedServiceLabel(fields.selectedService));
+  const privateCode = escape(getPrivateCodeLabel(fields.promoCode));
   const reference = escape(meta.reference || generateReference());
 
   const whatsappMessage = `Hi Derek, I just submitted a Business Class request (Reference ${reference}). Looking forward to hearing back.`;
@@ -130,7 +133,7 @@ function renderTicketHtml(fields, meta) {
             <!-- HERO -->
             <tr>
               <td style="background:#07111F;padding:30px 24px 18px;text-align:center;border-radius:24px 24px 0 0;">
-                <div style="font:700 11px Arial,sans-serif;letter-spacing:3px;text-transform:uppercase;color:#FFFFFF;line-height:1.2;">Business Class Request</div>
+                <div style="font:700 11px Arial,sans-serif;letter-spacing:3px;text-transform:uppercase;color:#FFFFFF;line-height:1.2;">Business &amp; First Class Request</div>
               </td>
             </tr>
             <tr>
@@ -171,6 +174,10 @@ function renderTicketHtml(fields, meta) {
                   <tr>
                     ${iconCard('Contact Email', email)}
                     ${iconCard('Contact Phone', phone)}
+                  </tr>
+                  <tr>
+                    ${iconCard('Selected Support', selectedService)}
+                    ${iconCard('Private Code', privateCode)}
                   </tr>
                 </table>
                 ${notesBlock(fields.notes)}

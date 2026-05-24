@@ -37,11 +37,99 @@ import {
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 import { initParticles } from '../utils/threeParticles.js';
+import {
+  ACCRUED_MILES_SERVICE_VALUE,
+  GUIDANCE_SERVICE_VALUE,
+  STANDARD_SERVICE_VALUE,
+} from '../utils/quoteRequest.js';
 
 const reasonIcons = [CircleDollarSign, CalendarClock, Route, ConciergeBell, Headphones, BadgeCheck];
 const stepIcons = [PlaneTakeoff, BriefcaseBusiness, Sparkles, Gem];
 const HOME_REQUEST_TITLE = 'Business & First Class Flight Quote Request';
 const HOME_REQUEST_SOURCE = 'Home Page quote form';
+const packageCards = [
+  {
+    value: GUIDANCE_SERVICE_VALUE,
+    title: 'Guidance Package',
+    summary:
+      'Derek reviews your fare, checks the route logic, and helps you unlock better-value business or first class options.',
+    meta: 'Fee: 50% of verified savings unlocked through Derek’s guidance.',
+    detail:
+      'Example: if Derek helps you save $1,000 compared to the verified published fare, the guidance fee is $500. Final options and savings are confirmed directly before booking.',
+    Icon: Sparkles,
+  },
+  {
+    value: ACCRUED_MILES_SERVICE_VALUE,
+    title: 'Use Your Accrued Miles',
+    summary:
+      'Have unused miles or reward points? Derek helps you understand where they create the most value for business or first class travel.',
+    meta: 'Best for travelers with airline miles, card points, or loyalty rewards.',
+    detail:
+      'Best for travelers with airline miles, card points, or loyalty rewards who want help turning them into smarter premium-cabin options.',
+    Icon: CircleDollarSign,
+  },
+];
+
+function TravelAdvantageSelector({ selectedService, onSelectService, promoCode, onPromoCodeChange }) {
+  return (
+    <section className="travel-advantage" aria-labelledby="travel-advantage-title">
+      <div className="travel-advantage__header">
+        <p className="travel-advantage__eyebrow">Optional Support</p>
+        <h2 id="travel-advantage-title">Select Your Travel Advantage</h2>
+        <p>Pick the support option that best matches your trip. Derek will review the details personally.</p>
+      </div>
+
+      <div className="travel-advantage__grid">
+        {packageCards.map((card) => {
+          const selected = selectedService === card.value;
+          const toggleSelection = () => onSelectService(selected ? STANDARD_SERVICE_VALUE : card.value);
+
+          return (
+            <button
+              type="button"
+              className={`travel-advantage__card ${selected ? 'is-selected' : ''}`}
+              key={card.value}
+              aria-pressed={selected}
+              onClick={toggleSelection}
+            >
+              <div className="travel-advantage__card-top">
+                <span className="travel-advantage__icon">
+                  <card.Icon aria-hidden="true" size={20} />
+                </span>
+                <span className="travel-advantage__status">{selected ? 'Selected' : 'Add to request'}</span>
+              </div>
+              <div className="travel-advantage__card-copy">
+                <strong>{card.title}</strong>
+                <p>{card.summary}</p>
+                <span>{card.meta}</span>
+                {selected && <small>{card.detail}</small>}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="travel-advantage__code">
+        <label htmlFor="private-code" className="travel-advantage__code-label">
+          <span>Private Code</span>
+          <input
+            id="private-code"
+            name="promoCode"
+            type="text"
+            value={promoCode}
+            onChange={(event) => onPromoCodeChange(event.target.value)}
+            placeholder="Have a private code?"
+            autoComplete="off"
+            maxLength={120}
+          />
+        </label>
+        <p className="travel-advantage__hint">
+          Leave both cards unselected if you want a standard flight request with no added support package.
+        </p>
+      </div>
+    </section>
+  );
+}
 
 function GoogleMark() {
   return (
@@ -163,7 +251,7 @@ const homeBlogExcerpts = {
     'Unpublished Business Class options come from fare access, timing, routing, and experience.',
 };
 
-function Hero() {
+function Hero({ selectedService, onSelectService, promoCode, onPromoCodeChange, onResetExtras }) {
   const canvasRef = useRef(null);
   const heroRef = useRef(null);
   const videoRef = useRef(null);
@@ -268,7 +356,7 @@ function Hero() {
   };
 
   return (
-    <section className="hero" ref={heroRef}>
+    <section className="hero" id="home-hero" ref={heroRef}>
       <img className="hero__image hero__poster" src={homeHeroVideo.poster} alt={homeHeroVideo.alt} />
       {showVideo && videoUsable && (
         <video
@@ -333,8 +421,25 @@ function Hero() {
             </div>
           </aside>
 
-          <div className="hero__form-panel">
-            <QuoteForm requirePhone source={HOME_REQUEST_SOURCE} requestTitle={HOME_REQUEST_TITLE} />
+          <div className="hero__form-panel" id="request-form">
+            <QuoteForm
+              requirePhone
+              source={HOME_REQUEST_SOURCE}
+              requestTitle={HOME_REQUEST_TITLE}
+              extraPayload={{ selectedService, promoCode }}
+              confirmationContext={{
+                selectedService,
+                promoCode,
+                advisorAvatarSrc: imagery.derekAvatar,
+              }}
+              onResetExtras={onResetExtras}
+            />
+            <TravelAdvantageSelector
+              selectedService={selectedService}
+              onSelectService={onSelectService}
+              promoCode={promoCode}
+              onPromoCodeChange={onPromoCodeChange}
+            />
             <p className="hero__proof">
               Sample route scenarios show meaningful savings versus public Business Class and First Class fares.
             </p>
@@ -582,7 +687,7 @@ function HowItWorks() {
 
 function Testimonials() {
   return (
-    <section className="testimonials">
+    <section className="testimonials" id="expectations">
       <div className="container">
         <div className="testimonials__intro" data-reveal>
           <p className="eyebrow">Advisor Support</p>
@@ -635,15 +740,28 @@ function BlogPreview() {
 
 export default function Home() {
   const pageRef = useRef(null);
+  const [selectedService, setSelectedService] = useState(STANDARD_SERVICE_VALUE);
+  const [promoCode, setPromoCode] = useState('');
   useDocumentMeta(
     'Derek Monti - Personal Aviation Advisor | Business Class at Insider Prices',
     'Get business and first class flights at 15-60% off published fares. Derek Monti is your personal aviation expert.',
   );
   usePageMotion(pageRef);
 
+  const resetHomeExtras = () => {
+    setSelectedService(STANDARD_SERVICE_VALUE);
+    setPromoCode('');
+  };
+
   return (
     <div ref={pageRef}>
-      <Hero />
+      <Hero
+        selectedService={selectedService}
+        onSelectService={setSelectedService}
+        promoCode={promoCode}
+        onPromoCodeChange={setPromoCode}
+        onResetExtras={resetHomeExtras}
+      />
       <section className="savings-section scenic-section scenic-section--savings">
         <ScenicBackdrop backdrop={siteBackdrops.homeSavings} />
         <div className="container">
@@ -667,7 +785,7 @@ export default function Home() {
       <BioTeaser />
       <HowItWorks />
       <Testimonials />
-      <section className="faq-section">
+      <section className="faq-section" id="faq">
         <div className="container faq-section__inner">
           <SectionHeader eyebrow="FAQ" title="Frequently Asked Questions" align="left" />
           <FaqAccordion items={homeFaqs} />

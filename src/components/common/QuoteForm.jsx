@@ -1,6 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, CheckCircle2, Mail, MapPin, Phone, Plane, Search, Send, Users } from 'lucide-react';
 import { getMailto, getWhatsappUrl } from '../../utils/message.js';
+import {
+  PRIVATE_CODE_CONFIRMATION,
+  getSelectedServiceLabel,
+  normalizePromoCode,
+} from '../../utils/quoteRequest.js';
 import Button from './Button.jsx';
 import DatePicker from './DatePicker.jsx';
 import SelectMenu from './SelectMenu.jsx';
@@ -64,12 +69,45 @@ function Field({ icon: Icon, label, children, compact = false, wide = false }) {
   );
 }
 
+function SuccessAdvisorAvatar({ src, alt }) {
+  const [showFallback, setShowFallback] = useState(!src);
+
+  useEffect(() => {
+    setShowFallback(!src);
+  }, [src]);
+
+  return (
+    <div className="quote-success__avatar-shell">
+      {showFallback ? (
+        <div className="quote-success__avatar quote-success__avatar--fallback" aria-hidden="true">
+          <span>DM</span>
+        </div>
+      ) : (
+        <img
+          className="quote-success__avatar"
+          src={src}
+          alt={alt}
+          onError={() => setShowFallback(true)}
+          loading="eager"
+          decoding="async"
+        />
+      )}
+      <span className="quote-success__avatar-badge" aria-hidden="true">
+        <CheckCircle2 size={16} strokeWidth={2.2} />
+      </span>
+    </div>
+  );
+}
+
 export default function QuoteForm({
   variant = 'hero',
   full = false,
   requirePhone = false,
   source = '',
   requestTitle = '',
+  extraPayload = null,
+  confirmationContext = null,
+  onResetExtras,
 }) {
   const [fields, setFields] = useState(initialFields);
   const [status, setStatus] = useState('idle');
@@ -79,10 +117,11 @@ export default function QuoteForm({
   const messageFields = useMemo(
     () => ({
       ...fields,
+      ...(extraPayload || {}),
       source,
       requestTitle,
     }),
-    [fields, source, requestTitle],
+    [extraPayload, fields, source, requestTitle],
   );
   const mailto = useMemo(() => getMailto(messageFields), [messageFields]);
   const whatsapp = useMemo(() => getWhatsappUrl(messageFields), [messageFields]);
@@ -97,6 +136,7 @@ export default function QuoteForm({
     setStatus('idle');
     setErrorMsg('');
     setTicketMeta(null);
+    onResetExtras?.();
   };
 
   const submit = async (event) => {
@@ -143,14 +183,32 @@ export default function QuoteForm({
     return `${count} ${count === 1 ? 'Passenger' : 'Passengers'}`;
   });
   const formClassName = `quote-form quote-form--${variant} ${showPhone ? 'quote-form--phone' : ''}`;
+  const showEnhancedConfirmation = Boolean(confirmationContext);
+  const selectedServiceLabel = showEnhancedConfirmation
+    ? getSelectedServiceLabel(confirmationContext?.selectedService)
+    : '';
+  const privateCode = showEnhancedConfirmation ? normalizePromoCode(confirmationContext?.promoCode) : '';
 
   if (status === 'success') {
     return (
       <div className={`${formClassName} quote-form--success`} role="status" aria-live="polite">
         <div className="quote-success">
-          <div className="quote-success__icon" aria-hidden="true">
-            <CheckCircle2 size={32} strokeWidth={2.2} />
-          </div>
+          {showEnhancedConfirmation ? (
+            <div className="quote-success__identity">
+              <SuccessAdvisorAvatar
+                src={confirmationContext?.advisorAvatarSrc}
+                alt="Derek Monti confirmation portrait"
+              />
+              <div className="quote-success__identity-copy">
+                <span>Derek Monti</span>
+                <strong>Personal Aviation Advisor</strong>
+              </div>
+            </div>
+          ) : (
+            <div className="quote-success__icon" aria-hidden="true">
+              <CheckCircle2 size={32} strokeWidth={2.2} />
+            </div>
+          )}
           <div className="quote-success__copy">
             <h3>Request received</h3>
             <p>
@@ -162,6 +220,20 @@ export default function QuoteForm({
               <span>Next step</span>
               <strong>Derek replies personally within hours.</strong>
             </div>
+            {showEnhancedConfirmation && (
+              <div className="quote-success__summary" aria-label="Request summary">
+                <div>
+                  <span>Selected support</span>
+                  <strong>{selectedServiceLabel}</strong>
+                </div>
+                {privateCode && (
+                  <div>
+                    <span>Private code</span>
+                    <p>{PRIVATE_CODE_CONFIRMATION}</p>
+                  </div>
+                )}
+              </div>
+            )}
             <button type="button" className="quote-success__reset" onClick={reset}>
               Send another request
             </button>

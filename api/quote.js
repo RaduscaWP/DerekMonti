@@ -4,6 +4,12 @@
 import { ensureEnv } from './_loadEnv.js';
 import { Resend } from 'resend';
 import { renderTicketHtml, renderTicketSubject, generateReference, todayFormatted } from './_emailTemplate.js';
+import {
+  getPrivateCodeLabel,
+  getSelectedServiceLabel,
+  normalizePromoCode,
+  normalizeSelectedService,
+} from '../src/utils/quoteRequest.js';
 
 const DEREK_EMAIL = 'Derek@travelbusinessclass.com';
 const FROM_ADDRESS = 'Derek Monti <onboarding@resend.dev>';
@@ -82,6 +88,8 @@ function normalizeFields(raw) {
     email: cleanText(raw.email, 120).toLowerCase(),
     phone: cleanText(raw.phone, 40),
     notes: cleanText(raw.notes, 600, { multiline: true }),
+    selectedService: normalizeSelectedService(cleanText(raw.selectedService, 40)),
+    promoCode: normalizePromoCode(cleanText(raw.promoCode, 120)),
     source: cleanText(raw.source, 80),
     requestTitle: cleanText(raw.requestTitle, 120) || 'Business & First Class Flight Quote Request',
     companyWebsite: cleanText(raw.companyWebsite || raw.website || raw.url, 120),
@@ -126,6 +134,8 @@ function buildPlainSummary(fields, meta) {
     `Return:      ${fields.returnDate || (fields.tripType === 'One way' ? 'One way' : 'Not provided')}`,
     `Passengers:  ${fields.passengers || '1 Passenger'}`,
     `Cabin:       ${fields.cabin || 'Business'}`,
+    `Selected service: ${getSelectedServiceLabel(fields.selectedService)}`,
+    `Private code:     ${getPrivateCodeLabel(fields.promoCode)}`,
     '',
     fields.name ? `Name:        ${fields.name}` : null,
     fields.email ? `Email:       ${fields.email}` : null,
@@ -221,6 +231,10 @@ export default async function handler(req, res) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     const isDev = process.env.NODE_ENV !== 'production';
+    console.error(
+      '[api/quote] RESEND_API_KEY missing from process.env. ' +
+        'On Vercel: Settings → Environment Variables → add RESEND_API_KEY for Production/Preview/Development, then Redeploy.',
+    );
     return res.status(500).json({
       error: 'Email service is not configured. Please contact Derek by WhatsApp or email.',
       ...(isDev && {

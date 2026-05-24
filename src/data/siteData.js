@@ -17,6 +17,7 @@ export const imagery = {
   servicesHero: dealImage('23522837', 2400),
   aboutHero: dealImage('23522837', 2400),
   derekPortrait: '/images/derek-monti.jpg',
+  derekAvatar: '/images/DMphoto.jpg',
   cabin: dealImage('11757933', 1800),
   concierge: dealImage('5645180', 1400),
   lounge: dealImage('11757933', 1400),
@@ -216,7 +217,7 @@ export const routeDeals = [
     savings: 'Saved up to 37%',
     flexibleWindow: '+/- 2 days',
     note: 'Subject to inventory',
-    image: dealImage('1058759'),
+    image: imagery.cabin,
     advisorNote: {
       title: 'Where Derek adds judgement',
       points: ['Compare connection risk', 'Check partner airline consistency', 'Watch ticketing deadlines closely'],
@@ -235,7 +236,7 @@ export const routeDeals = [
     savings: 'Saved up to 40%',
     flexibleWindow: '+/- 5 days',
     note: 'Based on real booking logic',
-    image: dealImage('262786'),
+    image: imagery.lounge,
     advisorNote: {
       title: 'How to avoid a weak fare',
       points: ['Confirm mixed-cabin exposure', 'Review EgyptAir and partner options', 'Check stop length against savings'],

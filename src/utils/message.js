@@ -1,4 +1,5 @@
 import { contactConfig } from '../data/siteData.js';
+import { getPrivateCodeLabel, getSelectedServiceLabel } from './quoteRequest.js';
 
 function formatDate(value) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
@@ -18,6 +19,8 @@ export function buildQuoteMessage(fields) {
     `Return: ${formatDate(fields.returnDate)}`,
     `Passengers: ${fields.passengers || '1'}`,
     `Cabin: ${fields.cabin || 'Business'}`,
+    `Selected service: ${getSelectedServiceLabel(fields.selectedService)}`,
+    `Private code: ${getPrivateCodeLabel(fields.promoCode)}`,
     fields.name ? `Name: ${fields.name}` : null,
     fields.email ? `Email: ${fields.email}` : null,
     fields.phone ? `Phone Number: ${fields.phone}` : null,
