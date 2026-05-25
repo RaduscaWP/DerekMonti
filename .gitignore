@@ -9,3 +9,4 @@ playwright-report/
 .env.local
 .env.*.local
 preview-ticket.html
+.claude/settings.local.json

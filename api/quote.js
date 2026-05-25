@@ -4,6 +4,7 @@
 import { ensureEnv } from './_loadEnv.js';
 import { Resend } from 'resend';
 import { renderTicketHtml, renderTicketSubject, generateReference, todayFormatted } from './_emailTemplate.js';
+import { checkRateLimit, verifyTurnstile } from './_security.js';
 import {
   getPrivateCodeLabel,
   getSelectedServiceLabel,
@@ -12,17 +13,12 @@ import {
 } from '../src/utils/quoteRequest.js';
 
 const DEREK_EMAIL = 'Derek@travelbusinessclass.com';
-const FROM_ADDRESS = 'Derek Monti <onboarding@resend.dev>';
+const FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || 'Derek Monti <onboarding@resend.dev>';
 
 const MAX_BODY_BYTES = 12 * 1024;
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX = 8;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const PHONE_ALLOWED_RE = /^[+()\d\s.-]+$/;
-
-const rateBuckets = globalThis.__derekQuoteRateBuckets || new Map();
-globalThis.__derekQuoteRateBuckets = rateBuckets;
 
 function sanitizeLogError(error) {
   if (!error) return { message: 'Unknown email service error' };
@@ -32,26 +28,6 @@ function sanitizeLogError(error) {
     code: error.code,
     statusCode: error.statusCode,
   };
-}
-
-function clientKey(req) {
-  const forwarded = req.headers['x-forwarded-for'];
-  const firstForwarded = Array.isArray(forwarded) ? forwarded[0] : forwarded;
-  return (firstForwarded || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
-}
-
-function checkRateLimit(req) {
-  const now = Date.now();
-  const key = clientKey(req);
-  const current = rateBuckets.get(key);
-
-  if (!current || now - current.startedAt > RATE_LIMIT_WINDOW_MS) {
-    rateBuckets.set(key, { startedAt: now, count: 1 });
-    return true;
-  }
-
-  current.count += 1;
-  return current.count <= RATE_LIMIT_MAX;
 }
 
 function cleanText(value, max, { multiline = false } = {}) {
@@ -203,7 +179,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (process.env.NODE_ENV === 'production' && !checkRateLimit(req)) {
+  if (process.env.NODE_ENV === 'production' && !(await checkRateLimit(req))) {
     return res.status(429).json({ error: 'Too many requests. Please try again in a few minutes.' });
   }
 
@@ -225,6 +201,14 @@ export default async function handler(req, res) {
   const validationError = validateFields(fields);
   if (validationError) {
     return res.status(400).json({ error: validationError });
+  }
+
+  const turnstileResult = await verifyTurnstile(rawFields?.turnstileToken, req);
+  if (!turnstileResult.ok) {
+    console.warn('[api/quote] turnstile rejected:', turnstileResult.reason);
+    return res.status(400).json({
+      error: 'Could not verify that the request came from a real visitor. Please reload the page and try again.',
+    });
   }
 
   ensureEnv();

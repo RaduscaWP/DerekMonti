@@ -27,9 +27,8 @@ export function ensureEnv() {
     }
     if (!attempted) {
       attempted = true;
-      const k = process.env.RESEND_API_KEY;
-      const masked = k ? `${k.slice(0, 5)}...${k.slice(-4)}` : 'NOT SET';
-      console.log(`[api/_loadEnv] loaded ${count} key(s) from ${ENV_PATH} — RESEND_API_KEY=${masked}`);
+      const status = process.env.RESEND_API_KEY ? 'SET' : 'NOT SET';
+      console.log(`[api/_loadEnv] loaded ${count} key(s) from ${ENV_PATH} — RESEND_API_KEY=${status}`);
     }
   } catch (err) {
     if (!attempted) {

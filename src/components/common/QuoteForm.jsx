@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, CheckCircle2, Mail, MapPin, Phone, Plane, Search, Send, Users } from 'lucide-react';
 import { getMailto, getWhatsappUrl } from '../../utils/message.js';
 import {
@@ -9,6 +9,9 @@ import {
 import Button from './Button.jsx';
 import DatePicker from './DatePicker.jsx';
 import SelectMenu from './SelectMenu.jsx';
+import TurnstileWidget from './TurnstileWidget.jsx';
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';
 
 const initialFields = {
   tripType: 'Round trip',
@@ -113,6 +116,15 @@ export default function QuoteForm({
   const [status, setStatus] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [ticketMeta, setTicketMeta] = useState(null);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileResetRef = useRef(null);
+
+  const registerTurnstileReset = useCallback((resetFn) => {
+    turnstileResetRef.current = resetFn;
+  }, []);
+  const handleTurnstileToken = useCallback((token) => setTurnstileToken(token || ''), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(''), []);
+  const handleTurnstileError = useCallback(() => setTurnstileToken(''), []);
 
   const messageFields = useMemo(
     () => ({
@@ -136,6 +148,8 @@ export default function QuoteForm({
     setStatus('idle');
     setErrorMsg('');
     setTicketMeta(null);
+    setTurnstileToken('');
+    turnstileResetRef.current?.();
     onResetExtras?.();
   };
 
@@ -150,6 +164,12 @@ export default function QuoteForm({
       return;
     }
 
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setStatus('error');
+      setErrorMsg('Please complete the human-verification challenge before sending.');
+      return;
+    }
+
     setStatus('submitting');
     setErrorMsg('');
 
@@ -157,7 +177,7 @@ export default function QuoteForm({
       const response = await fetch('/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(messageFields),
+        body: JSON.stringify({ ...messageFields, turnstileToken }),
       });
       const data = await response.json().catch(() => ({}));
 
@@ -166,6 +186,8 @@ export default function QuoteForm({
       }
       setTicketMeta({ reference: data.reference, issued: data.issued });
       setStatus('success');
+      setTurnstileToken('');
+      turnstileResetRef.current?.();
     } catch (err) {
       setStatus('error');
       setErrorMsg(
@@ -173,6 +195,8 @@ export default function QuoteForm({
           ? 'The request service is not reachable from this page right now. Please use WhatsApp or email Derek directly.'
           : err.message || 'Network error. Please try again.',
       );
+      setTurnstileToken('');
+      turnstileResetRef.current?.();
     }
   };
 
@@ -371,6 +395,18 @@ export default function QuoteForm({
           )}
         </button>
       </div>
+
+      {TURNSTILE_SITE_KEY && (
+        <div className="quote-form__turnstile">
+          <TurnstileWidget
+            siteKey={TURNSTILE_SITE_KEY}
+            onToken={handleTurnstileToken}
+            onExpire={handleTurnstileExpire}
+            onError={handleTurnstileError}
+            registerReset={registerTurnstileReset}
+          />
+        </div>
+      )}
 
       {status === 'error' && (
         <div className="quote-form__error" role="alert">

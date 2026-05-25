@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, Mail, Search } from 'lucide-react';
+import { Mail, Search } from 'lucide-react';
 import { gsap } from 'gsap';
 import Button from '../components/common/Button.jsx';
+import FinalCta from '../components/common/FinalCta.jsx';
 import QuoteForm from '../components/common/QuoteForm.jsx';
 import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
@@ -126,29 +127,10 @@ export default function Blog() {
         </div>
       </section>
 
-      <section className="newsletter" id="contact">
-        <div className="container newsletter__inner" data-reveal>
-          <div>
-            <p className="eyebrow">Subscribe</p>
-            <h2>Receive Derek's Premium Travel Notes</h2>
-            <p>Short updates on fare windows, cabin trends, and useful routing ideas.</p>
-          </div>
-          <form>
-            <label>
-              <span>Name</span>
-              <input placeholder="Your name" />
-            </label>
-            <label>
-              <span>Email</span>
-              <input type="email" placeholder="you@example.com" />
-            </label>
-            <button type="button">
-              <CalendarDays aria-hidden="true" size={18} />
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </section>
+      <FinalCta
+        title="Ready to Plan Your Next Premium Trip?"
+        text="Send Derek your route and dates - he replies personally with curated business or first class options."
+      />
     </div>
   );
 }
