@@ -1,135 +1,73 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRef } from 'react';
+import { ArrowRight, BookOpenText } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Mail, Search } from 'lucide-react';
-import { gsap } from 'gsap';
-import Button from '../components/common/Button.jsx';
 import FinalCta from '../components/common/FinalCta.jsx';
-import QuoteForm from '../components/common/QuoteForm.jsx';
-import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
-import SectionHeader from '../components/common/SectionHeader.jsx';
-import { blogPosts, siteBackdrops } from '../data/siteData.js';
-import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
+import { blogPosts } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
-const categories = ['All', 'Business Class Tips', 'Travel Hacks', 'Destination Guides', "Derek's Picks"];
-
-function BlogCard({ post }) {
-  return (
-    <Link className="blog-card" to={`/blog/${post.slug}`} data-category={post.category}>
-      <div className="blog-card__image">
-        <img src={post.image} alt={post.title} loading="lazy" />
-        <span>{post.category}</span>
-      </div>
-      <div className="blog-card__body">
-        <time>{post.date}</time>
-        <h3>{post.title}</h3>
-        <p>{post.excerpt}</p>
-        <small>{post.readTime}</small>
-      </div>
-    </Link>
-  );
-}
-
-function BlogSidebar() {
-  return (
-    <aside className="blog-sidebar">
-      <div className="blog-sidebar__quote" data-reveal>
-        <div className="blog-sidebar__icon">
-          <Mail aria-hidden="true" size={22} />
-        </div>
-        <h2>Get Your Free Quote</h2>
-        <p>Derek responds personally within hours.</p>
-        <QuoteForm variant="sidebar" />
-      </div>
-      <div className="blog-sidebar__recent" data-reveal>
-        <h2>Recent Articles</h2>
-        {blogPosts.slice(0, 5).map((post) => (
-          <Link to={`/blog/${post.slug}`} key={post.slug}>
-            <img src={post.image} alt="" loading="lazy" />
-            <span>
-              <strong>{post.title}</strong>
-              <small>{post.date}</small>
-            </span>
-          </Link>
-        ))}
-      </div>
-    </aside>
-  );
-}
-
 export default function Blog() {
-  const [category, setCategory] = useState('All');
   const pageRef = useRef(null);
-  const gridRef = useRef(null);
 
-  useDocumentMeta(
-    'Blog - Business Class Tips, Travel Hacks and Deals | Derek Monti',
-    'Read premium travel insights, business class tips, destination guides and Derek Monti fare strategy notes.',
-  );
   usePageMotion(pageRef);
-
-  const posts = useMemo(
-    () => (category === 'All' ? blogPosts : blogPosts.filter((post) => post.category === category)),
-    [category],
-  );
-
-  useEffect(() => {
-    const cards = gridRef.current?.querySelectorAll('.blog-card');
-    if (!cards?.length) return;
-    gsap.fromTo(cards, { opacity: 0, y: 22 }, { opacity: 1, y: 0, stagger: 0.06, duration: 0.42, ease: 'power3.out' });
-  }, [posts]);
 
   return (
     <div ref={pageRef}>
-      <section className="blog-hero scenic-section scenic-section--blog-hero">
-        <ScenicBackdrop backdrop={siteBackdrops.blogHero} loading="eager" />
-        <div className="container">
-          <p className="eyebrow">Current Articles</p>
-          <h1>Travel Smarter. Read Better.</h1>
-          <p>Premium travel guidance, fare logic, and destination notes from Derek's desk.</p>
-          <div className="blog-hero__search">
-            <Search aria-hidden="true" size={18} />
-            <span>Subscribe for premium travel updates</span>
-            <Button href="#contact" size="sm">
-              Request Quote
-            </Button>
+      <section className="guides-hero" aria-labelledby="guides-page-title">
+        <div className="container guides-hero__inner">
+          <div data-reveal>
+            <p className="eyebrow eyebrow--light">Decision guides</p>
+            <h1 id="guides-page-title">Travel questions, answered for the whole journey.</h1>
+          </div>
+          <p data-reveal>
+            Practical frameworks for comparing premium itineraries without pretending that one airline, seat, or
+            headline price fits every traveler.
+          </p>
+        </div>
+      </section>
+
+      <section className="guides-index" aria-labelledby="guide-list-title">
+        <div className="container guides-index__layout">
+          <aside data-reveal>
+            <BookOpenText aria-hidden="true" size={24} />
+            <p className="eyebrow">Current library</p>
+            <h2 id="guide-list-title">Start with a real decision.</h2>
+            <p>
+              Each guide has one purpose, an honest reading time based on its word count, and a request path that
+              matches the topic.
+            </p>
+          </aside>
+          <div className="guides-index__list">
+            {blogPosts.map((post, index) => (
+              <Link to={`/blog/${post.slug}`} key={post.slug} data-reveal>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <div>
+                  <small>
+                    {post.category} · {post.readTime}
+                  </small>
+                  <h3>{post.title}</h3>
+                  <p>{post.excerpt}</p>
+                </div>
+                <ArrowRight aria-hidden="true" size={20} />
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="blog-listing">
-        <div className="container">
-          <SectionHeader
-            eyebrow="Journal"
-            title="Business and First Class Intelligence"
-            text="Choose a category or scan the latest travel notes."
-          />
-          <div className="category-filter" role="tablist" aria-label="Blog categories">
-            {categories.map((item) => (
-              <button
-                type="button"
-                key={item}
-                className={category === item ? 'active' : ''}
-                onClick={() => setCategory(item)}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-          <div className="blog-layout">
-            <div className="blog-grid" ref={gridRef}>
-              {posts.map((post) => (
-                <BlogCard post={post} key={post.slug} />
-              ))}
-            </div>
-            <BlogSidebar />
-          </div>
+      <section className="editorial-note" aria-labelledby="editorial-note-title">
+        <div className="container editorial-note__inner" data-reveal>
+          <p className="eyebrow">Editorial standard</p>
+          <h2 id="editorial-note-title">Facts that change need a source and a review date.</h2>
+          <p>
+            These initial guides focus on durable decision frameworks. Schedule, aircraft, lounge, fare-rule, and
+            airline-product claims are not published here without a maintainable source and factual review.
+          </p>
         </div>
       </section>
 
       <FinalCta
-        title="Ready to Plan Your Next Premium Trip?"
-        text="Send Derek your route and dates - he replies personally with curated business or first class options."
+        title="Want the framework applied to your trip?"
+        text="Share the itinerary, the fixed constraints, and the priorities you want Derek to weigh."
       />
     </div>
   );

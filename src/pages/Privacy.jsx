@@ -1,16 +1,11 @@
 import { useRef } from 'react';
 import { contactConfig } from '../data/siteData.js';
-import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
-const LAST_UPDATED = 'May 25, 2026';
+const LAST_UPDATED = 'August 31, 2026';
 
 export default function Privacy() {
   const pageRef = useRef(null);
-  useDocumentMeta(
-    'Privacy Policy | Derek Monti',
-    'How Derek Monti collects, uses, and protects the personal information of travelers using this site.',
-  );
   usePageMotion(pageRef);
 
   return (
@@ -26,106 +21,98 @@ export default function Privacy() {
       <section className="legal-body">
         <div className="container legal-body__inner" data-reveal>
           <p>
-            Derek Monti ("Derek", "we", "I") operates this website to help travelers request business and first
-            class flight quotes. This policy explains what personal information is collected, why, where it is sent,
-            and the choices available to you.
-          </p>
-
-          <h2>Who is the data controller</h2>
-          <p>
-            Derek Monti is the data controller for personal information submitted through this site. Contact for
-            privacy questions or data subject requests: <a href={`mailto:${contactConfig.email}`}>{contactConfig.email}</a>.
+            Fly with Derek uses this website to receive requests for personal review of premium-flight itineraries.
+            This notice describes the data handled by the current site implementation and the services used to
+            deliver and protect a request.
           </p>
 
           <h2>What information we collect</h2>
           <ul>
             <li>
-              <strong>Quote request data:</strong> name, email, phone or WhatsApp number, origin, destination, travel
-              dates, passenger count, cabin preference, optional notes, optional private code, and the support
-              package selected.
+              <strong>Quote request data:</strong> trip type, origin and destination for each leg, travel dates,
+              traveler count, cabin and flexibility preferences, name, email, preferred contact method, optional
+              phone or WhatsApp number, optional notes, and privacy acknowledgement.
             </li>
             <li>
-              <strong>Technical data:</strong> IP address, user-agent, referring URL, and page-view metadata captured
-              by hosting (Vercel) and our cookieless analytics provider (Vercel Analytics).
+              <strong>Technical data:</strong> normal request information such as IP address and browser headers can
+              be processed by hosting and security services. Vercel Analytics is present for aggregate site usage.
             </li>
             <li>
-              <strong>Anti-abuse data:</strong> if the human-verification challenge is shown, Cloudflare Turnstile
-              processes signals (IP, browser environment) to determine whether the visitor is a real person. No
-              tracking cookies are set by Turnstile.
-            </li>
-          </ul>
-
-          <h2>Why we use it (legal basis)</h2>
-          <ul>
-            <li>
-              <strong>To respond to your quote request</strong> &mdash; pre-contractual measures at your request
-              (GDPR Art. 6(1)(b)).
+              <strong>Local form state:</strong> the browser may keep itinerary structure and travel preferences in
+              session storage so a page refresh is less disruptive. Contact details, notes, and acknowledgement are
+              not stored there by this site.
             </li>
             <li>
-              <strong>To follow up by email, phone, or WhatsApp</strong> &mdash; legitimate interest in responding to
-              inquiries we receive (GDPR Art. 6(1)(f)).
-            </li>
-            <li>
-              <strong>To prevent abuse, spam, and credential stuffing</strong> &mdash; legitimate interest in service
-              integrity (GDPR Art. 6(1)(f)).
-            </li>
-            <li>
-              <strong>Aggregate analytics</strong> &mdash; legitimate interest in improving the site (GDPR Art.
-              6(1)(f)).
+              <strong>Anti-abuse data:</strong> when configured, rate limiting uses an IP-derived key and Cloudflare
+              Turnstile verifies a challenge token before submission.
             </li>
           </ul>
 
-          <h2>Who processes your data (sub-processors)</h2>
+          <h2>Why we use it</h2>
           <ul>
             <li>
-              <strong>Resend</strong> (United States) &mdash; transactional email delivery. Quote details are sent to
-              Resend so the confirmation email and lead notification can be delivered.
+              <strong>To review and respond to your request</strong> using the contact method you select.
             </li>
             <li>
-              <strong>Vercel</strong> (United States, with EU edge regions) &mdash; site hosting and aggregate
-              analytics.
+              <strong>To deliver request and confirmation emails</strong> and preserve an operational record of the
+              conversation.
             </li>
             <li>
-              <strong>Cloudflare</strong> (global) &mdash; Turnstile human-verification challenge on the quote form.
+              <strong>To reduce spam and abuse</strong> through validation, a honeypot, rate limiting, and optional
+              human verification.
             </li>
             <li>
-              <strong>Upstash</strong> (United States) &mdash; ephemeral rate-limit counters keyed by IP address,
-              with a short time-to-live, to prevent abuse.
+              <strong>To understand aggregate site use</strong> and improve the experience without intentionally
+              sending form contact details or notes to analytics.
+            </li>
+          </ul>
+
+          <h2>Services used by the site</h2>
+          <ul>
+            <li>
+              <strong>Resend</strong> &mdash; sends the advisor notification and customer confirmation email.
+            </li>
+            <li>
+              <strong>Vercel</strong> &mdash; hosts the site and provides aggregate analytics.
+            </li>
+            <li>
+              <strong>Cloudflare Turnstile</strong> &mdash; verifies the form when the integration is configured.
+            </li>
+            <li>
+              <strong>Upstash Redis</strong> &mdash; stores short-lived rate-limit counters when configured; otherwise
+              the API uses an in-memory fallback.
             </li>
           </ul>
           <p>
-            Transfers outside the European Economic Area rely on Standard Contractual Clauses or equivalent
-            safeguards provided by these vendors.
+            Each service processes data under its own terms and privacy notice. Their deployment regions, account
+            settings, and retention controls can vary with the production configuration.
           </p>
 
           <h2>How long we keep it</h2>
           <p>
-            Quote request emails are retained in Derek&apos;s inbox for as long as the request is reasonably active,
-            and archived for up to 24 months for follow-up and record-keeping. Rate-limit counters expire within 10
-            minutes. Aggregate analytics are retained according to Vercel&apos;s defaults. You may request earlier
-            deletion at any time.
+            The site code does not define the retention period for delivered email or provider account records.
+            Rate-limit windows are configured for ten minutes. Browser session storage normally lasts for the tab
+            session and can be cleared through browser controls. Provider retention follows the production account
+            settings and applicable requirements.
           </p>
 
           <h2>Cookies</h2>
           <p>
-            This site does not set tracking cookies. Vercel Analytics is cookieless. Cloudflare Turnstile may set
-            short-lived cookies strictly necessary to run the challenge; these are not used for tracking.
+            The application code does not add advertising cookies. Hosting, analytics, or anti-abuse services may
+            process technical identifiers according to their current notices and the production configuration.
           </p>
 
           <h2>Your rights</h2>
           <p>
-            Under applicable data protection law (including GDPR for EEA visitors and equivalent regimes), you have
-            the right to access, correct, delete, restrict, or port your personal data, and to object to processing
-            based on legitimate interest. To exercise these rights, write to{' '}
-            <a href={`mailto:${contactConfig.email}`}>{contactConfig.email}</a>. EEA visitors also have the right to
-            lodge a complaint with their national supervisory authority.
+            Depending on the law that applies to you, you may have rights to ask about, correct, or delete personal
+            data and to object to or restrict some processing. Use the contact options below to make a request.
           </p>
 
           <h2>Security</h2>
           <p>
-            Connections to this site use HTTPS. The site enforces strict transport security, a strict
-            Content-Security-Policy, and uses sub-resource fonts hosted on its own origin to avoid third-party
-            tracking. Email delivery uses authenticated transport. No payment data is collected on this site.
+            Production hosting is configured for HTTPS and security headers. The form validates and sanitizes its
+            payload, limits request size, and applies anti-abuse controls. The site does not request payment-card or
+            passport data. No internet transmission or storage system can be promised as completely secure.
           </p>
 
           <h2>Changes to this policy</h2>
@@ -136,9 +123,8 @@ export default function Privacy() {
 
           <h2>Contact</h2>
           <p>
-            Questions: <a href={`mailto:${contactConfig.email}`}>{contactConfig.email}</a>
-            <br />
-            Phone: <a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a>
+            Privacy questions can be sent through the <a href="/#request-form">request form</a> or discussed by
+            phone at <a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a>.
           </p>
         </div>
       </section>

@@ -11,7 +11,6 @@ export function ensureEnv() {
   if (process.env.RESEND_API_KEY) return;
   try {
     const raw = readFileSync(ENV_PATH, 'utf-8');
-    let count = 0;
     for (const line of raw.split(/\r?\n/)) {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#')) continue;
@@ -22,19 +21,11 @@ export function ensureEnv() {
       const existing = process.env[key];
       if (key && (existing === undefined || existing === '')) {
         process.env[key] = value;
-        count += 1;
       }
     }
-    if (!attempted) {
-      attempted = true;
-      const status = process.env.RESEND_API_KEY ? 'SET' : 'NOT SET';
-      console.log(`[api/_loadEnv] loaded ${count} key(s) from ${ENV_PATH} — RESEND_API_KEY=${status}`);
-    }
-  } catch (err) {
-    if (!attempted) {
-      attempted = true;
-      console.log(`[api/_loadEnv] could not read ${ENV_PATH}:`, err.message);
-    }
+    attempted = true;
+  } catch {
+    attempted = true;
   }
 }
 

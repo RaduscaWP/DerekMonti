@@ -1,83 +1,127 @@
 import { useRef } from 'react';
-import { BadgeCheck, Handshake, HeartHandshake, Plane, TimerReset } from 'lucide-react';
-import AnimatedCounter from '../components/common/AnimatedCounter.jsx';
-import Button from '../components/common/Button.jsx';
+import { ArrowRight, Compass, FileCheck2, MessageCircle, Scale } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import FinalCta from '../components/common/FinalCta.jsx';
-import ReviewCard from '../components/common/ReviewCard.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
-import { airlines, imagery, reviews, siteBackdrops, timeline, values } from '../data/siteData.js';
-import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
+import { evaluationItems, imagery } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
-const valueIcons = [Handshake, TimerReset, HeartHandshake];
+const principles = [
+  {
+    icon: MessageCircle,
+    title: 'A direct conversation',
+    body: 'The trip brief stays connected to the person reviewing it, so priorities can be clarified in context.',
+  },
+  {
+    icon: Scale,
+    title: 'Tradeoffs made visible',
+    body: 'Schedule, cabin, routing, flexibility, and fare conditions are easier to weigh when differences are stated plainly.',
+  },
+  {
+    icon: Compass,
+    title: 'The journey stays central',
+    body: 'The purpose of the trip and the traveler’s real constraints shape the comparison—not a generic ranking.',
+  },
+  {
+    icon: FileCheck2,
+    title: 'A clear next step',
+    body: 'A quote request begins a review. It does not create a booking or promise an outcome before real options exist.',
+  },
+];
 
 export default function About() {
   const pageRef = useRef(null);
-  useDocumentMeta(
-    'About Derek Monti - Your Personal Aviation Advisor',
-    'Meet Derek Monti, a personal aviation advisor helping travelers access premium cabin fares with human support.',
-  );
+
   usePageMotion(pageRef);
 
   return (
     <div ref={pageRef}>
-      <section className="page-hero page-hero--about">
-        <img src={imagery.aboutHero} alt="Airplane at sunset" />
-        <div className="page-hero__overlay" />
-        <div className="page-hero__content page-hero__content--center">
-          <p className="eyebrow">About Derek</p>
-          <h1>Helping People Travel Smart.</h1>
-          <p>Years of aviation expertise, private fare access, and a service style built around direct attention.</p>
+      <section className="editorial-hero editorial-hero--about" aria-labelledby="about-title">
+        <div className="container editorial-hero__inner">
+          <div className="editorial-hero__copy" data-reveal>
+            <p className="eyebrow eyebrow--light">About Derek</p>
+            <h1 id="about-title">The person behind the request.</h1>
+            <p>
+              Fly with Derek is built around a simple idea: premium travel decisions are easier when one person can
+              understand the full trip and explain the tradeoffs clearly.
+            </p>
+            <Link className="text-link text-link--light" to="/#request-form">
+              Share your trip <ArrowRight aria-hidden="true" size={17} />
+            </Link>
+          </div>
+          <figure className="about-portrait" data-reveal>
+            <img
+              src={imagery.derekPortrait}
+              alt="Derek Monti"
+              width="1122"
+              height="1402"
+              loading="eager"
+              decoding="async"
+            />
+            <figcaption>
+              <strong>Derek Monti</strong>
+              <span>Personal premium-flight advisor</span>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
-      <section className="about-bio">
-        <div className="container about-bio__inner">
-          <div className="about-bio__portrait" data-reveal>
-            <div className="derek-portrait derek-portrait--large">
-              <img
-                src={imagery.derekPortrait}
-                alt="Derek Monti smiling in a navy blazer"
-                loading="lazy"
-                decoding="async"
-                width="1122"
-                height="1402"
-              />
-            </div>
+      <section className="about-intro" aria-labelledby="about-approach-title">
+        <div className="container about-intro__layout">
+          <div data-reveal>
+            <p className="eyebrow">The operating approach</p>
+            <h2 id="about-approach-title">A human review, without the mythology.</h2>
           </div>
-          <div className="about-bio__copy" data-reveal>
-            <p className="eyebrow">Meet Derek</p>
-            <h2>Your Personal Aviation Expert</h2>
+          <div className="about-intro__copy" data-reveal>
             <p>
-              Derek Monti works like a private aviation advisor for commercial premium cabins. He understands the fare
-              channels, routing details, and quiet service touches that make business and first class travel feel
-              effortless.
+              The website does not present live inventory, guaranteed pricing, airline endorsements, or a substitute
+              for the conditions attached to a real ticket. It gives travelers a structured way to share a premium
+              itinerary for personal review.
             </p>
             <p>
-              His model is intentionally personal. You are not handed from agent to agent; Derek reviews the request,
-              weighs the tradeoffs, and explains the quote clearly before you commit.
+              Derek’s role is to bring the request into one coherent comparison: what must stay fixed, what can move,
+              where the cabin matters most, and which fare conditions deserve attention before a decision.
             </p>
-            <div className="counter-grid">
-              <AnimatedCounter value={20} suffix="+" label="Clients served" />
-              <AnimatedCounter value={1800} prefix="$" label="Average savings" />
-              <AnimatedCounter value={5} suffix=".0" label="Review target" />
-              <AnimatedCounter value={24} suffix="/7" label="Personal support" />
-            </div>
           </div>
         </div>
       </section>
 
-      <section className="timeline-section">
+      <section className="principles-section" aria-labelledby="principles-title">
         <div className="container">
           <SectionHeader
-            eyebrow="My Story"
-            title="The Journey to Becoming Your Aviation Expert"
-            text="Placeholder milestones are ready for Derek's real career story."
+            eyebrow="Service philosophy"
+            title="What the experience is designed to protect."
+            text="A calm process, clear boundaries, and enough context to make a premium itinerary understandable."
           />
-          <div className="timeline">
-            {timeline.map((item, index) => (
-              <article className={index % 2 === 0 ? 'left' : 'right'} key={item.year} data-reveal>
-                <span>{item.year}</span>
+          <h2 className="sr-only" id="principles-title">
+            Service principles
+          </h2>
+          <div className="principles-grid">
+            {principles.map((principle) => {
+              const Icon = principle.icon;
+              return (
+                <article key={principle.title} data-reveal>
+                  <Icon aria-hidden="true" size={22} />
+                  <h3>{principle.title}</h3>
+                  <p>{principle.body}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="about-method" aria-labelledby="about-method-title">
+        <div className="container about-method__layout">
+          <div className="about-method__header" data-reveal>
+            <p className="eyebrow eyebrow--light">The review lens</p>
+            <h2 id="about-method-title">Six questions before one recommendation.</h2>
+            <p>Each lens keeps the discussion anchored to the complete journey.</p>
+          </div>
+          <div className="about-method__list">
+            {evaluationItems.map((item) => (
+              <article key={item.title} data-reveal>
+                <span>{item.number}</span>
                 <div>
                   <h3>{item.title}</h3>
                   <p>{item.body}</p>
@@ -88,76 +132,26 @@ export default function About() {
         </div>
       </section>
 
-      <section className="values-section">
-        <img src={imagery.cabin} alt="Premium lounge atmosphere" />
-        <div className="values-section__overlay" />
-        <div className="container">
-          <SectionHeader
-            eyebrow="What I Stand For"
-            title="My Commitment to You"
-            text="Premium travel deserves a clear, calm, human advisor."
-            light
-          />
-          <div className="values-grid">
-            {values.map((value, index) => {
-              const Icon = valueIcons[index];
-              return (
-                <article key={value.title} data-reveal>
-                  <span>
-                    <Icon aria-hidden="true" size={24} />
-                  </span>
-                  <h3>{value.title}</h3>
-                  <p>{value.body}</p>
-                </article>
-              );
-            })}
+      <section className="about-boundary" aria-labelledby="about-boundary-title">
+        <div className="container about-boundary__inner" data-reveal>
+          <p className="eyebrow">Clear expectations</p>
+          <h2 id="about-boundary-title">What a request does—and does not do.</h2>
+          <div>
+            <p>
+              It gives Derek the route, dates, cabin preference, flexibility, and traveler priorities needed for an
+              initial review.
+            </p>
+            <p>
+              It does not reserve a seat, lock a fare, guarantee availability, or imply a relationship with any
+              airline. Those details can only be assessed against real options and their applicable rules.
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="airline-grid-section">
-        <div className="container">
-          <SectionHeader
-            eyebrow="Partner Airlines"
-            title="Airlines Derek Can Quote"
-            text="A practical premium network across the carriers travelers request most often."
-          />
-          <div className="airline-grid">
-            {airlines.slice(0, 12).map((airline) => (
-              <span key={airline} data-reveal>
-                <Plane aria-hidden="true" size={17} />
-                {airline}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="testimonials testimonials--light">
-        <div className="container">
-          <div className="testimonials__intro" data-reveal>
-            <p className="eyebrow">Social Proof</p>
-            <h2>Trusted by Premium Travelers</h2>
-            <p>Replace these placeholders with real Trustpilot reviews once Derek provides his page.</p>
-            <Button href="https://www.trustpilot.com/" variant="ghost">
-              See all reviews
-            </Button>
-          </div>
-          <div className="review-grid">
-            {reviews.map((review) => (
-              <ReviewCard review={review} key={review.name} />
-            ))}
-          </div>
-          <div className="about-badge" data-reveal>
-            <BadgeCheck aria-hidden="true" size={22} />
-            <span>Rated 5.0 / 5 placeholder</span>
-          </div>
-        </div>
-      </section>
       <FinalCta
-        backdrop={siteBackdrops.aboutFinalCta}
-        title="Ready to Work With Derek?"
-        text="Get in touch today and receive your personalized quote within hours."
+        title="Have a premium trip in mind?"
+        text="Share the itinerary and the constraints that matter. The next step is a personal review, not an automated booking."
       />
     </div>
   );

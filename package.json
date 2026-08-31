@@ -5,8 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build",
-    "preview": "vite preview --host 127.0.0.1"
+    "build": "npm run build:client && npm run build:ssr && npm run prerender && npm run validate:seo",
+    "build:client": "vite build",
+    "build:ssr": "vite build --ssr src/entry-server.jsx --outDir .vite/ssr",
+    "prerender": "node scripts/prerender.mjs",
+    "validate:seo": "node scripts/validate-prerender.mjs",
+    "test": "node --test tests/quote-contract.test.mjs tests/seo-deployment.test.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "preview:static": "node scripts/serve-prerender.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",

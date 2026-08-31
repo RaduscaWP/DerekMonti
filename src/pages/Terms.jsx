@@ -1,16 +1,11 @@
 import { useRef } from 'react';
 import { contactConfig } from '../data/siteData.js';
-import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
-const LAST_UPDATED = 'May 25, 2026';
+const LAST_UPDATED = 'August 31, 2026';
 
 export default function Terms() {
   const pageRef = useRef(null);
-  useDocumentMeta(
-    'Terms of Service | Derek Monti',
-    'The terms that apply when you request a flight quote or interact with Derek Monti.',
-  );
   usePageMotion(pageRef);
 
   return (
@@ -32,59 +27,49 @@ export default function Terms() {
 
           <h2>Nature of the service</h2>
           <p>
-            Derek Monti is an independent aviation advisor. The site does not sell tickets directly. Quote requests
-            submitted through the form result in a personal reply from Derek with itinerary options sourced through
-            licensed travel partners. Tickets, when issued, are issued by the operating airline or ticketing
-            partner; the airline&apos;s fare rules apply.
+            Fly with Derek is an independent request and guidance website. It does not display live inventory, take
+            payment, issue tickets, or represent an airline. A submitted request gives Derek information to review;
+            it does not create a booking, agency relationship, seat hold, or promise of a particular outcome.
           </p>
 
           <h2>Quotes are not bookings</h2>
           <p>
-            Any pricing shown on the site or in a reply is a quote based on availability at the time. Fares change
-            quickly. A quote becomes a confirmed booking only after the ticketing partner issues the ticket and the
-            traveler completes payment.
+            The site does not show live prices or availability. If an itinerary or price is later discussed, its
+            provider, availability, conditions, payment process, and confirmation status must be reviewed separately.
+            Nothing is confirmed merely because you submit this form or receive an initial message.
           </p>
 
           <h2>Your responsibilities</h2>
           <ul>
             <li>Provide accurate trip details, passenger names, and contact information.</li>
-            <li>Verify passport validity, visas, and any health or entry requirements for your route.</li>
-            <li>Review fare rules, change fees, and cancellation conditions before paying for a ticket.</li>
+            <li>Verify passports, visas, health rules, and entry requirements with current official sources.</li>
+            <li>Review the issuing party, fare rules, fees, change terms, and cancellation conditions before paying.</li>
             <li>Do not submit fraudulent requests, automated traffic, or third-party information without consent.</li>
           </ul>
 
           <h2>Cancellations, changes, and refunds</h2>
           <p>
-            Changes and refunds follow the operating airline&apos;s fare rules and any consolidator partner
-            conditions disclosed before booking. Derek will explain the relevant rules before any ticket is issued.
-            Service fees, if any, will be disclosed in writing before payment.
+            This website does not set ticket change, cancellation, or refund rules. Those terms depend on the actual
+            ticket and issuing party. Review the complete written conditions before proceeding with any purchase.
           </p>
 
-          <h2>No guarantee of savings</h2>
+          <h2>No guarantee of price or availability</h2>
           <p>
-            Sample savings shown on this site reflect comparable recent quotes and are illustrative. Actual savings
-            depend on route, dates, cabin, inventory, and timing. No specific saving amount is guaranteed.
+            No particular price, saving, cabin, schedule, aircraft, route, or availability is promised. Airline
+            products and operating details can change, so current information must be checked before a decision.
           </p>
 
           <h2>Intellectual property</h2>
           <p>
-            Content on this site, including text, layout, and imagery, is owned by Derek Monti or used under license
-            from the original creators (for example, Unsplash and Pexels contributors). Do not reuse the content
-            without permission.
+            Do not reproduce or commercially reuse site content beyond uses permitted by applicable law without
+            first obtaining permission from the relevant rights holder.
           </p>
 
-          <h2>Limitation of liability</h2>
+          <h2>General information</h2>
           <p>
-            To the extent permitted by law, Derek Monti is not liable for indirect or consequential losses arising
-            from use of the site or reliance on a quote, including travel disruption caused by airlines, weather,
-            government action, or other third-party events. Mandatory consumer rights are unaffected.
-          </p>
-
-          <h2>Governing law</h2>
-          <p>
-            These terms are governed by the laws applicable at Derek Monti&apos;s place of business. Disputes that
-            cannot be resolved informally will be resolved by the competent courts at that location, without
-            limiting any mandatory consumer rights you have in your country of residence.
+            Guides on this site are general planning information, not legal, immigration, safety, or financial
+            advice. Use current airline and government sources for decisions that depend on changing rules. Nothing
+            in these terms limits rights that cannot lawfully be limited.
           </p>
 
           <h2>Changes</h2>
@@ -95,9 +80,8 @@ export default function Terms() {
 
           <h2>Contact</h2>
           <p>
-            Questions: <a href={`mailto:${contactConfig.email}`}>{contactConfig.email}</a>
-            <br />
-            Phone: <a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a>
+            Questions can be sent through the <a href="/#request-form">request form</a> or discussed by phone at{' '}
+            <a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a>.
           </p>
         </div>
       </section>

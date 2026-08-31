@@ -1,89 +1,85 @@
-import { Instagram, Linkedin, MessageCircle } from 'lucide-react';
+import { ArrowUpRight, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { contactConfig } from '../../data/siteData.js';
 import { getWhatsappUrl } from '../../utils/message.js';
 
-const columns = [
-  {
-    title: 'Navigation',
-    links: ['Home', 'Services', 'About', 'Blog', 'Contact'],
-  },
-  {
-    title: 'Regions',
-    links: ['Europe', 'Asia', 'Middle East', 'North America', 'Latin America', 'Oceania'],
-  },
-  {
-    title: 'Countries',
-    links: ['France', 'Italy', 'Germany', 'Japan', 'UAE', 'UK', 'View More'],
-  },
-  {
-    title: 'Airlines',
-    links: ['Emirates', 'Qatar', 'Turkish', 'Singapore', 'Cathay Pacific', 'Lufthansa'],
-  },
+const navigation = [
+  { label: 'Business Class', to: '/business-class-flights' },
+  { label: 'First Class', to: '/first-class-flights' },
+  { label: 'Services', to: '/services' },
+  { label: 'Guides', to: '/blog' },
+  { label: 'About Derek', to: '/about' },
+];
+
+const planning = [
+  { label: 'US to Europe', to: '/business-class-flights/europe' },
+  { label: 'Europe to USA', to: '/business-class-flights/usa' },
+  { label: 'Complex Itineraries', to: '/services/complex-itineraries' },
+  { label: 'Time-Sensitive Travel', to: '/services/last-minute-business-class' },
+  { label: 'Premium Flight Advisor', to: '/services/premium-flight-advisor' },
 ];
 
 export default function Footer() {
+  const whatsapp = getWhatsappUrl({ requestTitle: 'Premium flight request' });
+
   return (
     <footer className="footer">
-      <div className="footer__main">
-        <div className="footer__brand footer-col" data-reveal>
-          <a className="footer__logo" href="/">
-            Derek <strong>Monti</strong>
+      <div className="container footer__top">
+        <div className="footer__brand" data-reveal>
+          <Link to="/" className="footer__logo">
+            Fly with <strong>Derek</strong>
+          </Link>
+          <p>Personal review for business- and first-class flight requests.</p>
+          <a href="/#request-form" className="footer__quote">
+            Request a personal review <ArrowUpRight aria-hidden="true" size={17} />
           </a>
-          <p>Your personal aviation advisor - premium seats at prices you will not find anywhere else.</p>
-          <div className="footer__socials">
-            <a href="https://www.linkedin.com/" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
-              <Linkedin aria-hidden="true" size={18} />
-            </a>
-            <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-              <Instagram aria-hidden="true" size={18} />
-            </a>
-            <a href={getWhatsappUrl()} aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
-              <MessageCircle aria-hidden="true" size={18} />
-            </a>
-          </div>
         </div>
 
-        {columns.map((column) => (
-          <div className="footer__column footer-col" key={column.title} data-reveal>
-            <h3>{column.title}</h3>
-            <ul>
-              {column.links.map((link) => (
-                <li key={link}>
-                  <a href={link === 'Contact' ? '#contact' : '#'}>{link}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <nav className="footer__column" aria-label="Site navigation" data-reveal>
+          <h2>Navigate</h2>
+          {navigation.map((item) => (
+            <Link to={item.to} key={item.to}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-        <div className="footer__contact footer-col" data-reveal>
-          <h3>Contact</h3>
+        <nav className="footer__column" aria-label="Planning pages" data-reveal>
+          <h2>Plan</h2>
+          {planning.map((item) => (
+            <Link to={item.to} key={item.to}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="footer__contact" data-reveal>
+          <h2>Direct contact</h2>
           <a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a>
-          <a href={`mailto:${contactConfig.email}`}>{contactConfig.email}</a>
-          <a className="footer__whatsapp" href={getWhatsappUrl()} target="_blank" rel="noopener noreferrer">
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer">
+            <MessageCircle aria-hidden="true" size={17} />
             WhatsApp Derek
           </a>
-          <a
-            className="footer__trust"
-            href={contactConfig.trustpilotUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <strong>Excellent</strong>
-            <span>Read reviews on Trustpilot</span>
-          </a>
+          <p>Do not send passport, payment, or account credentials through the website.</p>
+        </div>
+      </div>
+
+      <div className="footer__disclosure">
+        <div className="container">
+          <p>
+            Fly with Derek is an independent advisory service. Airline names and trademarks belong to their
+            respective owners; no airline endorsement or affiliation is implied.
+          </p>
         </div>
       </div>
 
       <div className="footer__bottom">
-        <p>Copyright 2026 Derek Monti. All fares are subject to availability and airline fare rules.</p>
-        <div>
-          <Link to="/privacy">Privacy Policy</Link>
-          <Link to="/terms">Terms</Link>
-          <span>Visa</span>
-          <span>Mastercard</span>
-          <span>American Express</span>
+        <div className="container">
+          <p>© {new Date().getFullYear()} Fly with Derek.</p>
+          <div>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </div>
         </div>
       </div>
     </footer>

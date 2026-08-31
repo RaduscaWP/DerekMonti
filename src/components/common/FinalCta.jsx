@@ -4,36 +4,28 @@ import { getWhatsappUrl } from '../../utils/message.js';
 import Button from './Button.jsx';
 
 export default function FinalCta({
-  title = 'Ready to Fly Better for Less?',
-  text = 'Send Derek your travel details and receive curated options within hours.',
-  crimson = false,
-  backdrop = null,
+  title = 'Have a premium trip in mind?',
+  text = 'Share the route, dates, flexibility, and the priorities that matter most.',
 }) {
+  const whatsapp = getWhatsappUrl({ requestTitle: 'Premium flight request' });
+
   return (
-    <section
-      className={`final-cta ${crimson ? 'final-cta--crimson' : ''} ${
-        backdrop ? 'scenic-section scenic-section--final-cta final-cta--with-backdrop' : ''
-      }`}
-      id="contact"
-    >
-      {backdrop && (
-        <>
-          <img className="scenic-section__image" src={backdrop.src} alt={backdrop.alt} />
-          <div className="scenic-section__overlay" aria-hidden="true" />
-        </>
-      )}
-      <div className="final-cta__inner" data-reveal>
-        <p className="eyebrow">REQUEST A QUOTE</p>
-        <h2>{title}</h2>
-        <p>{text}</p>
+    <section className="final-cta" aria-labelledby="final-cta-title">
+      <div className="container final-cta__inner" data-reveal>
+        <div>
+          <p className="eyebrow eyebrow--light">Request a review</p>
+          <h2 id="final-cta-title">{title}</h2>
+          <p>{text}</p>
+        </div>
         <div className="final-cta__actions">
-          <Button href={`mailto:${contactConfig.email}?subject=Business%20%26%20First%20Class%20Flight%20Quote%20Request`}>
-            Request a Quote
+          <Button href="/#request-form" size="lg">
+            Request a personal review
           </Button>
-          <Button href={getWhatsappUrl()} variant="outline" icon={false}>
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer">
             <MessageCircle aria-hidden="true" size={18} />
-            <span>Chat on WhatsApp</span>
-          </Button>
+            WhatsApp Derek
+          </a>
+          <a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a>
         </div>
       </div>
     </section>

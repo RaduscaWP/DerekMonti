@@ -13,8 +13,10 @@ export default function Button({
   const classes = `btn btn--${variant} btn--${size} ${className}`.trim();
 
   if (href) {
+    const external = /^https?:\/\//.test(href);
+    const linkProps = external && props.target === '_blank' ? { rel: 'noopener noreferrer' } : {};
     return (
-      <a className={classes} href={href} {...props}>
+      <a className={classes} href={href} {...linkProps} {...props}>
         <span>{children}</span>
         {icon && <ArrowRight aria-hidden="true" size={18} strokeWidth={2.1} />}
       </a>

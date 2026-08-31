@@ -1,88 +1,95 @@
 import { useRef } from 'react';
+import { ArrowLeft, ArrowRight, Clock3 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Share2 } from 'lucide-react';
-import Button from '../components/common/Button.jsx';
-import QuoteForm from '../components/common/QuoteForm.jsx';
-import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
-import { blogPosts, contactConfig, siteBackdrops } from '../data/siteData.js';
-import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
+import FinalCta from '../components/common/FinalCta.jsx';
+import { blogPosts } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
+import NotFound from './NotFound.jsx';
 
 export default function BlogArticle() {
   const { slug } = useParams();
   const pageRef = useRef(null);
-  const post = blogPosts.find((item) => item.slug === slug) || blogPosts[0];
-  const related = blogPosts.filter((item) => item.slug !== post.slug).slice(0, 3);
+  const post = blogPosts.find((item) => item.slug === slug);
+  const related = post ? blogPosts.filter((item) => item.slug !== post.slug).slice(0, 2) : [];
 
-  useDocumentMeta(`${post.title} | Derek Monti`, post.excerpt);
   usePageMotion(pageRef);
+
+  if (!post) {
+    return <NotFound />;
+  }
 
   return (
     <div ref={pageRef}>
-      <section className="article-hero">
-        <img src={post.image} alt={post.title} />
-        <div className="article-hero__overlay" />
-        <div className="article-hero__content">
-          <Link to="/blog" className="article-hero__back">
-            <ArrowLeft aria-hidden="true" size={18} />
-            Blog
+      <header className="article-header">
+        <div className="container article-header__inner">
+          <Link to="/blog" className="article-header__back">
+            <ArrowLeft aria-hidden="true" size={17} />
+            All guides
           </Link>
-          <span>{post.category}</span>
+          <p className="eyebrow eyebrow--light">{post.category}</p>
           <h1>{post.title}</h1>
-          <p>
-            {post.date} - {post.readTime}
-          </p>
+          <div className="article-header__meta">
+            <span>
+              <Clock3 aria-hidden="true" size={16} />
+              {post.readTime}
+            </span>
+            <span>{post.wordCount.toLocaleString('en-US')} words</span>
+          </div>
         </div>
-      </section>
+      </header>
 
-      <section className="article-layout">
-        <div className="container article-layout__inner">
-          <article className="article-body" data-reveal>
-            <p className="article-body__lead">{post.excerpt}</p>
-            {post.body.map((section) => (
+      <div className="article-page">
+        <div className="container article-page__layout">
+          <article className="article-content" data-reveal>
+            <p className="article-content__lead">{post.excerpt}</p>
+            {post.sections.map((section) => (
               <section key={section.heading}>
                 <h2>{section.heading}</h2>
-                <p>{section.text}</p>
+                {section.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+                {section.bullets?.length > 0 && (
+                  <ul>
+                    {section.bullets.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
               </section>
             ))}
-            <blockquote>
-              Derek's rule of thumb: a premium fare should save money without making the journey harder.
-            </blockquote>
-            <div className="article-share">
-              <Share2 aria-hidden="true" size={18} />
-              <span>Share this article with a traveler who overpays for business class.</span>
-            </div>
+            <aside className="article-content__caveat">
+              <strong>Important</strong>
+              <p>
+                This guide is general decision support, not live fare or inventory information. A real itinerary must
+                be checked against its current cabin, availability, and ticket conditions.
+              </p>
+            </aside>
           </article>
 
-          <aside className="article-sidebar">
-            <div className="article-sidebar__quote" data-reveal>
-              <h2>Request a Quote</h2>
-              <p>Send Derek your route and receive options personally.</p>
-              <QuoteForm variant="sidebar" />
-            </div>
-            <div className="article-sidebar__related" data-reveal>
-              <h2>Related Articles</h2>
+          <aside className="article-rail" aria-label="Related guidance">
+            <div>
+              <p className="eyebrow">Related guides</p>
               {related.map((item) => (
                 <Link to={`/blog/${item.slug}`} key={item.slug}>
-                  <img src={item.image} alt="" loading="lazy" />
-                  <span>{item.title}</span>
+                  <span>{item.category}</span>
+                  <strong>{item.title}</strong>
+                  <ArrowRight aria-hidden="true" size={17} />
                 </Link>
               ))}
             </div>
+            <Link className="article-rail__quote" to="/#request-form">
+              <span>Apply this to your trip</span>
+              <strong>Request a personal review</strong>
+              <ArrowRight aria-hidden="true" size={18} />
+            </Link>
           </aside>
         </div>
-      </section>
+      </div>
 
-      <section className="article-cta scenic-section scenic-section--article-cta" id="contact">
-        <ScenicBackdrop backdrop={siteBackdrops.articleCta} />
-        <div className="container" data-reveal>
-          <h2>Have a route in mind?</h2>
-          <p>Derek can compare public fares against private premium cabin options.</p>
-          <Button href={`mailto:${contactConfig.email}?subject=Premium%20flight%20quote%20request`}>
-            Send Derek the Trip
-          </Button>
-        </div>
-      </section>
+      <FinalCta
+        title="Turn the framework into a trip brief."
+        text="Send the route, dates, flexibility, and the tradeoffs that matter most to you."
+      />
     </div>
   );
 }

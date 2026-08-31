@@ -1,100 +1,159 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Menu, Phone, X } from 'lucide-react';
-import { gsap } from 'gsap';
-import { contactConfig } from '../../data/siteData.js';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { ArrowRight, Menu, X } from 'lucide-react';
 
 const navItems = [
-  { label: 'Home', to: '/' },
+  { label: 'Business Class', to: '/business-class-flights' },
+  { label: 'First Class', to: '/first-class-flights' },
   { label: 'Services', to: '/services' },
+  { label: 'Guides', to: '/blog' },
   { label: 'About', to: '/about' },
-  { label: 'Blog', to: '/blog' },
 ];
 
 export default function Navbar() {
-  const navRef = useRef(null);
+  const location = useLocation();
+  const toggleRef = useRef(null);
+  const dialogRef = useRef(null);
+  const restoreFocusRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 80);
+    const handleScroll = () => setIsScrolled(window.scrollY > 28);
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
-    if (navRef.current) {
-      const tween = gsap.fromTo(
-        navRef.current,
-        { y: -100, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power3.out',
-          delay: 0.15,
-          clearProps: 'transform,opacity',
-        },
-      );
-      return () => tween.kill();
-    }
-    return undefined;
-  }, []);
+    restoreFocusRef.current = false;
+    setIsOpen(false);
+  }, [location.pathname, location.hash]);
+
+  const openMenu = () => {
+    restoreFocusRef.current = true;
+    setIsOpen(true);
+  };
+
+  const closeMenu = ({ restoreFocus = true } = {}) => {
+    restoreFocusRef.current = restoreFocus;
+    setIsOpen(false);
+  };
+
+  const closeForNavigation = (destination) => {
+    const target = new URL(destination, window.location.origin);
+    const sameLocation = target.pathname === location.pathname && target.hash === location.hash;
+    closeMenu({ restoreFocus: sameLocation });
+  };
 
   useEffect(() => {
-    document.body.classList.toggle('nav-open', isOpen);
-    return () => document.body.classList.remove('nav-open');
+    if (!isOpen) return undefined;
+
+    const dialog = dialogRef.current;
+    const focusable = dialog?.querySelectorAll('a[href], button:not([disabled])') || [];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    first?.focus();
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMenu();
+        return;
+      }
+      if (event.key !== 'Tab' || focusable.length < 2) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      if (restoreFocusRef.current) toggleRef.current?.focus();
+      restoreFocusRef.current = false;
+    };
   }, [isOpen]);
 
+  const solid = isScrolled || location.pathname !== '/';
+
   return (
-    <header className={`navbar ${isScrolled ? 'scrolled' : ''}`} ref={navRef}>
-      <a className="navbar__brand" href="/">
-        <span>Derek</span>
-        <strong>Monti</strong>
-      </a>
+    <header className={`navbar ${solid ? 'navbar--solid' : ''}`}>
+      <div className="container navbar__inner">
+        <Link className="navbar__brand" to="/" aria-label="Fly with Derek home">
+          <span>Fly with</span>
+          <strong>Derek</strong>
+        </Link>
 
-      <nav className="navbar__links" aria-label="Primary navigation">
-        {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} end={item.to === '/'}>
-            {item.label}
-          </NavLink>
-        ))}
-        <a href="#contact">Contact</a>
-      </nav>
-
-      <div className="navbar__contact">
-        <a href={`tel:${contactConfig.phoneHref}`}>
-          <small>Call Derek 24/7</small>
-          <span>{contactConfig.phoneLabel}</span>
-        </a>
-        <a className="navbar__call" href={`tel:${contactConfig.phoneHref}`} aria-label="Call Derek">
-          <Phone aria-hidden="true" size={18} />
-        </a>
-      </div>
-
-      <button className="navbar__toggle" type="button" onClick={() => setIsOpen(true)} aria-label="Open menu">
-        <Menu aria-hidden="true" />
-      </button>
-
-      <div className={`mobile-menu ${isOpen ? 'open' : ''}`} aria-hidden={!isOpen}>
-        <button type="button" onClick={() => setIsOpen(false)} aria-label="Close menu">
-          <X aria-hidden="true" />
-        </button>
-        <nav>
+        <nav className="navbar__links" aria-label="Primary navigation">
           {navItems.map((item) => (
-            <NavLink key={item.to} to={item.to} onClick={() => setIsOpen(false)} end={item.to === '/'}>
+            <NavLink key={item.to} to={item.to}>
               {item.label}
             </NavLink>
           ))}
-          <a href="#contact" onClick={() => setIsOpen(false)}>
-            Contact
-          </a>
         </nav>
-        <a className="mobile-menu__phone" href={`tel:${contactConfig.phoneHref}`}>
-          {contactConfig.phoneLabel}
+
+        <a className="navbar__cta" href="/#request-form">
+          Request a quote
+          <ArrowRight aria-hidden="true" size={17} />
         </a>
+
+        <button
+          ref={toggleRef}
+          className="navbar__toggle"
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls="mobile-navigation"
+          aria-label="Open navigation menu"
+          onClick={openMenu}
+        >
+          <Menu aria-hidden="true" size={24} />
+        </button>
       </div>
+
+      {isOpen && (
+        <div
+          className="mobile-menu"
+          id="mobile-navigation"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+        >
+          <div className="mobile-menu__top">
+            <Link className="navbar__brand" to="/" onClick={() => closeForNavigation('/')}>
+              <span>Fly with</span>
+              <strong>Derek</strong>
+            </Link>
+            <button type="button" onClick={() => closeMenu()} aria-label="Close navigation menu">
+              <X aria-hidden="true" size={25} />
+            </button>
+          </div>
+          <nav aria-label="Mobile navigation">
+            {navItems.map((item, index) => (
+              <NavLink key={item.to} to={item.to} onClick={() => closeForNavigation(item.to)}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+          <a
+            className="mobile-menu__cta"
+            href="/#request-form"
+            onClick={() => closeForNavigation('/#request-form')}
+          >
+            Request a personal review
+            <ArrowRight aria-hidden="true" size={18} />
+          </a>
+        </div>
+      )}
     </header>
   );
 }

@@ -1,525 +1,233 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft,
+  ArrowDown,
   ArrowRight,
-  BadgeCheck,
-  BriefcaseBusiness,
-  CalendarClock,
-  CircleDollarSign,
-  ConciergeBell,
-  Gem,
-  Headphones,
-  PlaneTakeoff,
+  CalendarRange,
+  Check,
+  Compass,
+  FileSearch,
+  MessageCircle,
+  Plane,
   Route,
-  Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import { gsap } from 'gsap';
-import AirlineMarquee from '../components/common/AirlineMarquee.jsx';
 import Button from '../components/common/Button.jsx';
 import FaqAccordion from '../components/common/FaqAccordion.jsx';
-import FinalCta from '../components/common/FinalCta.jsx';
 import QuoteForm from '../components/common/QuoteForm.jsx';
-import RouteCarousel from '../components/common/RouteCarousel.jsx';
-import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
 import {
   blogPosts,
+  capabilities,
   contactConfig,
-  extraServices,
-  imagery,
-  homeHeroVideo,
+  discoveryLinks,
+  evaluationItems,
   homeFaqs,
-  methodology,
-  routeDeals,
-  siteBackdrops,
+  imagery,
   steps,
   whyDerek,
 } from '../data/siteData.js';
-import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
-import { initParticles } from '../utils/threeParticles.js';
-import {
-  ACCRUED_MILES_SERVICE_VALUE,
-  GUIDANCE_SERVICE_VALUE,
-  STANDARD_SERVICE_VALUE,
-} from '../utils/quoteRequest.js';
+import { getWhatsappUrl } from '../utils/message.js';
 
-const reasonIcons = [CircleDollarSign, CalendarClock, Route, ConciergeBell, Headphones, BadgeCheck];
-const stepIcons = [PlaneTakeoff, BriefcaseBusiness, Sparkles, Gem];
-const HOME_REQUEST_TITLE = 'Business & First Class Flight Quote Request';
-const HOME_REQUEST_SOURCE = 'Home Page quote form';
-const packageCards = [
-  {
-    value: GUIDANCE_SERVICE_VALUE,
-    title: 'Guidance Package',
-    summary:
-      'Derek reviews your fare, checks the route logic, and helps you unlock better-value business or first class options.',
-    meta: 'Fee: 50% of verified savings unlocked through Derek’s guidance.',
-    detail:
-      'Example: if Derek helps you save $1,000 compared to the verified published fare, the guidance fee is $500. Final options and savings are confirmed directly before booking.',
-    Icon: Sparkles,
-  },
-  {
-    value: ACCRUED_MILES_SERVICE_VALUE,
-    title: 'Use Your Accrued Miles',
-    summary:
-      'Have unused miles or reward points? Derek helps you understand where they create the most value for business or first class travel.',
-    meta: 'Best for travelers with airline miles, card points, or loyalty rewards.',
-    detail:
-      'Best for travelers with airline miles, card points, or loyalty rewards who want help turning them into smarter premium-cabin options.',
-    Icon: CircleDollarSign,
-  },
-];
+const HOME_REQUEST_TITLE = 'Premium flight quote request';
+const HOME_REQUEST_SOURCE = 'Home page quote form';
+const whyIcons = [MessageCircle, FileSearch, Compass, Route];
+const stepIcons = [CalendarRange, FileSearch, Check];
 
-function TravelAdvantageSelector({ selectedService, onSelectService, promoCode, onPromoCodeChange }) {
-  return (
-    <section className="travel-advantage" aria-labelledby="travel-advantage-title">
-      <div className="travel-advantage__header">
-        <p className="travel-advantage__eyebrow">Optional Support</p>
-        <h2 id="travel-advantage-title">Select Your Travel Advantage</h2>
-        <p>Pick the support option that best matches your trip. Derek will review the details personally.</p>
-      </div>
+function canUseDecorativeWebGl() {
+  if (typeof window === 'undefined') return false;
+  if (window.innerWidth < 900 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
 
-      <div className="travel-advantage__grid">
-        {packageCards.map((card) => {
-          const selected = selectedService === card.value;
-          const toggleSelection = () => onSelectService(selected ? STANDARD_SERVICE_VALUE : card.value);
-
-          return (
-            <button
-              type="button"
-              className={`travel-advantage__card ${selected ? 'is-selected' : ''}`}
-              key={card.value}
-              aria-pressed={selected}
-              onClick={toggleSelection}
-            >
-              <div className="travel-advantage__card-top">
-                <span className="travel-advantage__icon">
-                  <card.Icon aria-hidden="true" size={20} />
-                </span>
-                <span className="travel-advantage__status">{selected ? 'Selected' : 'Add'}</span>
-              </div>
-              <div className="travel-advantage__card-copy">
-                <strong>{card.title}</strong>
-                <p>{card.summary}</p>
-                <span>{card.meta}</span>
-                {selected && <small>{card.detail}</small>}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="travel-advantage__code">
-        <label htmlFor="private-code" className="travel-advantage__code-label">
-          <span>Private Code</span>
-          <input
-            id="private-code"
-            name="promoCode"
-            type="text"
-            value={promoCode}
-            onChange={(event) => onPromoCodeChange(event.target.value)}
-            placeholder="For returning clients or private referrals"
-            autoComplete="off"
-            maxLength={120}
-          />
-        </label>
-        <p className="travel-advantage__hint">No selection needed for a standard flight request.</p>
-      </div>
-    </section>
-  );
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch {
+    return false;
+  }
 }
 
-function GoogleMark() {
-  return (
-    <svg viewBox="0 0 48 48" aria-hidden="true" className="trust-logo trust-logo--google">
-      <path fill="#4285F4" d="M43.6 20.5H42V20H24v8h11.3C33.6 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.2-.1-2.3-.4-3.5z" />
-      <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.6 15.1 18.9 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 16.2 4 9.4 8.5 6.3 14.7z" />
-      <path fill="#FBBC05" d="M24 44c5.2 0 9.9-2 13.4-5.3l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.6 5.1C9.2 39.5 16.1 44 24 44z" />
-      <path fill="#EA4335" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.2 5.2C36.9 39.1 44 34 44 24c0-1.2-.1-2.3-.4-3.5z" />
-    </svg>
-  );
-}
-
-function TrustpilotMark() {
-  return (
-    <svg viewBox="0 0 176 44" aria-label="Trustpilot" className="trust-logo trust-logo--trustpilot" role="img">
-      <path fill="#00B67A" d="M35.2 15.4H24.9L21.7 5.6l-3.2 9.8H8.2l8.4 6.1-3.2 9.8 8.4-6.1 8.3 6.1-3.2-9.8 8.3-6.1Z" />
-      <path fill="#005128" d="m27.6 23.7-.7-2.2-5.1 3.7 5.8-1.5Z" />
-      <text x="45" y="29" fill="#0B1929" fontFamily="Arial, Helvetica, sans-serif" fontSize="23" fontWeight="700" letterSpacing="-.7">
-        Trustpilot
-      </text>
-    </svg>
-  );
-}
-
-function BbbMark() {
-  return (
-    <svg viewBox="0 0 132 50" aria-label="BBB Accredited Business" className="trust-logo trust-logo--bbb" role="img">
-      <rect width="132" height="50" rx="6" fill="#0B1929" />
-      <path d="M21 10h13c5 0 8 2.3 8 6.4 0 2.4-1.2 4.2-3.3 5.2 2.8.9 4.5 3 4.5 6.2 0 4.8-3.8 7.2-9.1 7.2H21V10Zm12 10.2c2 0 3.1-.9 3.1-2.5 0-1.7-1.2-2.5-3.3-2.5h-5.9v5h6.1Zm.8 9.6c2.2 0 3.5-1 3.5-2.9 0-1.8-1.3-2.8-3.6-2.8h-6.8v5.7h6.9Z" fill="#fff" />
-      <path d="M48 10h13c5 0 8 2.3 8 6.4 0 2.4-1.2 4.2-3.3 5.2 2.8.9 4.5 3 4.5 6.2 0 4.8-3.8 7.2-9.1 7.2H48V10Zm12 10.2c2 0 3.1-.9 3.1-2.5 0-1.7-1.2-2.5-3.3-2.5h-5.9v5h6.1Zm.8 9.6c2.2 0 3.5-1 3.5-2.9 0-1.8-1.3-2.8-3.6-2.8h-6.8v5.7h6.9Z" fill="#fff" />
-      <path d="M75 10h13c5 0 8 2.3 8 6.4 0 2.4-1.2 4.2-3.3 5.2 2.8.9 4.5 3 4.5 6.2 0 4.8-3.8 7.2-9.1 7.2H75V10Zm12 10.2c2 0 3.1-.9 3.1-2.5 0-1.7-1.2-2.5-3.3-2.5h-5.9v5h6.1Zm.8 9.6c2.2 0 3.5-1 3.5-2.9 0-1.8-1.3-2.8-3.6-2.8h-6.8v5.7h6.9Z" fill="#fff" />
-      <path d="M104 13h20v6h-20v-6Zm0 10h20v5h-20v-5Zm0 9h20v5h-20v-5Z" fill="#8A194F" />
-      <text x="20" y="44" fill="#fff" fontFamily="Arial, sans-serif" fontSize="7" fontWeight="700" letterSpacing=".7">ACCREDITED BUSINESS</text>
-    </svg>
-  );
-}
-
-function ArcMark() {
-  return (
-    <svg viewBox="0 0 124 44" aria-label="ARC accredited agency" className="trust-logo trust-logo--arc" role="img">
-      <rect width="124" height="44" rx="6" fill="#fff" />
-      <path d="M17 31 28 9l11 22h-7l-2-4h-4l-2 4h-7Zm10.4-9h2.2L28.5 19l-1.1 3Z" fill="#0B1929" />
-      <path d="M45 13h13c5 0 8 2.7 8 7 0 3-1.5 5.2-4.1 6.3l5.2 7.7h-7.7l-4.2-6.6h-3.1V34H45V13Zm12.1 9.2c1.8 0 2.9-.9 2.9-2.3 0-1.5-1.1-2.3-2.9-2.3h-5v4.6h5Z" fill="#0B1929" />
-      <path d="M72 23.5C72 17 77 12.5 83.8 12.5c4.6 0 8.4 2.1 10.3 5.6l-5.3 3c-1-1.8-2.6-2.7-4.7-2.7-3.1 0-5.2 2.1-5.2 5.1 0 3 2.2 5.1 5.3 5.1 2 0 3.7-.9 4.7-2.7l5.3 3c-1.9 3.5-5.7 5.6-10.4 5.6C77 34.5 72 30 72 23.5Z" fill="#8A194F" />
-      <text x="18" y="40" fill="#4A5568" fontFamily="Arial, sans-serif" fontSize="6.5" fontWeight="700" letterSpacing=".8">AIRLINES REPORTING CORPORATION</text>
-    </svg>
-  );
-}
-
-function Stars() {
-  return (
-    <span className="trust-stars" aria-label="Five star rating">
-      <span>★</span>
-      <span>★</span>
-      <span>★</span>
-      <span>★</span>
-      <span>★</span>
-    </span>
-  );
-}
-
-const trustItems = [
-  {
-    brand: <GoogleMark />,
-    title: 'Google Reviews',
-    value: '4.9 / 5',
-    body: 'Clients consistently rate Derek highly for business and first class service.',
-    href: 'https://search.google.com/local/reviews',
-    stars: true,
-  },
-  {
-    brand: <TrustpilotMark />,
-    title: 'Trustpilot',
-    value: 'Excellent',
-    body: 'Independent reviews reflect Derek\'s Business Class and First Class support.',
-    href: contactConfig.trustpilotUrl,
-    stars: true,
-  },
-  {
-    brand: <BbbMark />,
-    title: 'BBB',
-    value: 'A+ Rating',
-    body: 'Accredited business profile reference for TravelBusinessClass ticketing.',
-    href: 'https://www.bbb.org/',
-  },
-  {
-    brand: <ArcMark />,
-    title: 'ARC',
-    value: 'Accredited Agency',
-    body: 'Secure, compliant ticketing through established business and first class travel channels.',
-    href: 'https://www2.arccorp.com/',
-  },
-];
-
-const expectationCards = [
-  {
-    label: 'Business Class route audit',
-    title: 'A cleaner view of the fare',
-    body: 'Derek reviews aircraft, cabin quality, timing, and fare rules before recommending a Business Class option.',
-  },
-  {
-    label: 'First Class availability check',
-    title: 'Luxury only when it makes sense',
-    body: 'For First Class requests, Derek checks whether the product, route, and price justify the upgrade.',
-  },
-  {
-    label: 'Last-minute itinerary support',
-    title: 'A human follow-up path',
-    body: 'When timing matters, Derek can clarify details by phone or WhatsApp and keep the request moving.',
-  },
-];
-
-const homeBlogExcerpts = {
-  'why-travelers-overpay-business-class':
-    'The public fare is only one version of the Business Class market. Here is why cabin pricing moves differently.',
-  'business-class-service-beyond-seat':
-    'Comfort begins before boarding. Better booking support can change the entire Business Class trip.',
-  'hidden-business-class-deals':
-    'Unpublished Business Class options come from fare access, timing, routing, and experience.',
-};
-
-function Hero({ selectedService, onSelectService, promoCode, onPromoCodeChange, onResetExtras }) {
-  const canvasRef = useRef(null);
+function Hero() {
   const heroRef = useRef(null);
-  const videoRef = useRef(null);
-  const [showVideo, setShowVideo] = useState(false);
-  const [videoUsable, setVideoUsable] = useState(true);
-  const [videoReady, setVideoReady] = useState(false);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    const desktopQuery = window.matchMedia('(min-width: 901px)');
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const updateVideoState = () => setShowVideo(desktopQuery.matches && !motionQuery.matches);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let disposed = false;
+    let disposeParticles = () => {};
 
-    updateVideoState();
-    desktopQuery.addEventListener('change', updateVideoState);
-    motionQuery.addEventListener('change', updateVideoState);
+    if (!reduceMotion) {
+      const context = gsap.context(() => {
+        gsap
+          .timeline({ delay: 0.12 })
+          .from('.home-hero__eyebrow', { y: 18, opacity: 0, duration: 0.45, ease: 'power3.out' })
+          .from('.home-hero__title span', { yPercent: 110, duration: 0.72, stagger: 0.08, ease: 'power4.out' }, '-=0.2')
+          .from('.home-hero__copy, .home-hero__actions, .home-hero__note', {
+            y: 20,
+            opacity: 0,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: 'power3.out',
+          }, '-=0.35')
+          .from('.home-hero__portrait', { x: 36, opacity: 0, duration: 0.65, ease: 'power3.out' }, '-=0.55');
+      }, heroRef);
 
-    const cleanup = initParticles(canvasRef.current);
-    const ctx = gsap.context(() => {
-      const timeline = gsap.timeline({ delay: 0.15 });
-      timeline
-        .from('.hero__eyebrow', { y: 22, opacity: 0, duration: 0.45, ease: 'power3.out' })
-        .from('.hero__title .line', { y: 58, opacity: 0, duration: 0.58, stagger: 0.06, ease: 'power3.out' }, '-=0.18')
-        .from('.hero__headline', { y: 22, opacity: 0, duration: 0.42, ease: 'power3.out' }, '-=0.32')
-        .from('.hero__copy', { y: 20, opacity: 0, duration: 0.42, ease: 'power3.out' }, '-=0.28')
-        .from('.hero__airlines', { y: 16, opacity: 0, duration: 0.36, ease: 'power3.out' }, '-=0.22')
-        .from('.hero__advisor-card', { y: 28, opacity: 0, duration: 0.52, ease: 'power3.out' }, '-=0.2')
-        .from('.hero .quote-form', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.22');
-    }, heroRef);
+      if (canUseDecorativeWebGl()) {
+        import('../utils/threeParticles.js')
+          .then(({ initParticles }) => {
+            if (disposed) return;
+            try {
+              disposeParticles = initParticles(canvasRef.current);
+            } catch {
+              disposeParticles = () => {};
+            }
+          })
+          .catch(() => {});
+      }
+
+      return () => {
+        disposed = true;
+        disposeParticles();
+        context.revert();
+      };
+    }
 
     return () => {
-      desktopQuery.removeEventListener('change', updateVideoState);
-      motionQuery.removeEventListener('change', updateVideoState);
-      cleanup();
-      ctx.revert();
+      disposed = true;
+      disposeParticles();
     };
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    setVideoReady(false);
-    setVideoUsable(true);
-
-    if (!showVideo) return undefined;
-
-    const video = videoRef.current;
-    if (!video) return undefined;
-
-    video.muted = true;
-    video.playsInline = true;
-
-    const startPlayback = async () => {
-      try {
-        await video.play();
-        if (!cancelled && video.readyState >= 2) {
-          setVideoReady(true);
-        }
-      } catch {
-        if (!cancelled) {
-          setVideoReady(false);
-        }
-      }
-    };
-
-    const loadTimer = window.setTimeout(() => {
-      if (!cancelled && video.readyState === 0) {
-        setVideoUsable(false);
-      }
-    }, 9000);
-
-    void startPlayback();
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(loadTimer);
-    };
-  }, [showVideo]);
-
-  const activateVideo = () => {
-    const video = videoRef.current;
-    if (!video || video.paused || video.readyState < 2) return;
-    setVideoReady(true);
-  };
-
-  const requestVideoPlayback = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    void video
-      .play()
-      .then(() => {
-        if (video.readyState >= 2) {
-          setVideoReady(true);
-        }
-      })
-      .catch(() => setVideoReady(false));
-  };
-
-  const disableVideo = () => {
-    setVideoReady(false);
-    setVideoUsable(false);
-  };
-
   return (
-    <section className="hero" id="home-hero" ref={heroRef}>
-      <img className="hero__image hero__poster" src={homeHeroVideo.poster} alt={homeHeroVideo.alt} />
-      {showVideo && videoUsable && (
-        <video
-          ref={videoRef}
-          className={`hero__video ${videoReady ? 'hero__video--ready' : ''}`}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          poster={homeHeroVideo.poster}
-          aria-hidden="true"
-          onCanPlay={requestVideoPlayback}
-          onError={disableVideo}
-          onLoadedData={requestVideoPlayback}
-          onPlaying={activateVideo}
-          onStalled={() => setVideoReady(false)}
-        >
-          <source src={homeHeroVideo.src} type="video/mp4" />
-        </video>
-      )}
-      <div className="hero__overlay" />
-      <canvas className="hero__particles" ref={canvasRef} aria-hidden="true" />
-      <div className="hero__content">
-        <div className="hero__layout">
-          <div className="hero__intro">
-            <p className="hero__eyebrow">Personal Aviation Advisor</p>
-            <h1 className="hero__title">
-              <span className="line">Derek</span>
-              <span className="line">Monti</span>
-            </h1>
-            <p className="hero__headline">Business Class. Remarkable Prices.</p>
-            <p className="hero__copy">
-              Business and first class seats sourced personally by Derek - private fare access, calmer support, and
-              quotes within hours.
-            </p>
-            <div className="hero__airlines">
-              <span>Flying with</span>
-              <b>Qatar</b>
-              <b>Emirates</b>
-              <b>Turkish</b>
-              <b>Singapore</b>
-              <b>Cathay Pacific</b>
-            </div>
+    <section className="home-hero" ref={heroRef} aria-labelledby="home-title">
+      <div className="home-hero__wash" aria-hidden="true" />
+      <canvas className="home-hero__particles" ref={canvasRef} aria-hidden="true" />
+      <div className="container home-hero__inner">
+        <div className="home-hero__content">
+          <p className="home-hero__eyebrow">Personal premium-flight guidance</p>
+          <h1 className="home-hero__title" id="home-title">
+            <span>Premium flights,</span>
+            <span>handled personally.</span>
+          </h1>
+          <p className="home-hero__copy">
+            Business- and first-class options researched around your dates, priorities, cabin preference, and
+            flexibility.
+          </p>
+          <div className="home-hero__actions">
+            <Button href="#request-form" size="lg">
+              Request a personal review
+            </Button>
+            <a className="text-link text-link--light" href="#how-it-works">
+              See how it works <ArrowDown aria-hidden="true" size={17} />
+            </a>
           </div>
-
-          <aside className="hero__advisor-card" aria-label="Derek Monti advisor profile">
-            <div className="hero__advisor-image">
-              <img
-                src={imagery.derekPortrait}
-                alt="Derek Monti smiling in a navy blazer"
-                loading="eager"
-                decoding="async"
-                width="1122"
-                height="1402"
-              />
-            </div>
-            <div className="hero__advisor-meta">
-              <strong>Derek Monti</strong>
-              <p>Business &amp; first class, sourced by hand.</p>
-            </div>
-          </aside>
-
-          <div className="hero__form-panel" id="request-form">
-            <QuoteForm
-              requirePhone
-              source={HOME_REQUEST_SOURCE}
-              requestTitle={HOME_REQUEST_TITLE}
-              extraPayload={{ selectedService, promoCode }}
-              confirmationContext={{
-                selectedService,
-                promoCode,
-                advisorAvatarSrc: imagery.derekAvatar,
-              }}
-              onResetExtras={onResetExtras}
-            />
-            <TravelAdvantageSelector
-              selectedService={selectedService}
-              onSelectService={onSelectService}
-              promoCode={promoCode}
-              onPromoCodeChange={onPromoCodeChange}
-            />
-          </div>
+          <p className="home-hero__note">
+            <ShieldCheck aria-hidden="true" size={17} />
+            A request starts a personal review. It is not a booking or a guarantee of availability.
+          </p>
         </div>
+
+        <figure className="home-hero__portrait">
+          <div className="home-hero__portrait-frame">
+            <img
+              src={imagery.derekPortrait}
+              alt="Derek Monti"
+              width="1122"
+              height="1402"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </div>
+          <figcaption>
+            <span>Derek Monti</span>
+            <strong>Your point of contact</strong>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
 }
 
-function TrustBar() {
+function CapabilityStrip() {
   return (
-    <section className="trust-bar">
-      <div className="trust-bar__inner">
-        {trustItems.map((item) => (
-          <a key={item.title} href={item.href} target="_blank" rel="noreferrer" data-reveal>
-            <div className="trust-bar__brand">{item.brand}</div>
-            <div className="trust-bar__rating">
-              <strong>{item.value}</strong>
-              {item.stars && <Stars />}
+    <section className="capability-strip" aria-labelledby="capability-title">
+      <h2 className="sr-only" id="capability-title">
+        Service scope
+      </h2>
+      <div className="container capability-strip__grid">
+        {capabilities.map((item, index) => (
+          <article key={item.label} data-reveal>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <div>
+              <h3>{item.label}</h3>
+              <p>{item.detail}</p>
             </div>
-            <h3>{item.title}</h3>
-            <p>{item.body}</p>
-          </a>
+          </article>
         ))}
       </div>
     </section>
   );
 }
 
-function Methodology() {
-  const exampleDeal = routeDeals[1];
-  const publishedFare = Number(exampleDeal.published.replace(/[$,]/g, ''));
-  const derekFare = Number(exampleDeal.derek.replace(/[$,]/g, ''));
-  const savings = publishedFare - derekFare;
-  const flexibleLabel = exampleDeal.flexibleWindow.replace(' days', '-day');
-
+function QuoteSection() {
   return (
-    <section className="methodology scenic-section scenic-section--methodology">
-      <ScenicBackdrop backdrop={siteBackdrops.homeMethodology} />
-      <div className="container methodology__inner">
-        <div className="methodology__intro" data-reveal>
-          <p className="eyebrow">How Derek Works</p>
-          <h2>Fare method, not guesswork.</h2>
+    <section className="quote-section" id="request-form" aria-labelledby="quote-title">
+      <div className="container quote-section__layout">
+        <div className="quote-section__intro" data-reveal>
+          <p className="eyebrow">Start with the essentials</p>
+          <h2 id="quote-title">Tell Derek about the trip.</h2>
           <p>
-            Derek compares the public fare, private quote channels, aircraft quality, ticket rules, and date flexibility
-            before recommending the cleanest business and first class itinerary.
+            Share the fixed details first, then add the preferences that will shape the review. Your information is
+            used to respond to this request.
+          </p>
+          <ol>
+            <li>
+              <span>01</span>
+              <p>Route, dates, travelers, and cabin.</p>
+            </li>
+            <li>
+              <span>02</span>
+              <p>Flexibility and the tradeoffs you care about.</p>
+            </li>
+            <li>
+              <span>03</span>
+              <p>A safe contact method for the response.</p>
+            </li>
+          </ol>
+        </div>
+        <div className="quote-section__form">
+          <QuoteForm
+            variant="full"
+            full
+            source={HOME_REQUEST_SOURCE}
+            requestTitle={HOME_REQUEST_TITLE}
+            confirmationContext={{ advisorAvatarSrc: imagery.derekAvatar }}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function EvaluationSection() {
+  return (
+    <section className="evaluation-section" aria-labelledby="evaluation-title">
+      <div className="container">
+        <div className="evaluation-section__header" data-reveal>
+          <div>
+            <p className="eyebrow eyebrow--light">What Derek evaluates</p>
+            <h2 id="evaluation-title">A fare is only one part of the journey.</h2>
+          </div>
+          <p>
+            The method is a consistent comparison of the details that change the quality of a trip, not a display of
+            illustrative prices that may no longer apply.
           </p>
         </div>
-        <aside className="methodology__ticket" aria-label="Example fare audit" data-reveal>
-          <div className="methodology__ticket-top">
-            <span>Fare Audit</span>
-            <small>{flexibleLabel} search</small>
-          </div>
-          <div className="methodology__route">
-            <div>
-              <strong>{exampleDeal.fromCode}</strong>
-              <span>{exampleDeal.from}</span>
-            </div>
-            <PlaneTakeoff aria-hidden="true" size={28} strokeWidth={1.7} />
-            <div>
-              <strong>{exampleDeal.toCode}</strong>
-              <span>{exampleDeal.to}</span>
-            </div>
-          </div>
-          <dl className="methodology__fares">
-            <div>
-              <dt>Published fare</dt>
-              <dd>{exampleDeal.published}</dd>
-            </div>
-            <div>
-              <dt>Derek's quote</dt>
-              <dd>{exampleDeal.derek}</dd>
-            </div>
-            <div>
-              <dt>Client keeps</dt>
-              <dd>${savings.toLocaleString()}</dd>
-            </div>
-          </dl>
-          <p>Example only. Final fares depend on live inventory and ticketing deadline.</p>
-        </aside>
-        <div className="methodology__rail" data-reveal>
-          {methodology.map((item, index) => (
-            <article key={item.title}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
+        <div className="evaluation-grid">
+          {evaluationItems.map((item) => (
+            <article key={item.title} data-reveal>
+              <span>{item.number}</span>
               <h3>{item.title}</h3>
               <p>{item.body}</p>
             </article>
@@ -530,121 +238,36 @@ function Methodology() {
   );
 }
 
-function WhyDerek() {
+function WhySection() {
   return (
-    <section className="why-section">
-      <div className="container">
-        <SectionHeader
-          eyebrow="Six Good Reasons"
-          title="Book With Derek"
-          text="Business and first class fares are only useful when the service around them is equally considered."
-        />
-        <div className="why-showcase">
-          <aside className="why-showcase__brief" data-reveal>
-            <p className="eyebrow">Derek's Difference</p>
-            <h3>Business class fares deserve a human eye.</h3>
-            <p>
-              Derek checks the fare, aircraft, routing, rules, and support path before you commit. The result feels
-              less like searching and more like having someone in your corner.
-            </p>
-            <div className="why-showcase__metrics" aria-label="Derek Monti service highlights">
-              <div>
-                <strong>15-60%</strong>
-                <span>business and first class savings</span>
-              </div>
-              <div>
-                <strong>24/7</strong>
-                <span>direct trip support</span>
-              </div>
-            </div>
-            <Button href={`tel:${contactConfig.phoneHref}`} variant="outline-dark">
-              Call Derek
-            </Button>
-          </aside>
-          <div className="why-list">
-            {whyDerek.map((reason, index) => {
-              const Icon = reasonIcons[index];
-              return (
-                <article key={reason.title}>
-                  <span className="why-list__number">{String(index + 1).padStart(2, '0')}</span>
-                  <span className="why-list__icon">
-                    <Icon aria-hidden="true" size={21} />
-                  </span>
-                  <div>
-                    <h3>{reason.title}</h3>
-                    <p>{reason.body}</p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function GuidanceTeaser() {
-  return (
-    <section className="guidance-teaser">
-      <div className="container guidance-teaser__inner" data-reveal>
-        <div className="guidance-teaser__copy">
-          <p className="eyebrow">Derek's Desk</p>
-          <h2>Found a fare? Let Derek pressure-test it before you book.</h2>
+    <section className="why-section" aria-labelledby="why-title">
+      <div className="container why-section__layout">
+        <div className="why-section__intro" data-reveal>
+          <p className="eyebrow">Why Derek</p>
+          <h2 id="why-title">Human context for a high-value decision.</h2>
           <p>
-            Send the route, aircraft, or airline you are considering. Derek reads the parts most travelers never see:
-            rules, cabin quality, connection risk, and whether the savings are worth it.
+            The service is designed for travelers who want the whole itinerary reviewed—not another wall of search
+            results.
           </p>
-          <Button href="#contact" variant="outline-dark">
-            Ask for guidance
-          </Button>
+          <Link className="text-link" to="/about">
+            Meet Derek <ArrowRight aria-hidden="true" size={17} />
+          </Link>
         </div>
-        <div className="guidance-teaser__sequence" aria-label="Private fare playbook flow">
-          {extraServices.map((service, index) => (
-            <article key={service.title}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{service.storyLabel}</strong>
-              <p>{service.activeSummary}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function BioTeaser() {
-  return (
-    <section className="bio-teaser">
-      <div className="bio-teaser__inner">
-        <div className="bio-teaser__copy" data-reveal>
-          <p className="eyebrow">Passion for Excellence</p>
-          <h2>Derek places every client at the center of his attention.</h2>
-          <p>
-            You get a personal travel advisor entirely dedicated to understanding your needs, building long-term
-            relationships, and finding the highest value for each business and first class journey.
-          </p>
-          <Button href="#contact">Contact Derek</Button>
-        </div>
-        <div className="bio-teaser__portrait" data-reveal>
-          <div className="derek-portrait">
-            <img
-              src={imagery.derekPortrait}
-              alt="Derek Monti smiling in a navy blazer"
-              loading="lazy"
-              decoding="async"
-              width="1122"
-              height="1402"
-            />
-          </div>
-        </div>
-        <div className="bio-teaser__support" data-reveal>
-          <p className="eyebrow">24/7 and 365/year</p>
-          <h3>Personal Support Service</h3>
-          <p>
-            Derek is available for questions, adjustments, and unexpected travel events - before departure and while
-            you are moving.
-          </p>
+        <div className="why-section__list">
+          {whyDerek.map((item, index) => {
+            const Icon = whyIcons[index];
+            return (
+              <article key={item.title} data-reveal>
+                <span>
+                  <Icon aria-hidden="true" size={21} />
+                </span>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -653,22 +276,25 @@ function BioTeaser() {
 
 function HowItWorks() {
   return (
-    <section className="steps-section">
+    <section className="process-section" id="how-it-works" aria-labelledby="process-title">
       <div className="container">
         <SectionHeader
-          eyebrow="Simple Steps"
-          title="How to Book"
-          text="A quote request starts a personal conversation, not a generic booking flow."
+          eyebrow="A simple process"
+          title="From trip brief to a clearer decision."
+          text="Three steps keep the request focused and leave room for the details that make each journey different."
         />
-        <div className="steps">
+        <h2 className="sr-only" id="process-title">
+          How it works
+        </h2>
+        <div className="process-grid">
           {steps.map((step, index) => {
             const Icon = stepIcons[index];
             return (
               <article key={step.title} data-reveal>
-                <div className="steps__icon">
-                  <Icon aria-hidden="true" size={24} />
+                <div className="process-grid__top">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <Icon aria-hidden="true" size={22} />
                 </div>
-                <span>Step {String(index + 1).padStart(2, '0')}</span>
                 <h3>{step.title}</h3>
                 <p>{step.body}</p>
               </article>
@@ -680,51 +306,28 @@ function HowItWorks() {
   );
 }
 
-function Testimonials() {
+function DiscoverySection() {
   return (
-    <section className="testimonials" id="expectations">
-      <div className="container">
-        <div className="testimonials__intro" data-reveal>
-          <p className="eyebrow">Advisor Support</p>
-          <h2>What Travelers Can Expect From Derek</h2>
-          <p>Clear Business Class and First Class fare guidance before you commit to the ticket.</p>
-        </div>
-        <div className="review-grid">
-          {expectationCards.map((item) => (
-            <article className="proof-card" key={item.title} data-reveal>
-              <span className="proof-card__label">{item.label}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function BlogPreview() {
-  return (
-    <section className="blog-preview">
+    <section className="discovery-section" aria-labelledby="discovery-title">
       <div className="container">
         <SectionHeader
-          eyebrow="Current Articles"
-          title="Travel Smarter. Read Better."
-          text="Business Class strategy, destination guidance, and Derek's practical travel notes."
+          eyebrow="Explore by need"
+          title="Start with the trip you are planning."
+          text="Each guide has a distinct purpose and leads back to the same focused request when you are ready."
+          align="left"
         />
-        <div className="blog-preview__grid">
-          {blogPosts.slice(0, 3).map((post) => (
-            <Link className="blog-card" to={`/blog/${post.slug}`} key={post.slug} data-reveal>
-              <div className="blog-card__image">
-                <img src={post.image} alt={post.title} loading="lazy" />
-                <span>{post.category}</span>
-              </div>
-              <div className="blog-card__body">
-                <time>{post.date}</time>
-                <h3>{post.title}</h3>
-                <p>{homeBlogExcerpts[post.slug] || post.excerpt}</p>
-                <small>{post.readTime}</small>
-              </div>
+        <h2 className="sr-only" id="discovery-title">
+          Services and travel guides
+        </h2>
+        <div className="discovery-grid">
+          {discoveryLinks.map((item) => (
+            <Link to={item.href} key={item.href} data-reveal>
+              <span>{item.eyebrow}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+              <strong>
+                Explore <ArrowRight aria-hidden="true" size={17} />
+              </strong>
             </Link>
           ))}
         </div>
@@ -733,86 +336,89 @@ function BlogPreview() {
   );
 }
 
+function GuidesSection() {
+  return (
+    <section className="guides-preview" aria-labelledby="guides-title">
+      <div className="container">
+        <div className="guides-preview__header" data-reveal>
+          <div>
+            <p className="eyebrow">Decision guides</p>
+            <h2 id="guides-title">Read before you compare.</h2>
+          </div>
+          <Link className="text-link" to="/blog">
+            View all guides <ArrowRight aria-hidden="true" size={17} />
+          </Link>
+        </div>
+        <div className="guide-list">
+          {blogPosts.map((post, index) => (
+            <Link to={`/blog/${post.slug}`} key={post.slug} data-reveal>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <div>
+                <small>{post.category}</small>
+                <h3>{post.title}</h3>
+                <p>{post.excerpt}</p>
+              </div>
+              <strong>{post.readTime}</strong>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCallout() {
+  const whatsappUrl = getWhatsappUrl({ requestTitle: HOME_REQUEST_TITLE });
+
+  return (
+    <section className="home-final" aria-labelledby="final-title">
+      <div className="container home-final__inner" data-reveal>
+        <div>
+          <p className="eyebrow eyebrow--light">Your next trip</p>
+          <h2 id="final-title">Bring Derek the itinerary—not a perfect brief.</h2>
+          <p>Share what is fixed, what can move, and what a good journey needs to protect.</p>
+        </div>
+        <div className="home-final__actions">
+          <Button href="#request-form" size="lg">
+            Request a personal review
+          </Button>
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+            <MessageCircle aria-hidden="true" size={18} />
+            WhatsApp Derek
+          </a>
+          <a href={`tel:${contactConfig.phoneHref}`}>Call {contactConfig.phoneLabel}</a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const pageRef = useRef(null);
-  const savingsCarouselRef = useRef(null);
-  const [selectedService, setSelectedService] = useState(STANDARD_SERVICE_VALUE);
-  const [promoCode, setPromoCode] = useState('');
-  useDocumentMeta(
-    'Derek Monti - Personal Aviation Advisor | Business Class at Insider Prices',
-    'Get business and first class flights at 15-60% off published fares. Derek Monti is your personal aviation expert.',
-  );
-  usePageMotion(pageRef);
 
-  const resetHomeExtras = () => {
-    setSelectedService(STANDARD_SERVICE_VALUE);
-    setPromoCode('');
-  };
+  usePageMotion(pageRef);
 
   return (
     <div ref={pageRef}>
-      <Hero
-        selectedService={selectedService}
-        onSelectService={setSelectedService}
-        promoCode={promoCode}
-        onPromoCodeChange={setPromoCode}
-        onResetExtras={resetHomeExtras}
-      />
-      <section className="savings-section savings-section--inline-controls scenic-section scenic-section--savings">
-        <ScenicBackdrop backdrop={siteBackdrops.homeSavings} />
-        <div className="container">
-          <div className="savings-section__lead">
-            <SectionHeader
-              eyebrow="Smart Savings"
-              title="Save More. Fly Better."
-              text="By uncovering hidden fares and private offers, Derek makes business and first class travel more accessible without compromising comfort."
-              align="left"
-              light
-            />
-            <div className="route-carousel__controls savings-section__controls" aria-label="Route carousel controls">
-              <button
-                type="button"
-                onClick={() => savingsCarouselRef.current?.scroll(-1)}
-                aria-label="Previous deal"
-              >
-                <ArrowLeft aria-hidden="true" size={18} />
-              </button>
-              <button
-                type="button"
-                onClick={() => savingsCarouselRef.current?.scroll(1)}
-                aria-label="Next deal"
-              >
-                <ArrowRight aria-hidden="true" size={18} />
-              </button>
-            </div>
-          </div>
-          <RouteCarousel ref={savingsCarouselRef} deals={routeDeals} showControls={false} />
-          <p className="savings-section__fineprint">
-            Sample fares are based on comparable recent quotes. Prices change quickly and are not guaranteed until
-            ticketed.
-          </p>
-        </div>
-      </section>
-      <Methodology />
-      <WhyDerek />
-      <TrustBar />
-      <GuidanceTeaser />
-      <BioTeaser />
+      <Hero />
+      <CapabilityStrip />
+      <QuoteSection />
+      <EvaluationSection />
+      <WhySection />
       <HowItWorks />
-      <Testimonials />
-      <section className="faq-section" id="faq">
-        <div className="container faq-section__inner">
-          <SectionHeader eyebrow="FAQ" title="Frequently Asked Questions" align="left" />
+      <DiscoverySection />
+      <GuidesSection />
+      <section className="faq-section" id="faq" aria-labelledby="faq-title">
+        <div className="container faq-section__layout">
+          <div data-reveal>
+            <p className="eyebrow">Before you request</p>
+            <h2 id="faq-title">Useful answers, stated plainly.</h2>
+            <p>Learn what the request process needs, what can change, and how to describe useful flexibility.</p>
+          </div>
           <FaqAccordion items={homeFaqs} />
         </div>
       </section>
-      <AirlineMarquee />
-      <BlogPreview />
-      <FinalCta
-        backdrop={siteBackdrops.homeFinalCta}
-        title="Ready to Fly Business Class for Less?"
-        text="Send Derek your Business Class or First Class travel details and receive curated options within hours."
-      />
+      <FinalCallout />
     </div>
   );
 }

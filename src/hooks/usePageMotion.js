@@ -7,6 +7,14 @@ export function usePageMotion(scopeRef) {
     const scope = scopeRef.current;
     if (!scope) return undefined;
 
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      scope.querySelectorAll('[data-reveal]').forEach((element) => {
+        element.style.removeProperty('opacity');
+        element.style.removeProperty('transform');
+      });
+      return undefined;
+    }
+
     const ctx = gsap.context(() => {
       gsap.utils.toArray('[data-reveal]').forEach((element) => {
         gsap.from(element, {

@@ -1,73 +1,138 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CalendarDays, CheckCircle2, Mail, MapPin, Phone, Plane, Search, Send, Users } from 'lucide-react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { CheckCircle2, Mail, MapPin, Phone, Plane, Plus, Search, Send, Trash2, Users } from 'lucide-react';
 import { getMailto, getWhatsappUrl } from '../../utils/message.js';
 import {
-  PRIVATE_CODE_CONFIRMATION,
-  getSelectedServiceLabel,
-  normalizePromoCode,
+  CABIN_OPTIONS,
+  CONTACT_PREFERENCE_OPTIONS,
+  FLEXIBILITY_OPTIONS,
+  TRIP_TYPE_OPTIONS,
+  validateQuoteFields,
 } from '../../utils/quoteRequest.js';
 import Button from './Button.jsx';
-import DatePicker from './DatePicker.jsx';
-import SelectMenu from './SelectMenu.jsx';
 import TurnstileWidget from './TurnstileWidget.jsx';
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';
+const STORAGE_KEY = 'fly-with-derek:quote-progress:v2';
+const MAX_LEGS = 6;
 
-const initialFields = {
-  tripType: 'Round trip',
-  from: '',
-  to: '',
-  departure: '',
-  returnDate: '',
-  passengers: '1 Passenger',
-  cabin: 'Business',
-  name: '',
-  email: '',
-  phone: '',
-  notes: '',
-  companyWebsite: '',
-};
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const PHONE_ALLOWED_RE = /^[+()\d\s.-]+$/;
-
-function isValidPhone(value) {
-  const trimmed = value.trim();
-  const digits = trimmed.replace(/\D/g, '');
-  return trimmed.length > 0 && PHONE_ALLOWED_RE.test(trimmed) && digits.length >= 7 && digits.length <= 20;
+function todayIso() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
-function validateQuote(fields, { requirePhone = false } = {}) {
-  if (!fields.from.trim() || !fields.to.trim()) {
-    return 'Please add both origin and destination.';
-  }
-
-  if (!ISO_DATE_RE.test(fields.departure)) {
-    return 'Please choose a departure date.';
-  }
-
-  if (!EMAIL_RE.test(fields.email.trim())) {
-    return 'Please enter a valid email address, for example name@example.com.';
-  }
-
-  if (requirePhone && !isValidPhone(fields.phone)) {
-    return 'Please enter a valid phone number so Derek can follow up quickly.';
-  }
-
-  return '';
+function createLeg() {
+  return { from: '', to: '', departure: '' };
 }
 
-function Field({ icon: Icon, label, children, compact = false, wide = false }) {
+function createInitialFields() {
+  return {
+    tripType: 'round_trip',
+    from: '',
+    to: '',
+    departure: '',
+    returnDate: '',
+    legs: [createLeg(), createLeg()],
+    travelers: '1',
+    cabin: 'business',
+    flexibility: 'exact',
+    fullName: '',
+    email: '',
+    phone: '',
+    contactPreference: 'email',
+    notes: '',
+    privacyAcknowledged: false,
+    companyWebsite: '',
+    formStartedAt: Date.now(),
+  };
+}
+
+function restoreSafeProgress(defaults) {
+  if (typeof window === 'undefined') return defaults;
+  try {
+    const stored = JSON.parse(window.sessionStorage.getItem(STORAGE_KEY) || 'null');
+    if (!stored || typeof stored !== 'object') return defaults;
+    const storedLegs = Array.isArray(stored.legs)
+      ? stored.legs.slice(0, MAX_LEGS).map((leg) => ({
+          from: String(leg?.from || '').slice(0, 80),
+          to: String(leg?.to || '').slice(0, 80),
+          departure: String(leg?.departure || '').slice(0, 10),
+        }))
+      : defaults.legs;
+
+    return {
+      ...defaults,
+      tripType: stored.tripType || defaults.tripType,
+      from: String(stored.from || '').slice(0, 80),
+      to: String(stored.to || '').slice(0, 80),
+      departure: String(stored.departure || '').slice(0, 10),
+      returnDate: String(stored.returnDate || '').slice(0, 10),
+      legs: storedLegs.length >= 2 ? storedLegs : defaults.legs,
+      travelers: String(stored.travelers || defaults.travelers),
+      cabin: stored.cabin || defaults.cabin,
+      flexibility: stored.flexibility || defaults.flexibility,
+      contactPreference: stored.contactPreference || defaults.contactPreference,
+    };
+  } catch {
+    return defaults;
+  }
+}
+
+function persistSafeProgress(fields) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        tripType: fields.tripType,
+        from: fields.from,
+        to: fields.to,
+        departure: fields.departure,
+        returnDate: fields.returnDate,
+        legs: fields.legs,
+        travelers: fields.travelers,
+        cabin: fields.cabin,
+        flexibility: fields.flexibility,
+        contactPreference: fields.contactPreference,
+      }),
+    );
+  } catch {
+    // Storage may be blocked; the form remains fully functional without it.
+  }
+}
+
+function clearSafeProgress() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore unavailable storage.
+  }
+}
+
+function Field({ id, icon: Icon, label, required = false, error, help, children, wide = false }) {
   return (
-    <div
-      className={`quote-field ${compact ? 'quote-field--compact' : ''} ${wide ? 'quote-field--wide' : ''}`}
-    >
-      <span className="quote-field__label">
+    <div className={`quote-field ${wide ? 'quote-field--wide' : ''}`}>
+      <label className="quote-field__label" htmlFor={id}>
         {Icon && <Icon aria-hidden="true" size={16} strokeWidth={2} />}
-        {label}
-      </span>
+        <span>
+          {label}
+          {required ? ' (required)' : ''}
+        </span>
+      </label>
       {children}
+      {help && (
+        <small className="quote-field__help" id={`${id}-help`}>
+          {help}
+        </small>
+      )}
+      {error && (
+        <p className="quote-field__error" id={`${id}-error`}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -102,76 +167,187 @@ function SuccessAdvisorAvatar({ src, alt }) {
   );
 }
 
+function humanizeErrorKey(key) {
+  const legMatch = /^legs\.(\d+)\.(from|to|departure)$/.exec(key);
+  if (legMatch) {
+    const labels = { from: 'origin', to: 'destination', departure: 'departure date' };
+    return `Flight ${Number(legMatch[1]) + 1} ${labels[legMatch[2]]}`;
+  }
+
+  return (
+    {
+      tripType: 'Trip type',
+      from: 'Origin',
+      to: 'Destination',
+      departure: 'Departure date',
+      returnDate: 'Return date',
+      legs: 'Multi-city itinerary',
+      travelers: 'Travelers',
+      cabin: 'Cabin preference',
+      flexibility: 'Date flexibility',
+      fullName: 'Full name',
+      email: 'Email',
+      phone: 'Phone or WhatsApp',
+      contactPreference: 'Contact preference',
+      privacyAcknowledged: 'Privacy acknowledgement',
+      turnstile: 'Human verification',
+    }[key] || 'Form field'
+  );
+}
+
 export default function QuoteForm({
   variant = 'hero',
-  full = false,
-  requirePhone = false,
   source = '',
   requestTitle = '',
-  extraPayload = null,
   confirmationContext = null,
-  onResetExtras,
 }) {
-  const [fields, setFields] = useState(initialFields);
+  const instanceId = useId().replace(/:/g, '');
+  const [fields, setFields] = useState(createInitialFields);
+  const [storageReady, setStorageReady] = useState(false);
+  const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [submissionError, setSubmissionError] = useState('');
   const [ticketMeta, setTicketMeta] = useState(null);
   const [turnstileToken, setTurnstileToken] = useState('');
+  const errorSummaryRef = useRef(null);
+  const successRef = useRef(null);
   const turnstileResetRef = useRef(null);
+
+  const fieldId = useCallback(
+    (name) => `quote-${instanceId}-${name.replace(/[^a-zA-Z0-9_-]/g, '-')}`,
+    [instanceId],
+  );
 
   const registerTurnstileReset = useCallback((resetFn) => {
     turnstileResetRef.current = resetFn;
   }, []);
-  const handleTurnstileToken = useCallback((token) => setTurnstileToken(token || ''), []);
+  const handleTurnstileToken = useCallback((token) => {
+    setTurnstileToken(token || '');
+    if (token) {
+      setErrors((current) => {
+        if (!current.turnstile) return current;
+        const next = { ...current };
+        delete next.turnstile;
+        return next;
+      });
+    }
+  }, []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(''), []);
   const handleTurnstileError = useCallback(() => setTurnstileToken(''), []);
+
+  useEffect(() => {
+    setFields((current) => restoreSafeProgress(current));
+    setStorageReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (storageReady) persistSafeProgress(fields);
+  }, [fields, storageReady]);
+
+  useEffect(() => {
+    if (status !== 'success') return undefined;
+    const frame = window.requestAnimationFrame(() => successRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [status]);
 
   const messageFields = useMemo(
     () => ({
       ...fields,
-      ...(extraPayload || {}),
       source,
       requestTitle,
     }),
-    [extraPayload, fields, source, requestTitle],
+    [fields, requestTitle, source],
   );
   const mailto = useMemo(() => getMailto(messageFields), [messageFields]);
   const whatsapp = useMemo(() => getWhatsappUrl(messageFields), [messageFields]);
 
-  const update = (event) => {
-    const { name, value } = event.target;
+  const clearError = (name) => {
+    setErrors((current) => {
+      if (!current[name]) return current;
+      const next = { ...current };
+      delete next[name];
+      return next;
+    });
+  };
+
+  const updateField = (name, value) => {
     setFields((current) => ({ ...current, [name]: value }));
+    clearError(name);
+    if (status === 'error') {
+      setStatus('idle');
+      setSubmissionError('');
+    }
+  };
+
+  const updateLeg = (index, name, value) => {
+    setFields((current) => ({
+      ...current,
+      legs: current.legs.map((leg, legIndex) => (legIndex === index ? { ...leg, [name]: value } : leg)),
+    }));
+    clearError(`legs.${index}.${name}`);
+    clearError('legs');
+  };
+
+  const validateOnBlur = (name) => {
+    const nextErrors = validateQuoteFields(fields);
+    setErrors((current) => {
+      const next = { ...current };
+      if (nextErrors[name]) next[name] = nextErrors[name];
+      else delete next[name];
+      return next;
+    });
+  };
+
+  const addLeg = () => {
+    setFields((current) =>
+      current.legs.length >= MAX_LEGS ? current : { ...current, legs: [...current.legs, createLeg()] },
+    );
+    clearError('legs');
+  };
+
+  const removeLeg = (index) => {
+    setFields((current) => {
+      if (current.legs.length <= 2) return current;
+      return { ...current, legs: current.legs.filter((_, legIndex) => legIndex !== index) };
+    });
+    setErrors({});
+  };
+
+  const focusErrorSummary = () => {
+    window.requestAnimationFrame(() => errorSummaryRef.current?.focus());
   };
 
   const reset = () => {
-    setFields(initialFields);
+    clearSafeProgress();
+    setFields(createInitialFields());
+    setErrors({});
     setStatus('idle');
-    setErrorMsg('');
+    setSubmissionError('');
     setTicketMeta(null);
     setTurnstileToken('');
     turnstileResetRef.current?.();
-    onResetExtras?.();
   };
 
   const submit = async (event) => {
     event.preventDefault();
     if (status === 'submitting') return;
 
-    const validationError = validateQuote(fields, { requirePhone });
-    if (validationError) {
-      setStatus('error');
-      setErrorMsg(validationError);
-      return;
+    const validationErrors = validateQuoteFields(fields);
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      validationErrors.turnstile = 'Complete the human-verification challenge.';
     }
 
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
       setStatus('error');
-      setErrorMsg('Please complete the human-verification challenge before sending.');
+      setSubmissionError('Review the highlighted fields and try again.');
+      focusErrorSummary();
       return;
     }
 
     setStatus('submitting');
-    setErrorMsg('');
+    setErrors({});
+    setSubmissionError('');
 
     try {
       const response = await fetch('/api/quote', {
@@ -182,50 +358,72 @@ export default function QuoteForm({
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'We could not send your boarding pass right now.');
+        const serverErrors = data.fieldErrors && typeof data.fieldErrors === 'object' ? data.fieldErrors : {};
+        if (data.code === 'FORM_TIMING') {
+          setFields((current) => ({ ...current, formStartedAt: Date.now() }));
+        }
+        setErrors(serverErrors);
+        setStatus('error');
+        setSubmissionError(data.error || 'The request could not be sent. Your entries have been kept.');
+        focusErrorSummary();
+        setTurnstileToken('');
+        turnstileResetRef.current?.();
+        return;
       }
-      setTicketMeta({ reference: data.reference, issued: data.issued });
+
+      setTicketMeta({ reference: data.reference });
       setStatus('success');
+      clearSafeProgress();
       setTurnstileToken('');
       turnstileResetRef.current?.();
-    } catch (err) {
+    } catch {
       setStatus('error');
-      setErrorMsg(
-        err instanceof TypeError
-          ? 'The request service is not reachable from this page right now. Please use WhatsApp or email Derek directly.'
-          : err.message || 'Network error. Please try again.',
-      );
+      setSubmissionError('The request service is not reachable right now. Your entries have been kept.');
+      focusErrorSummary();
       setTurnstileToken('');
       turnstileResetRef.current?.();
     }
   };
 
-  const isOneWay = fields.tripType === 'One way';
-  const showPhone = requirePhone || full;
-  const passengerOptions = Array.from({ length: 10 }, (_, index) => {
-    const count = index + 1;
-    return `${count} ${count === 1 ? 'Passenger' : 'Passengers'}`;
+  const describedBy = (name, { help = false } = {}) => {
+    const ids = [];
+    if (help) ids.push(`${fieldId(name)}-help`);
+    if (errors[name]) ids.push(`${fieldId(name)}-error`);
+    return ids.length ? ids.join(' ') : undefined;
+  };
+
+  const inputA11y = (name, options) => ({
+    id: fieldId(name),
+    'aria-invalid': errors[name] ? 'true' : undefined,
+    'aria-describedby': describedBy(name, options),
+    onBlur: () => validateOnBlur(name),
   });
-  const formClassName = `quote-form quote-form--${variant} ${showPhone ? 'quote-form--phone' : ''}`;
-  const showEnhancedConfirmation = Boolean(confirmationContext);
-  const selectedServiceLabel = showEnhancedConfirmation
-    ? getSelectedServiceLabel(confirmationContext?.selectedService)
-    : '';
-  const privateCode = showEnhancedConfirmation ? normalizePromoCode(confirmationContext?.promoCode) : '';
+
+  const errorEntries = Object.entries(errors);
+  const formClassName = `quote-form quote-form--${variant} quote-form--phone`;
+  const isMultiCity = fields.tripType === 'multi_city';
+  const isRoundTrip = fields.tripType === 'round_trip';
+  const minimumTravelDate = todayIso();
 
   if (status === 'success') {
     return (
-      <div className={`${formClassName} quote-form--success`} role="status" aria-live="polite">
+      <div
+        ref={successRef}
+        className={`${formClassName} quote-form--success`}
+        role="status"
+        aria-live="polite"
+        tabIndex={-1}
+      >
         <div className="quote-success">
-          {showEnhancedConfirmation ? (
+          {confirmationContext?.advisorAvatarSrc ? (
             <div className="quote-success__identity">
               <SuccessAdvisorAvatar
-                src={confirmationContext?.advisorAvatarSrc}
-                alt="Derek Monti confirmation portrait"
+                src={confirmationContext.advisorAvatarSrc}
+                alt="Derek Monti"
               />
               <div className="quote-success__identity-copy">
-                <span>Derek Monti</span>
-                <strong>Personal Aviation Advisor</strong>
+                <span>Your advisor</span>
+                <strong>Derek Monti</strong>
               </div>
             </div>
           ) : (
@@ -236,28 +434,13 @@ export default function QuoteForm({
           <div className="quote-success__copy">
             <h3>Request received</h3>
             <p>
-              Reference <strong>{ticketMeta?.reference || 'DM request'}</strong> has been sent to{' '}
-              <strong>{fields.email}</strong>. Derek will audit the route, cabin, fare rules, and private availability
-              before replying with options.
+              Your reference is <strong>{ticketMeta?.reference || 'available in your confirmation'}</strong>. Derek
+              will review the itinerary and use your preferred contact method for the next step.
             </p>
             <div className="quote-success__meta">
-              <span>Next step</span>
-              <strong>Derek replies personally within hours.</strong>
+              <span>What happens next</span>
+              <strong>Your request will be reviewed personally. Fares and availability are confirmed before booking.</strong>
             </div>
-            {showEnhancedConfirmation && (
-              <div className="quote-success__summary" aria-label="Request summary">
-                <div>
-                  <span>Selected support</span>
-                  <strong>{selectedServiceLabel}</strong>
-                </div>
-                {privateCode && (
-                  <div>
-                    <span>Private code</span>
-                    <p>{PRIVATE_CODE_CONFIRMATION}</p>
-                  </div>
-                )}
-              </div>
-            )}
             <button type="button" className="quote-success__reset" onClick={reset}>
               Send another request
             </button>
@@ -268,120 +451,373 @@ export default function QuoteForm({
   }
 
   return (
-    <form className={formClassName} onSubmit={submit} noValidate>
+    <form className={formClassName} onSubmit={submit} noValidate aria-busy={status === 'submitting'}>
       <div className="quote-form__honeypot" aria-hidden="true">
-        <label>
-          Company website
-          <input
-            name="companyWebsite"
-            value={fields.companyWebsite}
-            onChange={update}
-            tabIndex={-1}
-            autoComplete="off"
-            maxLength={120}
-          />
-        </label>
+        <label htmlFor={fieldId('companyWebsite')}>Company website</label>
+        <input
+          id={fieldId('companyWebsite')}
+          name="companyWebsite"
+          value={fields.companyWebsite}
+          onChange={(event) => updateField('companyWebsite', event.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          maxLength={120}
+        />
       </div>
-      <div className="quote-form__tabs" role="tablist" aria-label="Trip type">
-        {['Round trip', 'One way'].map((type) => (
-          <button
-            className={fields.tripType === type ? 'active' : ''}
-            key={type}
-            type="button"
-            onClick={() => setFields((current) => ({ ...current, tripType: type }))}
-          >
-            {type}
-          </button>
-        ))}
-      </div>
+
+      {(submissionError || errorEntries.length > 0) && (
+        <div
+          className="quote-form__error"
+          role="alert"
+          aria-labelledby={fieldId('error-summary-title')}
+          ref={errorSummaryRef}
+          tabIndex={-1}
+        >
+          <p id={fieldId('error-summary-title')}>
+            <strong>{submissionError || 'Review the highlighted fields.'}</strong>
+          </p>
+          {errorEntries.length > 0 && (
+            <ul>
+              {errorEntries.map(([name, message]) => (
+                <li key={name}>
+                  <a href={`#${fieldId(name)}`}>
+                    {humanizeErrorKey(name)}: {message}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          {status === 'error' && submissionError && !errorEntries.length && (
+            <div className="quote-form__error-actions">
+              <Button href={whatsapp} variant="primary" icon={false}>
+                Message Derek on WhatsApp
+              </Button>
+              <a href={mailto} className="quote-form__error-mailto">
+                Or open your email app
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
+      <fieldset className="quote-form__tabs">
+        <legend>Trip type</legend>
+        {TRIP_TYPE_OPTIONS.map((option) => {
+          const id = fieldId(`tripType-${option.value}`);
+          return (
+            <label className={fields.tripType === option.value ? 'active' : ''} htmlFor={id} key={option.value}>
+              <input
+                id={id}
+                type="radio"
+                name={`tripType-${instanceId}`}
+                value={option.value}
+                checked={fields.tripType === option.value}
+                onChange={() => {
+                  updateField('tripType', option.value);
+                  setErrors({});
+                }}
+              />
+              <span>{option.label}</span>
+            </label>
+          );
+        })}
+      </fieldset>
 
       <div className="quote-form__grid">
-        {full && (
-          <Field label="Name">
-            <input name="name" value={fields.name} onChange={update} placeholder="Your name" maxLength={80} />
-          </Field>
-        )}
-
-        <Field icon={Plane} label="From" compact={!full}>
-          <input name="from" value={fields.from} onChange={update} placeholder="Flying from?" maxLength={80} />
-        </Field>
-        <Field icon={MapPin} label="To" compact={!full}>
-          <input name="to" value={fields.to} onChange={update} placeholder="Where to?" maxLength={80} />
-        </Field>
-        <Field icon={CalendarDays} label="Departure" compact={!full}>
-          <DatePicker name="departure" value={fields.departure} onChange={update} ariaLabel="Departure date" />
-        </Field>
-        {!isOneWay && (
-          <Field icon={CalendarDays} label="Return" compact={!full}>
-            <DatePicker name="returnDate" value={fields.returnDate} onChange={update} ariaLabel="Return date" />
-          </Field>
-        )}
-        <Field icon={Users} label="Passengers" compact={!full}>
-          <SelectMenu
-            name="passengers"
-            value={fields.passengers}
-            options={passengerOptions}
-            onChange={update}
-            ariaLabel="Passenger count"
-          />
-        </Field>
-        <Field icon={Mail} label="Your email" compact={!full}>
-          <input
-            name="email"
-            type="email"
-            value={fields.email}
-            onChange={update}
-            placeholder="you@gmail.com"
-            required
-            autoComplete="email"
-            maxLength={120}
-          />
-        </Field>
-        {showPhone && (
-          <Field icon={Phone} label="Phone Number" compact={!full}>
-            <input
-              name="phone"
-              type="tel"
-              value={fields.phone}
-              onChange={update}
-              placeholder="Your phone number"
-              required={requirePhone}
-              autoComplete="tel"
-              maxLength={40}
-            />
-          </Field>
-        )}
-
-        {full && (
+        {isMultiCity ? (
+          <fieldset
+            className="quote-form__multi-city"
+            id={fieldId('legs')}
+            tabIndex={errors.legs ? -1 : undefined}
+            aria-describedby={errors.legs ? `${fieldId('legs')}-error` : undefined}
+          >
+            <legend>Multi-city itinerary</legend>
+            {errors.legs && (
+              <p className="quote-field__error" id={`${fieldId('legs')}-error`}>
+                {errors.legs}
+              </p>
+            )}
+            {fields.legs.map((leg, index) => (
+              <div className="quote-form__leg" key={`leg-${index + 1}`}>
+                <h3>Flight {index + 1}</h3>
+                <Field
+                  id={fieldId(`legs.${index}.from`)}
+                  icon={Plane}
+                  label="Origin"
+                  required
+                  error={errors[`legs.${index}.from`]}
+                >
+                  <input
+                    {...inputA11y(`legs.${index}.from`)}
+                    name={`legs[${index}][from]`}
+                    value={leg.from}
+                    onChange={(event) => updateLeg(index, 'from', event.target.value)}
+                    placeholder="City or airport"
+                    autoComplete="off"
+                    maxLength={80}
+                    required
+                  />
+                </Field>
+                <Field
+                  id={fieldId(`legs.${index}.to`)}
+                  icon={MapPin}
+                  label="Destination"
+                  required
+                  error={errors[`legs.${index}.to`]}
+                >
+                  <input
+                    {...inputA11y(`legs.${index}.to`)}
+                    name={`legs[${index}][to]`}
+                    value={leg.to}
+                    onChange={(event) => updateLeg(index, 'to', event.target.value)}
+                    placeholder="City or airport"
+                    autoComplete="off"
+                    maxLength={80}
+                    required
+                  />
+                </Field>
+                <Field
+                  id={fieldId(`legs.${index}.departure`)}
+                  label="Departure"
+                  required
+                  error={errors[`legs.${index}.departure`]}
+                >
+                  <input
+                    {...inputA11y(`legs.${index}.departure`)}
+                    type="date"
+                    name={`legs[${index}][departure]`}
+                    value={leg.departure}
+                    min={minimumTravelDate}
+                    onChange={(event) => updateLeg(index, 'departure', event.target.value)}
+                    required
+                  />
+                </Field>
+                {fields.legs.length > 2 && (
+                  <button
+                    type="button"
+                    className="quote-form__remove-leg"
+                    onClick={() => removeLeg(index)}
+                    aria-label={`Remove flight ${index + 1}`}
+                  >
+                    <Trash2 aria-hidden="true" size={16} />
+                    Remove flight
+                  </button>
+                )}
+              </div>
+            ))}
+            {fields.legs.length < MAX_LEGS && (
+              <button type="button" className="quote-form__add-leg" onClick={addLeg}>
+                <Plus aria-hidden="true" size={17} />
+                Add another flight
+              </button>
+            )}
+          </fieldset>
+        ) : (
           <>
-            <Field label="Cabin">
-              <SelectMenu
-                name="cabin"
-                value={fields.cabin}
-                options={['Business', 'First', 'Either']}
-                onChange={update}
-                ariaLabel="Cabin class"
+            <Field id={fieldId('from')} icon={Plane} label="From" required error={errors.from}>
+              <input
+                {...inputA11y('from')}
+                name="from"
+                value={fields.from}
+                onChange={(event) => updateField('from', event.target.value)}
+                placeholder="City or airport"
+                autoComplete="off"
+                maxLength={80}
+                required
               />
             </Field>
-            <Field label="Notes" wide>
-              <textarea
-                name="notes"
-                value={fields.notes}
-                onChange={update}
-                placeholder="Airline preference, budget, timing, or anything Derek should know."
-                rows={4}
-                maxLength={600}
+            <Field id={fieldId('to')} icon={MapPin} label="To" required error={errors.to}>
+              <input
+                {...inputA11y('to')}
+                name="to"
+                value={fields.to}
+                onChange={(event) => updateField('to', event.target.value)}
+                placeholder="City or airport"
+                autoComplete="off"
+                maxLength={80}
+                required
               />
             </Field>
+            <Field id={fieldId('departure')} label="Departure" required error={errors.departure}>
+              <input
+                {...inputA11y('departure')}
+                type="date"
+                name="departure"
+                value={fields.departure}
+                min={minimumTravelDate}
+                onChange={(event) => updateField('departure', event.target.value)}
+                required
+              />
+            </Field>
+            {isRoundTrip && (
+              <Field id={fieldId('returnDate')} label="Return" required error={errors.returnDate}>
+                <input
+                  {...inputA11y('returnDate')}
+                  type="date"
+                  name="returnDate"
+                  value={fields.returnDate}
+                  min={fields.departure || undefined}
+                  onChange={(event) => updateField('returnDate', event.target.value)}
+                  required
+                />
+              </Field>
+            )}
           </>
         )}
 
-        <button
-          className="quote-form__submit"
-          type="submit"
-          aria-label="Request quote"
-          disabled={status === 'submitting'}
+        <Field id={fieldId('travelers')} icon={Users} label="Travelers" required error={errors.travelers}>
+          <select
+            {...inputA11y('travelers')}
+            name="travelers"
+            value={fields.travelers}
+            onChange={(event) => updateField('travelers', event.target.value)}
+            required
+          >
+            {Array.from({ length: 10 }, (_, index) => index + 1).map((count) => (
+              <option value={String(count)} key={count}>
+                {count} {count === 1 ? 'traveler' : 'travelers'}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field id={fieldId('cabin')} label="Cabin preference" required error={errors.cabin}>
+          <select
+            {...inputA11y('cabin')}
+            name="cabin"
+            value={fields.cabin}
+            onChange={(event) => updateField('cabin', event.target.value)}
+            required
+          >
+            {CABIN_OPTIONS.map((option) => (
+              <option value={option.value} key={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field id={fieldId('flexibility')} label="Date flexibility" required error={errors.flexibility}>
+          <select
+            {...inputA11y('flexibility')}
+            name="flexibility"
+            value={fields.flexibility}
+            onChange={(event) => updateField('flexibility', event.target.value)}
+            required
+          >
+            {FLEXIBILITY_OPTIONS.map((option) => (
+              <option value={option.value} key={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field id={fieldId('fullName')} label="Full name" required error={errors.fullName}>
+          <input
+            {...inputA11y('fullName')}
+            name="fullName"
+            value={fields.fullName}
+            onChange={(event) => updateField('fullName', event.target.value)}
+            autoComplete="name"
+            maxLength={80}
+            required
+          />
+        </Field>
+
+        <Field id={fieldId('email')} icon={Mail} label="Email" required error={errors.email}>
+          <input
+            {...inputA11y('email')}
+            name="email"
+            type="email"
+            value={fields.email}
+            onChange={(event) => updateField('email', event.target.value)}
+            autoComplete="email"
+            inputMode="email"
+            maxLength={120}
+            required
+          />
+        </Field>
+
+        <Field
+          id={fieldId('phone')}
+          icon={Phone}
+          label="Phone or WhatsApp"
+          error={errors.phone}
+          help="Optional unless you prefer phone or WhatsApp contact."
         >
+          <input
+            {...inputA11y('phone', { help: true })}
+            name="phone"
+            type="tel"
+            value={fields.phone}
+            onChange={(event) => updateField('phone', event.target.value)}
+            autoComplete="tel"
+            inputMode="tel"
+            maxLength={40}
+          />
+        </Field>
+
+        <Field
+          id={fieldId('contactPreference')}
+          label="Preferred contact"
+          required
+          error={errors.contactPreference}
+        >
+          <select
+            {...inputA11y('contactPreference')}
+            name="contactPreference"
+            value={fields.contactPreference}
+            onChange={(event) => updateField('contactPreference', event.target.value)}
+            required
+          >
+            {CONTACT_PREFERENCE_OPTIONS.map((option) => (
+              <option value={option.value} key={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field id={fieldId('notes')} label="Notes or priorities" wide>
+          <textarea
+            id={fieldId('notes')}
+            name="notes"
+            value={fields.notes}
+            onChange={(event) => updateField('notes', event.target.value)}
+            placeholder="Airline preferences, schedule priorities, or accessibility needs (optional)"
+            rows={3}
+            maxLength={600}
+          />
+        </Field>
+
+        <div className="quote-form__privacy">
+          <input
+            id={fieldId('privacyAcknowledged')}
+            name="privacyAcknowledged"
+            type="checkbox"
+            checked={fields.privacyAcknowledged}
+            onChange={(event) => updateField('privacyAcknowledged', event.target.checked)}
+            onBlur={() => validateOnBlur('privacyAcknowledged')}
+            aria-invalid={errors.privacyAcknowledged ? 'true' : undefined}
+            aria-describedby={errors.privacyAcknowledged ? `${fieldId('privacyAcknowledged')}-error` : undefined}
+            required
+          />
+          <label htmlFor={fieldId('privacyAcknowledged')}>
+            I have read the{' '}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer">
+              Privacy Policy (opens in a new tab)
+            </a>{' '}
+            and agree that my trip and contact details may be used to respond to this request. (required)
+          </label>
+          {errors.privacyAcknowledged && (
+            <p className="quote-field__error" id={`${fieldId('privacyAcknowledged')}-error`}>
+              {errors.privacyAcknowledged}
+            </p>
+          )}
+        </div>
+
+        <button className="quote-form__submit" type="submit" disabled={status === 'submitting'}>
           {status === 'submitting' ? (
             <>
               <Send aria-hidden="true" size={18} />
@@ -390,14 +826,19 @@ export default function QuoteForm({
           ) : (
             <>
               <Search aria-hidden="true" size={20} />
-              <span>Request</span>
+              <span>Send trip for review</span>
             </>
           )}
         </button>
       </div>
 
       {TURNSTILE_SITE_KEY && (
-        <div className="quote-form__turnstile">
+        <div
+          className="quote-form__turnstile"
+          id={fieldId('turnstile')}
+          tabIndex={errors.turnstile ? -1 : undefined}
+          aria-describedby={errors.turnstile ? `${fieldId('turnstile')}-error` : undefined}
+        >
           <TurnstileWidget
             siteKey={TURNSTILE_SITE_KEY}
             onToken={handleTurnstileToken}
@@ -405,31 +846,17 @@ export default function QuoteForm({
             onError={handleTurnstileError}
             registerReset={registerTurnstileReset}
           />
+          {errors.turnstile && (
+            <p className="quote-field__error" id={`${fieldId('turnstile')}-error`}>
+              {errors.turnstile}
+            </p>
+          )}
         </div>
       )}
 
-      {status === 'error' && (
-        <div className="quote-form__error" role="alert">
-          <p>{errorMsg}</p>
-          <div className="quote-form__error-actions">
-            <Button href={whatsapp} variant="primary" icon={false}>
-              Message Derek on WhatsApp
-            </Button>
-            <a href={mailto} className="quote-form__error-mailto">
-              Or open your email app
-            </a>
-          </div>
-        </div>
-      )}
-
-      {full && status !== 'error' && (
-        <div className="quote-form__actions">
-          <Button href={whatsapp} variant="outline-dark" icon={false}>
-            Chat on WhatsApp
-          </Button>
-          <p>Derek replies personally. No booking engine, no automated handoff.</p>
-        </div>
-      )}
+      <p className="quote-form__privacy-note">
+        Your details are used only to review and respond to this request. No payment is collected here.
+      </p>
     </form>
   );
 }

@@ -1,249 +1,153 @@
-import { useRef, useState } from 'react';
-import { BriefcaseBusiness, Clock3, Crown, Rotate3D, ShieldCheck } from 'lucide-react';
-import AirlineMarquee from '../components/common/AirlineMarquee.jsx';
-import Button from '../components/common/Button.jsx';
+import { useRef } from 'react';
+import { ArrowRight, Clock3, Layers3, ScanSearch } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import FaqAccordion from '../components/common/FaqAccordion.jsx';
 import FinalCta from '../components/common/FinalCta.jsx';
-import RouteCarousel from '../components/common/RouteCarousel.jsx';
-import ScenicBackdrop from '../components/common/ScenicBackdrop.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
-import { extraServices, imagery, serviceDeals, services, servicesFaqs, siteBackdrops, steps } from '../data/siteData.js';
-import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
+import { evaluationItems, servicesFaqs, steps } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 
-const icons = [BriefcaseBusiness, Crown, Rotate3D, Clock3];
-
-function ServiceCard({ service, index }) {
-  const [flipped, setFlipped] = useState(false);
-  const Icon = icons[index];
-
-  return (
-    <article
-      className={`service-card ${flipped ? 'flipped' : ''}`}
-      onClick={() => setFlipped((current) => !current)}
-      data-reveal
-      tabIndex={0}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') setFlipped((current) => !current);
-      }}
-    >
-      <div className="service-card__inner">
-        <div className="service-card__face service-card__front">
-          <span className="service-card__badge">{service.badge}</span>
-          <Icon aria-hidden="true" size={34} />
-          <h3>{service.title}</h3>
-          <p>{service.description}</p>
-        </div>
-        <div className="service-card__face service-card__back">
-          <span>Example</span>
-          <h3>{service.title}</h3>
-          <p>{service.example}</p>
-          <small>Tap or hover to return</small>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function ServicesHero() {
-  return (
-    <section className="page-hero page-hero--services">
-      <img src={imagery.servicesHero} alt="Premium airport terminal" />
-      <div className="page-hero__overlay" />
-      <div className="page-hero__content">
-        <p className="eyebrow">Services</p>
-        <h1>Premium Flight Planning, Handled Personally.</h1>
-        <p>
-          Business class, first class, complex itineraries, and urgent requests sourced by Derek with private fare
-          access.
-        </p>
-        <Button href="#services-grid">Explore Services</Button>
-      </div>
-    </section>
-  );
-}
-
-function CompactSteps() {
-  return (
-    <section className="steps-section steps-section--dark scenic-section scenic-section--steps">
-      <ScenicBackdrop backdrop={siteBackdrops.servicesSteps} />
-      <div className="container">
-        <SectionHeader
-          eyebrow="How It Works"
-          title="From Message to E-Ticket"
-          text="The process stays simple because Derek does the fare work behind the scenes."
-          light
-        />
-        <div className="steps">
-          {steps.map((step, index) => (
-            <article key={step.title} data-reveal>
-              <div className="steps__icon">
-                <span>{String(index + 1).padStart(2, '0')}</span>
-              </div>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ExtraServices() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeService = extraServices[activeIndex];
-
-  return (
-    <section className="guidance-section" id="guidance">
-      <div className="container guidance-section__inner">
-        <aside className="guidance-section__copy" data-reveal>
-          <p className="eyebrow">Extra Services</p>
-          <h2>Book Smarter With Derek's Guidance</h2>
-          <p>
-            For travelers who want the strategy behind premium fares, not just the final quote. Derek turns fare logic
-            into practical next steps before you commit.
-          </p>
-          <div className="guidance-story" aria-label="Guidance flow">
-            {extraServices.map((service, index) => (
-              <button
-                key={service.title}
-                type="button"
-                className={activeIndex === index ? 'active' : ''}
-                onClick={() => setActiveIndex(index)}
-              >
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <strong>{service.storyLabel}</strong>
-              </button>
-            ))}
-          </div>
-          <Button href="#contact" variant="outline-dark">
-            Ask for guidance
-          </Button>
-        </aside>
-        <div className="guidance-folio" data-reveal>
-          <div className="guidance-folio__tabs" role="tablist" aria-label="Derek guidance services">
-            {extraServices.map((service, index) => (
-              <button
-                key={service.title}
-                id={`guidance-tab-${index}`}
-                type="button"
-                role="tab"
-                aria-selected={activeIndex === index}
-                aria-controls={`guidance-panel-${index}`}
-                tabIndex={activeIndex === index ? 0 : -1}
-                onClick={() => setActiveIndex(index)}
-              >
-                <span>{service.label}</span>
-                <strong>{service.title}</strong>
-              </button>
-            ))}
-          </div>
-          <article
-            className="guidance-folio__panel"
-            id={`guidance-panel-${activeIndex}`}
-            role="tabpanel"
-            aria-labelledby={`guidance-tab-${activeIndex}`}
-          >
-            <span>{activeService.storyLabel}</span>
-            <h3>{activeService.title}</h3>
-            <p>{activeService.activeSummary}</p>
-            <ul>
-              {activeService.checklist.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-            <small>{activeService.outcome}</small>
-          </article>
-        </div>
-        <div className="guidance-accordion" data-reveal aria-label="Derek guidance services">
-          {extraServices.map((service, index) => {
-            const isActive = activeIndex === index;
-            return (
-              <article className={isActive ? 'active' : ''} key={service.title}>
-                <button type="button" aria-expanded={isActive} onClick={() => setActiveIndex(index)}>
-                  <span>{service.label}</span>
-                  <strong>{service.title}</strong>
-                </button>
-                <div aria-hidden={!isActive}>
-                  <p>{service.activeSummary}</p>
-                  <ul>
-                    {service.checklist.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                  <small>{service.outcome}</small>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
+const serviceLinks = [
+  {
+    icon: ScanSearch,
+    eyebrow: 'Core service',
+    title: 'Premium flight advisor',
+    body: 'A structured review of business- and first-class options around the traveler’s complete brief.',
+    href: '/services/premium-flight-advisor',
+  },
+  {
+    icon: Layers3,
+    eyebrow: 'Complex travel',
+    title: 'Multi-city and open-jaw itineraries',
+    body: 'Bring multiple legs, mixed-cabin priorities, and fixed commitments into one request.',
+    href: '/services/complex-itineraries',
+  },
+  {
+    icon: Clock3,
+    eyebrow: 'Time-sensitive travel',
+    title: 'Last-minute premium requests',
+    body: 'Separate non-negotiable timing from preferences so available tradeoffs can be assessed clearly.',
+    href: '/services/last-minute-business-class',
+  },
+];
 
 export default function Services() {
   const pageRef = useRef(null);
-  useDocumentMeta(
-    'Services - Business Class, First Class and Complex Itineraries | Derek Monti',
-    'Business class, first class, last-minute bookings and complex premium itineraries sourced personally by Derek Monti.',
-  );
+
   usePageMotion(pageRef);
 
   return (
     <div ref={pageRef}>
-      <ServicesHero />
-      <section className="services-section" id="services-grid">
+      <section className="editorial-hero editorial-hero--services" aria-labelledby="services-title">
+        <div className="container editorial-hero__inner editorial-hero__inner--single">
+          <div className="editorial-hero__copy" data-reveal>
+            <p className="eyebrow eyebrow--light">Services</p>
+            <h1 id="services-title">Premium travel, reviewed as a whole.</h1>
+            <p>
+              Share a business- or first-class trip and the priorities that shape it. Derek reviews the itinerary
+              dimensions together and helps make the tradeoffs easier to understand.
+            </p>
+            <Link className="hero-link" to="/#request-form">
+              Request a personal review <ArrowRight aria-hidden="true" size={18} />
+            </Link>
+          </div>
+          <p className="editorial-hero__aside" data-reveal>
+            No live inventory is displayed here. Availability, price, cabin, and ticket conditions can only be
+            discussed against a real itinerary.
+          </p>
+        </div>
+      </section>
+
+      <section className="services-index" aria-labelledby="services-index-title">
         <div className="container">
           <SectionHeader
-            eyebrow="What Derek Handles"
-            title="One Advisor for the Whole Premium Journey"
-            text="Each service is built around your exact route, timing, cabin preference, and comfort threshold."
+            eyebrow="Choose by need"
+            title="Three distinct ways to start."
+            text="Each service page explains the information needed, the review lens, and the practical limitations."
+            align="left"
           />
-          <div className="services-grid">
-            {services.map((service, index) => (
-              <ServiceCard service={service} index={index} key={service.title} />
+          <h2 className="sr-only" id="services-index-title">
+            Services
+          </h2>
+          <div className="services-index__list">
+            {serviceLinks.map((service, index) => {
+              const Icon = service.icon;
+              return (
+                <Link to={service.href} key={service.href} data-reveal>
+                  <span className="services-index__number">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="services-index__icon">
+                    <Icon aria-hidden="true" size={22} />
+                  </span>
+                  <div>
+                    <small>{service.eyebrow}</small>
+                    <h3>{service.title}</h3>
+                    <p>{service.body}</p>
+                  </div>
+                  <ArrowRight aria-hidden="true" size={20} />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="service-lens" aria-labelledby="service-lens-title">
+        <div className="container service-lens__layout">
+          <div className="service-lens__intro" data-reveal>
+            <p className="eyebrow eyebrow--light">The comparison framework</p>
+            <h2 id="service-lens-title">What is evaluated before a traveler decides.</h2>
+            <p>The framework remains consistent while the weighting changes for each trip.</p>
+          </div>
+          <div className="service-lens__grid">
+            {evaluationItems.map((item) => (
+              <article key={item.title} data-reveal>
+                <span>{item.number}</span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
-      <ExtraServices />
-      <AirlineMarquee />
-      <section className="savings-section scenic-section scenic-section--services-savings">
-        <ScenicBackdrop backdrop={siteBackdrops.servicesSavings} />
+
+      <section className="process-section process-section--services" aria-labelledby="services-process-title">
         <div className="container">
           <SectionHeader
-            eyebrow="Savings Proof"
-            title="Recent Fare Scenarios"
-            text="Route examples show how published fares can shift when Derek searches private channels."
-            light
+            eyebrow="How it works"
+            title="A short request. A considered review."
+            text="The process leaves the decision with the traveler and does not imply a booking until real terms are confirmed."
           />
-          <RouteCarousel deals={serviceDeals} />
+          <h2 className="sr-only" id="services-process-title">
+            Service process
+          </h2>
+          <div className="process-grid">
+            {steps.map((step, index) => (
+              <article key={step.title} data-reveal>
+                <div className="process-grid__top">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                </div>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
-      <CompactSteps />
-      <section className="faq-section">
-        <div className="container faq-section__inner">
+
+      <section className="faq-section" aria-labelledby="services-faq-title">
+        <div className="container faq-section__layout">
           <div data-reveal>
             <p className="eyebrow">Services FAQ</p>
-            <h2>Good Questions Before You Send Dates</h2>
-            <p>
-              Derek will confirm rules, availability, and ticketing deadlines before you commit to any fare.
-            </p>
-            <div className="faq-section__seal">
-              <ShieldCheck aria-hidden="true" size={20} />
-              <span>Transparent quote process</span>
-            </div>
+            <h2 id="services-faq-title">Know the boundaries before you begin.</h2>
+            <p>Clear expectations make a premium-travel request easier to review and easier to trust.</p>
           </div>
           <FaqAccordion items={servicesFaqs} />
         </div>
       </section>
+
       <FinalCta
-        crimson
-        backdrop={siteBackdrops.servicesFinalCta}
-        title="Ready to Fly Better for Less?"
-        text="Send Derek your travel details and receive options within hours - no commitment required."
+        title="Start with the trip you need to take."
+        text="Send the route, dates, cabin preference, and flexibility. You can explain the finer priorities in your own words."
       />
     </div>
   );

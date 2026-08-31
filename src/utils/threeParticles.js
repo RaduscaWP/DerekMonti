@@ -1,13 +1,23 @@
 import * as THREE from 'three';
 
 export function initParticles(canvas) {
-  if (!canvas || window.innerWidth < 768) {
+  if (
+    !canvas ||
+    window.innerWidth < 900 ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return () => {};
+  }
+
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
+  } catch {
     return () => {};
   }
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -50,8 +60,8 @@ export function initParticles(canvas) {
   };
 
   const resize = () => {
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    const width = Math.max(canvas.clientWidth, 1);
+    const height = Math.max(canvas.clientHeight, 1);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
