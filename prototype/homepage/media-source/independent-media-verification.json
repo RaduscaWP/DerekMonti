@@ -1,0 +1,44 @@
+{
+  "hero-window-loop.mp4": {
+    "bytes": 582145,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "decoded_frames": 288,
+    "fps": 24.0,
+    "duration_seconds": 12.0,
+    "mean_pixel_difference_0_to_5sec_window": 8.432454545454545,
+    "mean_pixel_difference_0_to_5sec_cabin": 0.05325846354166667,
+    "adjacent_mean_pixel_difference_median": 0.08002132839626735,
+    "adjacent_mean_pixel_difference_p95": 0.11570277743869357,
+    "first_last_mean_pixel_difference": 0.970830069647895,
+    "ffmpeg_streams": [
+      "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1536x1024, 385 kb/s, 24 fps, 24 tbr, 12288 tbn (default)"
+    ]
+  },
+  "hero-window-loop.webm": {
+    "bytes": 311986,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "decoded_frames": 288,
+    "fps": 24.0,
+    "duration_seconds": 12.0,
+    "mean_pixel_difference_0_to_5sec_window": 8.295056277056277,
+    "mean_pixel_difference_0_to_5sec_cabin": 0.04257207961309524,
+    "adjacent_mean_pixel_difference_median": 0.0490105946858724,
+    "adjacent_mean_pixel_difference_p95": 0.10183351304796005,
+    "first_last_mean_pixel_difference": 0.9812240600585938,
+    "ffmpeg_streams": [
+      "Stream #0:0: Video: vp9 (Profile 0), yuv420p(tv, progressive), 1536x1024, SAR 1:1 DAR 3:2, 24 fps, 24 tbr, 1k tbn (default)"
+    ]
+  },
+  "original_source": {
+    "frames": 690,
+    "fps": 24.0,
+    "width": 1280.0,
+    "height": 720.0
+  }
+}

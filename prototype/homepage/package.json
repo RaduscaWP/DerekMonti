@@ -1,0 +1,25 @@
+{
+  "name": "fly-with-derek-homepage-prototype",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/prepare-sites-build.mjs",
+    "preview": "vite preview",
+    "test:sites": "node --test tests/sites-worker.test.mjs",
+    "test": "node --test tests/trip-state.test.mjs"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.2.8",
+    "@fontsource/syne": "^5.2.7",
+    "@vitejs/plugin-react": "^5.1.4",
+    "gsap": "^3.12.5",
+    "lucide-react": "^0.468.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.77.2",
+    "vite": "^6.4.2"
+  },
+  "devDependencies": {}
+}
