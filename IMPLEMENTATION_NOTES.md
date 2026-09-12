@@ -1,5 +1,13 @@
 # Fly with Derek — Implementation Notes
 
+## Homepage production integration — 2026-09-12
+
+The root route now renders the approved cinematic personal-advisor experience from `src/components/homepage/`. It uses the fixed-cabin hero composition, a 12-second muted cloud-view loop with matching poster, Derek's supplied portrait, an interactive comfort studio, a focused three-step process, the production trip-request flow, FAQ, closing action, and a homepage-specific header/footer. Other routes retain the established shared layout.
+
+The homepage form posts through the existing `/api/quote` contract. It supports round trip, one way, and two-to-six-leg multi-city journeys; optional comfort preference is transmitted as its own validated field; traveler notes remain unchanged; contact PII is excluded from saved session progress; and success requires an HTTP success response, `{ ok: true }`, and a non-empty request reference. The existing honeypot, timing, request-size, validation, optional Turnstile, rate limiting, and advisor-first delivery behavior remain in place.
+
+The current dependency set uses React Router 7.18.3 and Vite 6.4.3. The SSR entry imports `StaticRouter` from the React Router DOM root export. The complete suite passes 40/40 tests, the client/SSR/prerender build passes, and npm reports zero known vulnerabilities. Detailed local browser and adapter evidence is in [`qa/homepage-production/README.md`](qa/homepage-production/README.md).
+
 Status date: 2026-08-31  
 Scope: final PRD-led implementation in the current working tree  
 Production deployment status: not performed or verified by this report

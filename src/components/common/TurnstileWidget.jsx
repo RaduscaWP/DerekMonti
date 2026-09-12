@@ -27,7 +27,7 @@ function loadScript() {
   return scriptPromise;
 }
 
-export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, registerReset, className = '' }) {
+export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, registerReset, className = '', size = 'normal' }) {
   const hostRef = useRef(null);
   const widgetIdRef = useRef(null);
   const callbacksRef = useRef({ onToken, onExpire, onError });
@@ -44,6 +44,7 @@ export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, r
         if (cancelled || !turnstile || !hostRef.current) return;
         widgetId = turnstile.render(hostRef.current, {
           sitekey: siteKey,
+          size,
           callback: (token) => callbacksRef.current.onToken?.(token),
           'expired-callback': () => callbacksRef.current.onExpire?.(),
           'error-callback': () => callbacksRef.current.onError?.(),
@@ -74,7 +75,7 @@ export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, r
       }
       widgetIdRef.current = null;
     };
-  }, [siteKey, registerReset]);
+  }, [siteKey, registerReset, size]);
 
   if (!siteKey) return null;
 

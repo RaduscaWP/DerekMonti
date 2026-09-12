@@ -1,5 +1,17 @@
 # Fly with Derek — QA Report
 
+## Homepage release update — 2026-09-12
+
+The approved cinematic homepage is now integrated into the production application. The August 31 report below remains as the historical PRD baseline; its 12-test count, bundle measurements, homepage description, and deployment status describe that older build.
+
+- The current suite passes **40/40 tests**: 18 homepage trip-flow tests, 18 shared quote/API/email tests, and four SEO/deployment tests.
+- The final Vite 6.4.3 client build, SSR build, 16-route prerender, `404.html`, sitemap, robots, and SEO validation pass.
+- `npm.cmd audit --audit-level=low` reports **0 vulnerabilities** after the React Router 7.18.3 update and its SSR compatibility change.
+- The built homepage passed targeted browser checks at 1440×1000, 768×1024, 390×844, and 320×800. Hero video/poster behavior, responsive layout, mobile menu, reduced motion, the comfort studio, route handoff, legacy-page navigation, and browser logs were checked.
+- The real form adapter was exercised against a local no-delivery HTTP fixture. It preserved data through a recoverable 503 and showed success only after an explicit API receipt with a reference. No external lead or message was sent.
+
+Current evidence and screenshots: [`qa/homepage-production/README.md`](qa/homepage-production/README.md).
+
 Report date: 2026-08-31  
 Scope: final PRD implementation in the current working tree  
 Release decision: **repository checks passed; production approval remains gated**

@@ -23,6 +23,12 @@ export const CONTACT_PREFERENCE_OPTIONS = [
   { value: 'whatsapp', label: 'WhatsApp' },
 ];
 
+export const COMFORT_PREFERENCE_OPTIONS = [
+  { value: 'rested', label: 'Rested' },
+  { value: 'work', label: 'Ready to work' },
+  { value: 'together', label: 'Travelling together' },
+];
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const PHONE_ALLOWED_RE = /^[+()\d\s.-]+$/;
@@ -32,6 +38,7 @@ const TRIP_TYPE_VALUES = optionValues(TRIP_TYPE_OPTIONS);
 const CABIN_VALUES = optionValues(CABIN_OPTIONS);
 const FLEXIBILITY_VALUES = optionValues(FLEXIBILITY_OPTIONS);
 const CONTACT_PREFERENCE_VALUES = optionValues(CONTACT_PREFERENCE_OPTIONS);
+const COMFORT_PREFERENCE_VALUES = optionValues(COMFORT_PREFERENCE_OPTIONS);
 
 const legacyTripTypes = {
   'Round trip': 'round_trip',
@@ -83,6 +90,10 @@ export function getFlexibilityLabel(value) {
 
 export function getContactPreferenceLabel(value) {
   return optionLabel(CONTACT_PREFERENCE_OPTIONS, normalizeContactPreference(value), 'Email');
+}
+
+export function getComfortPreferenceLabel(value) {
+  return optionLabel(COMFORT_PREFERENCE_OPTIONS, value, 'Not specified');
 }
 
 export function isValidPhone(value) {
@@ -178,6 +189,10 @@ export function validateQuoteFields(fields, { today = localTodayIso() } = {}) {
   if (!CABIN_VALUES.has(String(fields?.cabin || ''))) errors.cabin = 'Choose a cabin preference.';
   if (!FLEXIBILITY_VALUES.has(String(fields?.flexibility || ''))) {
     errors.flexibility = 'Choose how flexible your dates are.';
+  }
+  // Existing forms can omit this optional field; never silently select a priority.
+  if (fields?.comfortPreference != null && fields.comfortPreference !== '' && !COMFORT_PREFERENCE_VALUES.has(fields.comfortPreference)) {
+    errors.comfortPreference = 'Choose a valid comfort preference.';
   }
   if (fullName.length < 2) errors.fullName = 'Enter your full name.';
   if (!EMAIL_RE.test(email)) errors.email = 'Enter a valid email address.';

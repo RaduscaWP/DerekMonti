@@ -10,7 +10,7 @@
     "build:ssr": "vite build --ssr src/entry-server.jsx --outDir .vite/ssr",
     "prerender": "node scripts/prerender.mjs",
     "validate:seo": "node scripts/validate-prerender.mjs",
-    "test": "node --test tests/quote-contract.test.mjs tests/seo-deployment.test.mjs",
+    "test": "node --test tests/quote-contract.test.mjs tests/seo-deployment.test.mjs tests/homepage-trip.test.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "preview:static": "node scripts/serve-prerender.mjs"
   },
@@ -23,7 +23,7 @@
     "lucide-react": "^0.468.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^7.18.3",
     "resend": "^4.8.0",
     "three": "^0.160.1"
   },
@@ -31,6 +31,6 @@
     "@playwright/test": "^1.59.1",
     "@vitejs/plugin-react": "^5.1.4",
     "sass": "^1.77.2",
-    "vite": "^6.4.2"
+    "vite": "^6.4.3"
   }
 }

@@ -3,6 +3,7 @@ import test from 'node:test';
 import { renderTicketHtml } from '../api/_emailTemplate.js';
 import quoteHandler from '../api/quote.js';
 import { validateQuoteFields } from '../src/utils/quoteRequest.js';
+import { buildQuoteMessage, getMailto, getWhatsappUrl } from '../src/utils/message.js';
 
 const validRoundTrip = {
   tripType: 'round_trip',
@@ -22,7 +23,7 @@ const validRoundTrip = {
   privacyAcknowledged: true,
 };
 
-async function invokeQuoteApi(body, method = 'POST') {
+async function invokeQuoteApi(body, method = 'POST', { headers = {}, ip = '127.0.0.1' } = {}) {
   const response = {
     statusCode: 200,
     headers: {},
@@ -39,9 +40,55 @@ async function invokeQuoteApi(body, method = 'POST') {
       return this;
     },
   };
-  await quoteHandler({ method, headers: {}, body, socket: { remoteAddress: '127.0.0.1' } }, response);
+  await quoteHandler({ method, headers, body, socket: { remoteAddress: ip } }, response);
   return response;
 }
+
+// Every network path is replaced before invoking a deliverable request. These
+// contract tests can never submit leads or use the developer's email credentials.
+function mockQuoteServices(t, { emailStatuses = [], verificationSucceeds = true, production = false } = {}) {
+  const overrides = {
+    RESEND_API_KEY: 're_test_local_only',
+    TURNSTILE_SECRET: 'test_turnstile_secret',
+    NODE_ENV: production ? 'production' : 'test',
+    UPSTASH_REDIS_REST_URL: '',
+    UPSTASH_REDIS_REST_TOKEN: '',
+    KV_REST_API_URL: '',
+    KV_REST_API_TOKEN: '',
+  };
+  const previous = Object.fromEntries(Object.keys(overrides).map((key) => [key, process.env[key]]));
+  Object.assign(process.env, overrides);
+  t.after(() => {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+  const calls = { emails: [], challenges: [], unexpected: [] };
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    if (url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify') {
+      calls.challenges.push(options.body);
+      return Response.json({ success: verificationSucceeds });
+    }
+    if (url === 'https://api.resend.com/emails') {
+      calls.emails.push(JSON.parse(options.body));
+      const status = emailStatuses[calls.emails.length - 1] || 200;
+      return Response.json(status === 200 ? { id: 'local-test-message' } : { name: 'test_error' }, { status });
+    }
+    calls.unexpected.push(String(url));
+    throw new Error('Unexpected network request blocked by test');
+  });
+  t.mock.method(console, 'warn', () => {});
+  t.mock.method(console, 'error', () => {});
+  return calls;
+}
+
+const submission = (overrides = {}) => ({
+  ...validRoundTrip,
+  formStartedAt: Date.now() - 2_000,
+  turnstileToken: 'local-test-challenge',
+  ...overrides,
+});
 
 test('accepts a complete round-trip request', () => {
   assert.deepEqual(validateQuoteFields(validRoundTrip, { today: '2030-01-01' }), {});
@@ -147,4 +194,127 @@ test('API keeps the honeypot response non-revealing and does not attempt deliver
   assert.equal(response.statusCode, 200);
   assert.equal(response.payload.ok, true);
   assert.match(response.payload.reference, /^DM-/);
+});
+
+test('comfort preference is optional, accepts each explicit choice, and rejects unknown values or types', () => {
+  for (const comfortPreference of [undefined, null, '', 'rested', 'work', 'together']) {
+    assert.deepEqual(validateQuoteFields({ ...validRoundTrip, comfortPreference }, { today: '2030-01-01' }), {});
+  }
+  for (const comfortPreference of ['luxury', 'Rested', '<script>', ['rested'], {}, true]) {
+    assert.equal(
+      validateQuoteFields({ ...validRoundTrip, comfortPreference }, { today: '2030-01-01' }).comfortPreference,
+      'Choose a valid comfort preference.',
+    );
+  }
+});
+
+test('API delivers each preference separately from unchanged notes and keeps older forms valid', async (t) => {
+  const calls = mockQuoteServices(t);
+  const notes = 'Aisle seat, please.\nDo not turn <script>alert("x")</script> into markup.';
+  for (const [comfortPreference, label] of [
+    ['rested', 'Rested'], ['work', 'Ready to work'], ['together', 'Travelling together'], [undefined, null],
+  ]) {
+    const response = await invokeQuoteApi(submission({ comfortPreference, notes }));
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.payload.ok, true);
+    assert.equal(response.payload.confirmationSent, true);
+    assert.match(response.payload.reference, /^DM-/);
+    const [advisor, customer] = calls.emails.slice(-2);
+    assert.deepEqual(advisor.to, ['Derek@travelbusinessclass.com']);
+    assert.deepEqual(customer.to, ['ada@example.com']);
+    assert.equal(advisor.reply_to, 'ada@example.com');
+    for (const email of [advisor, customer]) {
+      assert.ok(email.text.includes(`Notes:\n${notes}\n\nPrivacy acknowledgement`));
+      assert.match(email.html, /&lt;script&gt;alert\(&quot;x&quot;\)&lt;\/script&gt;/);
+      assert.doesNotMatch(email.html, /<script>/);
+      if (label) {
+        assert.ok(email.text.includes(`Comfort preference: ${label}\n`));
+        assert.ok(email.html.includes('Comfort preference'));
+        assert.ok(email.html.includes(label));
+      } else {
+        assert.doesNotMatch(email.text + email.html, /Comfort preference/);
+      }
+    }
+  }
+  assert.equal(calls.emails.length, 8);
+  assert.equal(calls.challenges.length, 4);
+  assert.deepEqual(calls.unexpected, []);
+});
+
+test('API rejects an unknown comfort preference before verification or delivery', async (t) => {
+  const calls = mockQuoteServices(t);
+  for (const comfortPreference of ['private_suite', ['rested'], '<img src=x onerror=alert(1)>']) {
+    const response = await invokeQuoteApi(submission({ comfortPreference }));
+    assert.equal(response.statusCode, 400);
+    assert.equal(response.payload.fieldErrors.comfortPreference, 'Choose a valid comfort preference.');
+  }
+  assert.deepEqual(calls, { emails: [], challenges: [], unexpected: [] });
+});
+
+test('fallback links retain explicit comfort preference and original notes', () => {
+  const fields = { ...validRoundTrip, comfortPreference: 'work', notes: 'Aisle & window options, please.\nNo overnight connection.' };
+  const message = buildQuoteMessage(fields);
+  assert.ok(message.includes('Comfort preference: Ready to work'));
+  assert.ok(message.endsWith(`Notes: ${fields.notes}`));
+  assert.equal(new URL(getWhatsappUrl(fields)).searchParams.get('text'), message);
+  assert.equal(new URL(getMailto(fields)).searchParams.get('body'), message);
+  assert.doesNotMatch(buildQuoteMessage(validRoundTrip), /Comfort preference/);
+});
+
+test('comfort-enabled requests retain timing, honeypot, size, and HTTP method protections', async (t) => {
+  const calls = mockQuoteServices(t);
+  const tooFast = await invokeQuoteApi(submission({ comfortPreference: 'rested', formStartedAt: Date.now() }));
+  assert.equal(tooFast.statusCode, 400);
+  assert.equal(tooFast.payload.code, 'FORM_TIMING');
+  const expired = await invokeQuoteApi(submission({ comfortPreference: 'work', formStartedAt: Date.now() - 25 * 60 * 60 * 1000 }));
+  assert.equal(expired.payload.code, 'FORM_TIMING');
+  const honeypot = await invokeQuoteApi(submission({ comfortPreference: 'together', companyWebsite: 'spam.example' }));
+  assert.equal(honeypot.payload.ok, true);
+  const oversized = await invokeQuoteApi(submission({ comfortPreference: 'work' }), 'POST', { headers: { 'content-length': 13 * 1024 } });
+  assert.equal(oversized.statusCode, 413);
+  const wrongMethod = await invokeQuoteApi(submission({ comfortPreference: 'work' }), 'GET');
+  assert.equal(wrongMethod.statusCode, 405);
+  assert.equal(wrongMethod.headers.Allow, 'POST');
+  assert.deepEqual(calls, { emails: [], challenges: [], unexpected: [] });
+});
+
+test('failed human verification prevents email delivery with a selected comfort preference', async (t) => {
+  const calls = mockQuoteServices(t, { verificationSucceeds: false });
+  const response = await invokeQuoteApi(submission({ comfortPreference: 'together' }));
+  assert.equal(response.statusCode, 400);
+  assert.ok(response.payload.fieldErrors.turnstile);
+  assert.equal(calls.challenges.length, 1);
+  assert.equal(calls.emails.length, 0);
+});
+
+test('production rate limit still stops comfort-enabled requests before delivery', async (t) => {
+  const calls = mockQuoteServices(t, { production: true });
+  const ip = '192.0.2.44';
+  globalThis.__derekQuoteRateBuckets.delete(ip);
+  t.after(() => globalThis.__derekQuoteRateBuckets.delete(ip));
+  for (let index = 0; index < 8; index += 1) {
+    const response = await invokeQuoteApi(submission({ comfortPreference: 'rested', companyWebsite: 'spam.example' }), 'POST', { ip });
+    assert.equal(response.statusCode, 200);
+  }
+  const limited = await invokeQuoteApi(submission({ comfortPreference: 'rested' }), 'POST', { ip });
+  assert.equal(limited.statusCode, 429);
+  assert.deepEqual(calls, { emails: [], challenges: [], unexpected: [] });
+});
+
+test('advisor delivery failure remains a retryable failure without claiming submission success', async (t) => {
+  const calls = mockQuoteServices(t, { emailStatuses: [500] });
+  const response = await invokeQuoteApi(submission({ comfortPreference: 'work' }));
+  assert.equal(response.statusCode, 502);
+  assert.equal(response.payload.ok, undefined);
+  assert.match(response.payload.error, /could not be delivered/);
+  assert.equal(calls.emails.length, 1);
+});
+
+test('customer confirmation failure preserves advisor delivery success and reports the missing confirmation', async (t) => {
+  const calls = mockQuoteServices(t, { emailStatuses: [200, 500] });
+  const response = await invokeQuoteApi(submission({ comfortPreference: 'together' }));
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.payload.ok, true);
+  assert.equal(response.payload.confirmationSent, false);
+  assert.equal(calls.emails.length, 2);
 });
