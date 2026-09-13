@@ -1,6 +1,6 @@
 import {
   CABIN_OPTIONS, CONTACT_PREFERENCE_OPTIONS, FLEXIBILITY_OPTIONS, TRIP_TYPE_OPTIONS,
-  validateQuoteFields,
+  validateQuoteFields, SERVICE_INTENT_OPTIONS, CONVERSION_SOURCES,
 } from '../../utils/quoteRequest.js';
 
 export {
@@ -35,6 +35,8 @@ export function createInitialTrip() {
     cabin: 'business',
     flexibility: 'exact',
     comfort: null,
+    serviceIntent: null,
+    source: null,
     fullName: '',
     email: '',
     phone: '',
@@ -73,13 +75,13 @@ export function removeTripLeg(trip, index) {
 }
 
 export function fieldStep(name) {
-  if (['comfort', 'comfortPreference', 'flexibility', 'notes'].includes(name)) return 1;
+  if (['comfort', 'comfortPreference', 'serviceIntent', 'flexibility', 'notes'].includes(name)) return 1;
   if (['fullName', 'email', 'phone', 'contactPreference', 'privacyAcknowledged', 'turnstile'].includes(name)) return 2;
   return 0;
 }
 
 export function validateTrip(trip, options = {}) {
-  const errors = validateQuoteFields(trip, options);
+  const errors = validateQuoteFields({ ...trip, source: trip.source === null ? undefined : trip.source }, options);
   if (trip.comfort !== null && !COMFORT_OPTIONS.some(({ value }) => value === trip.comfort)) {
     errors.comfort = 'Choose a listed priority, or leave this optional preference unselected.';
   }
@@ -110,11 +112,12 @@ export function serializeTrip(trip) {
     contactPreference: trip.contactPreference,
     notes: trip.notes,
     privacyAcknowledged: trip.privacyAcknowledged === true,
-    source: 'homepage',
+    source: trip.source || 'homepage',
     requestTitle: 'Personal flight review',
   };
   // A preference is included only after an explicit choice. User notes stay intact.
   if (COMFORT_OPTIONS.some(({ value }) => value === trip.comfort)) payload.comfortPreference = trip.comfort;
+  if (SERVICE_INTENT_OPTIONS.some(({ value }) => value === trip.serviceIntent)) payload.serviceIntent = trip.serviceIntent;
   return payload;
 }
 
@@ -167,6 +170,8 @@ export function safeTripProgress(trip) {
     legs: trip.legs.map(({ from, to, departure }) => ({ from, to, departure })),
     travelers: trip.travelers, cabin: trip.cabin, flexibility: trip.flexibility,
     comfort: trip.comfort, contactPreference: trip.contactPreference,
+    ...(SERVICE_INTENT_OPTIONS.some(({ value }) => value === trip.serviceIntent) ? { serviceIntent: trip.serviceIntent } : {}),
+    ...(CONVERSION_SOURCES.includes(trip.source) ? { source: trip.source } : {}),
   };
 }
 
@@ -188,6 +193,18 @@ export function restoreTripProgress(defaults, stored) {
     cabin: option(stored.cabin, CABIN_OPTIONS, defaults.cabin),
     flexibility: option(stored.flexibility, FLEXIBILITY_OPTIONS, defaults.flexibility),
     comfort: option(stored.comfort, COMFORT_OPTIONS, null),
+    serviceIntent: option(stored.serviceIntent, SERVICE_INTENT_OPTIONS, null),
+    source: CONVERSION_SOURCES.includes(stored.source) ? stored.source : null,
     contactPreference: option(stored.contactPreference, CONTACT_PREFERENCE_OPTIONS, defaults.contactPreference),
   };
+}
+
+// Current-session choices win over stored values, even when chosen before the
+// provider's hydration effect. Restore only fields on the safe allowlist.
+export function mergeRestoredTrip(current, stored, dirtyFields = new Set()) {
+  const restored = restoreTripProgress(createInitialTrip(), stored);
+  const safeKeys = Object.keys(safeTripProgress(createInitialTrip())).concat('serviceIntent', 'source');
+  return Object.fromEntries(Object.entries(current).map(([key, value]) => [
+    key, safeKeys.includes(key) && !dirtyFields.has(key) && stored && Object.hasOwn(stored, key) ? restored[key] : value,
+  ]));
 }

@@ -6,7 +6,6 @@ import {
   changeTripType,
   COMFORT_OPTIONS,
   CONTACT_PREFERENCE_OPTIONS,
-  createInitialTrip,
   fieldStep,
   FLEXIBILITY_OPTIONS,
   getCabinLabel,
@@ -16,16 +15,15 @@ import {
   localTodayIso,
   MAX_TRIP_LEGS,
   removeTripLeg,
-  restoreTripProgress,
-  safeTripProgress,
   submitTripRequest,
-  TRIP_PROGRESS_STORAGE_KEY,
   TRIP_TYPE_OPTIONS,
   validateTrip,
   validateTripStep,
 } from './tripState.js';
 import TurnstileWidget from '../common/TurnstileWidget.jsx';
 import './trip-form.scss';
+import { useTripBrief } from '../../context/TripBriefProvider.jsx';
+import { SERVICE_INTENT_OPTIONS, getServiceIntentLabel } from '../../utils/quoteRequest.js';
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';
 const STEPS = ['Your journey', 'Your preferences', 'Contact & review'];
@@ -35,7 +33,7 @@ const fieldId = (name) => `trip-field-${name.replaceAll('.', '-')}`;
 function fieldLabel(name) {
   const legMatch = /^legs\.(\d+)\.(from|to|departure)$/.exec(name);
   if (legMatch) return `Flight ${Number(legMatch[1]) + 1}: ${{ from: 'from', to: 'to', departure: 'departure date' }[legMatch[2]]}`;
-  return ({ from: 'From', to: 'To', departure: 'Departure', returnDate: 'Return', tripType: 'Trip type', legs: 'Flights', travelers: 'Travelers', cabin: 'Cabin', comfort: 'Priority', flexibility: 'Date flexibility', notes: 'Notes', fullName: 'Full name', email: 'Email', phone: 'Phone', contactPreference: 'Contact preference', privacyAcknowledged: 'Privacy acknowledgement', turnstile: 'Human verification' })[name] || name;
+  return ({ from: 'From', to: 'To', departure: 'Departure', returnDate: 'Return', tripType: 'Trip type', legs: 'Flights', travelers: 'Travelers', cabin: 'Cabin', serviceIntent: 'Travel situation', comfort: 'Priority', flexibility: 'Date flexibility', notes: 'Notes', fullName: 'Full name', email: 'Email', phone: 'Phone', contactPreference: 'Contact preference', privacyAcknowledged: 'Privacy acknowledgement', turnstile: 'Human verification' })[name] || name;
 }
 
 function formatDate(date) {
@@ -69,7 +67,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
   const [status, setStatus] = useState('idle');
   const [submissionError, setSubmissionError] = useState('');
   const [result, setResult] = useState(null);
-  const [storageReady, setStorageReady] = useState(false);
+  const { clearConfirmedDraft, startNewRequest } = useTripBrief();
   const [companyWebsite, setCompanyWebsite] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
   const [today, setToday] = useState('');
@@ -108,20 +106,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
   useEffect(() => {
     formStartedAt.current = Date.now();
     setToday(localTodayIso());
-    try {
-      const stored = JSON.parse(window.sessionStorage.getItem(TRIP_PROGRESS_STORAGE_KEY) || 'null');
-      if (stored) setTrip((current) => restoreTripProgress(current, stored));
-    } catch { /* Storage is optional; the form works without it. */ }
-    setStorageReady(true);
-  }, [setTrip]);
-
-  useEffect(() => {
-    if (!storageReady) return;
-    try {
-      if (received) window.sessionStorage.removeItem(TRIP_PROGRESS_STORAGE_KEY);
-      else window.sessionStorage.setItem(TRIP_PROGRESS_STORAGE_KEY, JSON.stringify(safeTripProgress(trip)));
-    } catch { /* Private browsing may disable storage. */ }
-  }, [trip, storageReady, received]);
+  }, []);
 
   useEffect(() => () => onBusyChange?.(false), [onBusyChange]);
 
@@ -214,8 +199,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
   }
 
   function startAnotherRequest() {
-    setTrip(createInitialTrip());
-    setStep(0);
+    startNewRequest();
     setErrors({});
     setSubmissionError('');
     setResult(null);
@@ -244,6 +228,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
       if (!mounted.current) return;
       // The receipt always describes the immutable data actually submitted.
       setResult({ ...receipt, trip: submittedTrip });
+      clearConfirmedDraft();
       setStatus('success');
     } catch (error) {
       if (!mounted.current) return;
@@ -357,6 +342,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
               {trip.comfort && <button type="button" className="trip-text-button" onClick={() => update('comfort', null)}>Clear priority</button>}
             </fieldset>
             <div className="trip-fields">
+              <Field name="serviceIntent" label="Travel situation (optional)" wide error={errors.serviceIntent}><select {...inputProps('serviceIntent')} value={trip.serviceIntent || ''} onChange={(event) => update('serviceIntent', event.target.value || null)}><option value="">No situation selected</option>{SERVICE_INTENT_OPTIONS.map(({ value, label }) => <option value={value} key={value}>{label}</option>)}</select></Field>
               <Field name="flexibility" label="Date flexibility" wide error={errors.flexibility}><select {...inputProps('flexibility')} value={trip.flexibility} onChange={(event) => update('flexibility', event.target.value)}>{FLEXIBILITY_OPTIONS.map(({ value, label }) => <option value={value} key={value}>{label.replace('+/-', '±')}</option>)}</select></Field>
               <Field name="notes" label="Anything else Derek should know?" wide error={errors.notes} hint="Optional · up to 600 characters"><textarea {...inputProps('notes', true)} value={trip.notes} maxLength={600} rows={3} onChange={(event) => update('notes', event.target.value)} placeholder="An arrival time, a preferred airline, or something you need along the way…" /></Field>
             </div>
@@ -405,6 +391,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
       <div className="trip-brief-block">
         <div className="trip-brief-label"><span>Your preferences</span><button type="button" disabled={busy || received} onClick={() => navigate(1)} aria-label="Edit preferences"><Pencil size={13} aria-hidden="true" /> Edit</button></div>
         <p className="trip-brief-priority">{comfort ? comfort.label : 'Your priority, when you’re ready.'}</p>
+        {summaryTrip.serviceIntent && <div className="trip-brief-situation"><p className="trip-brief-priority">{getServiceIntentLabel(summaryTrip.serviceIntent)}</p><button type="button" className="trip-text-button" disabled={busy || received} onClick={() => update('serviceIntent', null)}>Remove travel situation</button></div>}
         <p className="trip-brief-muted">{getFlexibilityLabel(summaryTrip.flexibility).replace('+/-', '±')}</p>
         {summaryTrip.notes && <p className="trip-brief-notes">{summaryTrip.notes}</p>}
       </div>

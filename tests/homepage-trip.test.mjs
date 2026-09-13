@@ -258,3 +258,57 @@ test('malformed session data cannot introduce unsupported options or oversized i
   assert.equal(restored.legs[0].from.length, 80);
   assert.equal('email' in restored.legs[0], false);
 });
+
+test('Services intent defaults remain absent and explicit selections never change unrelated fields', () => {
+  const trip = validTrip({ notes: 'Keep my words.', comfort: 'rested' });
+  assert.equal(trip.serviceIntent, null);
+  assert.equal(trip.source, null);
+  assert.equal('serviceIntent' in serializeTrip(trip), false);
+  assert.equal('serviceIntent' in safeTripProgress(trip), false);
+  for (const serviceIntent of ['single_destination', 'complex_itinerary', 'time_sensitive', 'personal_advisor']) {
+    const selected = { ...trip, serviceIntent, source: 'services' };
+    assert.deepEqual(validateTrip(selected, dateOptions), {});
+    assert.equal(serializeTrip(selected).serviceIntent, serviceIntent);
+    assert.equal(serializeTrip(selected).source, 'services');
+    assert.equal(safeTripProgress(selected).serviceIntent, serviceIntent);
+    assert.equal(restoreTripProgress(createInitialTrip(), safeTripProgress(selected)).source, 'services');
+    assert.deepEqual({ ...selected, serviceIntent: null, source: null }, trip);
+  }
+});
+
+test('restoration fills untouched safe fields but preserves explicit choices and all in-memory PII', async () => {
+  const { mergeRestoredTrip } = await import('../src/components/homepage/tripState.js');
+  const stored = { ...safeTripProgress(validTrip({ serviceIntent: 'complex_itinerary', source: 'homepage' })), fullName: 'Injected', email: 'injected@example.com', notes: 'Injected', privacyAcknowledged: true };
+  const current = { ...createInitialTrip(), serviceIntent: 'time_sensitive', source: 'services', fullName: 'Current visitor', from: 'Tokyo HND' };
+  const merged = mergeRestoredTrip(current, stored, new Set(['serviceIntent', 'source', 'from']));
+  assert.equal(merged.serviceIntent, 'time_sensitive');
+  assert.equal(merged.source, 'services');
+  assert.equal(merged.from, 'Tokyo HND');
+  assert.equal(merged.to, 'London LHR');
+  assert.equal(merged.fullName, 'Current visitor');
+  assert.equal(merged.email, '');
+  assert.equal(merged.notes, '');
+  assert.equal(merged.privacyAcknowledged, false);
+  const cleared = mergeRestoredTrip({ ...current, serviceIntent: null }, stored, new Set(['serviceIntent']));
+  assert.equal(cleared.serviceIntent, null);
+  assert.deepEqual(mergeRestoredTrip(current, null), current);
+});
+
+test('Services attribution and intent survive validation failure, recoverable failure and retry', async () => {
+  const trip = validTrip({ serviceIntent: 'time_sensitive', source: 'services' });
+  const snapshot = structuredClone(trip);
+  const requests = [];
+  const fetchImpl = async (_url, options) => {
+    requests.push(JSON.parse(options.body));
+    return requests.length === 1 ? Response.json({ error: 'Service unavailable' }, { status: 503 }) : Response.json({ ok: true, reference: 'LOCAL-ONLY' });
+  };
+  await assert.rejects(submitTripRequest({ ...trip, email: '' }, { fetchImpl, today: dateOptions.today }), { code: 'VALIDATION' });
+  assert.equal(requests.length, 0);
+  await assert.rejects(submitTripRequest(trip, { fetchImpl, today: dateOptions.today }), /Service unavailable/);
+  assert.deepEqual(trip, snapshot);
+  const result = await submitTripRequest(trip, { fetchImpl, today: dateOptions.today });
+  assert.equal(result.reference, 'LOCAL-ONLY');
+  assert.deepEqual(requests[0], requests[1]);
+  assert.equal(requests[1].source, 'services');
+  assert.equal(requests[1].serviceIntent, 'time_sensitive');
+});

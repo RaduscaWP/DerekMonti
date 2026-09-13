@@ -1,13 +1,15 @@
+import { useMotionPreference } from '../context/MotionPreferenceProvider.jsx';
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export function usePageMotion(scopeRef) {
+  const { reduced, motionReady } = useMotionPreference();
   useEffect(() => {
     const scope = scopeRef.current;
-    if (!scope) return undefined;
+    if (!scope || !motionReady) return undefined;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduced) {
       scope.querySelectorAll('[data-reveal]').forEach((element) => {
         element.style.removeProperty('opacity');
         element.style.removeProperty('transform');
@@ -35,5 +37,5 @@ export function usePageMotion(scopeRef) {
       ctx.revert();
       ScrollTrigger.refresh();
     };
-  }, [scopeRef]);
+  }, [scopeRef, reduced, motionReady]);
 }

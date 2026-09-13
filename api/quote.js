@@ -12,6 +12,7 @@ import {
   TRIP_TYPE_OPTIONS,
   getCabinLabel,
   getComfortPreferenceLabel,
+  getServiceIntentLabel,
   getContactPreferenceLabel,
   getFlexibilityLabel,
   getItineraryLegs,
@@ -86,6 +87,7 @@ function normalizeFields(raw) {
     cabin: normalizeStrictOption(raw.cabin, CABIN_OPTIONS, normalizeCabin, ['Business', 'First', 'Either']),
     flexibility: normalizeStrictOption(raw.flexibility, FLEXIBILITY_OPTIONS, normalizeFlexibility),
     comfortPreference: raw.comfortPreference ?? '',
+    serviceIntent: raw.serviceIntent ?? null,
     fullName: cleanText(raw.fullName, 80),
     email: cleanText(raw.email, 120).toLowerCase(),
     phone: cleanText(raw.phone, 40),
@@ -96,7 +98,7 @@ function normalizeFields(raw) {
     ),
     notes: cleanText(raw.notes, 600, { multiline: true }),
     privacyAcknowledged: raw.privacyAcknowledged === true,
-    source: cleanText(raw.source, 80),
+    source: raw.source === undefined ? '' : raw.source,
     requestTitle: cleanText(raw.requestTitle, 120) || 'Premium Flight Review Request',
     companyWebsite: cleanText(raw.companyWebsite || raw.website || raw.url, 120),
     formStartedAt: Number.isFinite(formStartedAt) ? formStartedAt : 0,
@@ -147,6 +149,7 @@ function buildPlainSummary(fields, meta) {
     `Cabin: ${getCabinLabel(fields.cabin)}`,
     `Date flexibility: ${getFlexibilityLabel(fields.flexibility)}`,
     fields.comfortPreference ? `Comfort preference: ${getComfortPreferenceLabel(fields.comfortPreference)}` : null,
+    fields.serviceIntent ? `Travel situation: ${getServiceIntentLabel(fields.serviceIntent)}` : null,
     '',
     `Name: ${fields.fullName}`,
     `Email: ${fields.email}`,
@@ -169,7 +172,12 @@ async function readJsonBody(req) {
     throw error;
   }
 
-  if (req.body && typeof req.body === 'object') return req.body;
+  if (req.body && typeof req.body === 'object') {
+    if (Buffer.byteLength(JSON.stringify(req.body), 'utf8') > MAX_BODY_BYTES) {
+      throw Object.assign(new Error('Payload too large'), { statusCode: 413 });
+    }
+    return req.body;
+  }
 
   if (typeof req.body === 'string') {
     if (Buffer.byteLength(req.body, 'utf8') > MAX_BODY_BYTES) {

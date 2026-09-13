@@ -1,87 +1,18 @@
-import { ArrowUpRight, MessageCircle } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { contactConfig } from '../../data/siteData.js';
-import { getWhatsappUrl } from '../../utils/message.js';
-
-const navigation = [
-  { label: 'Business Class', to: '/business-class-flights' },
-  { label: 'First Class', to: '/first-class-flights' },
-  { label: 'Services', to: '/services' },
-  { label: 'Guides', to: '/blog' },
-  { label: 'About Derek', to: '/about' },
-];
-
-const planning = [
-  { label: 'US to Europe', to: '/business-class-flights/europe' },
-  { label: 'Europe to USA', to: '/business-class-flights/usa' },
-  { label: 'Complex Itineraries', to: '/services/complex-itineraries' },
-  { label: 'Time-Sensitive Travel', to: '/services/last-minute-business-class' },
-  { label: 'Premium Flight Advisor', to: '/services/premium-flight-advisor' },
-];
+import { primaryNavigation, planningNavigation } from '../../data/siteNavigation.js';
+import { useMotionPreference } from '../../context/MotionPreferenceProvider.jsx';
 
 export default function Footer() {
-  const whatsapp = getWhatsappUrl({ requestTitle: 'Premium flight request' });
-
-  return (
-    <footer className="footer">
-      <div className="container footer__top">
-        <div className="footer__brand" data-reveal>
-          <Link to="/" className="footer__logo">
-            Fly with <strong>Derek</strong>
-          </Link>
-          <p>Personal review for business- and first-class flight requests.</p>
-          <a href="/#request-form" className="footer__quote">
-            Request a personal review <ArrowUpRight aria-hidden="true" size={17} />
-          </a>
-        </div>
-
-        <nav className="footer__column" aria-label="Site navigation" data-reveal>
-          <h2>Navigate</h2>
-          {navigation.map((item) => (
-            <Link to={item.to} key={item.to}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <nav className="footer__column" aria-label="Planning pages" data-reveal>
-          <h2>Plan</h2>
-          {planning.map((item) => (
-            <Link to={item.to} key={item.to}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="footer__contact" data-reveal>
-          <h2>Direct contact</h2>
-          <a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a>
-          <a href={whatsapp} target="_blank" rel="noopener noreferrer">
-            <MessageCircle aria-hidden="true" size={17} />
-            WhatsApp Derek
-          </a>
-          <p>Do not send passport, payment, or account credentials through the website.</p>
-        </div>
-      </div>
-
-      <div className="footer__disclosure">
-        <div className="container">
-          <p>
-            Fly with Derek is an independent advisory service. Airline names and trademarks belong to their
-            respective owners; no airline endorsement or affiliation is implied.
-          </p>
-        </div>
-      </div>
-
-      <div className="footer__bottom">
-        <div className="container">
-          <p>© {new Date().getFullYear()} Fly with Derek.</p>
-          <div>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
+  const { reduced, systemReduced, setQuietMotion } = useMotionPreference();
+  return <footer className="site-footer"><div className="section-wrap">
+    <div className="footer-main">
+      <div className="footer-brand"><Link className="brand brand--light" to="/">Fly with <strong>Derek</strong></Link><p>Business & first class.<br />Personally arranged.</p></div>
+      <nav aria-label="Footer navigation"><span className="footer-label">Explore</span>{primaryNavigation.map(({ label, to }) => <Link key={to} to={to}>{label}</Link>)}</nav>
+      <div className="footer-contact"><span className="footer-label">Let's talk travel</span><a href={`tel:${contactConfig.phoneHref}`}>{contactConfig.phoneLabel}</a><a href={`mailto:${contactConfig.email}`}>{contactConfig.email}</a><a href={`https://wa.me/${contactConfig.whatsappNumber}`} target="_blank" rel="noreferrer">WhatsApp <ArrowUpRight size={15} aria-hidden="true" /></a></div>
+    </div>
+    <nav className="footer-planning" aria-label="Planning pages"><span className="footer-label">Plan by journey</span>{planningNavigation.map(({ label, to }) => <Link key={to} to={to}>{label}<ArrowUpRight size={14} aria-hidden="true" /></Link>)}</nav>
+    <div className="footer-bottom"><p>© {new Date().getFullYear()} Fly with Derek</p><div><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><a href="#top">Back to top <ArrowUpRight size={14} aria-hidden="true" /></a></div><label className="motion-preference"><input type="checkbox" checked={reduced} disabled={systemReduced} onChange={(event) => setQuietMotion(event.target.checked)} /> Reduce motion</label></div>
+  </div></footer>;
 }

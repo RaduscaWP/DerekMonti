@@ -29,6 +29,17 @@ export const COMFORT_PREFERENCE_OPTIONS = [
   { value: 'together', label: 'Travelling together' },
 ];
 
+export const SERVICE_INTENT_OPTIONS = [
+  { value: 'single_destination', label: 'One clear journey' },
+  { value: 'complex_itinerary', label: 'Several connected stops' },
+  { value: 'time_sensitive', label: 'Departure is close' },
+  { value: 'personal_advisor', label: 'Personal flight advisor' },
+];
+export const CONVERSION_SOURCES = ['homepage', 'services'];
+export function getServiceIntentLabel(value) {
+  return optionLabel(SERVICE_INTENT_OPTIONS, value, 'Not specified');
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const PHONE_ALLOWED_RE = /^[+()\d\s.-]+$/;
@@ -143,6 +154,14 @@ function validateRouteFields(fields, errors, prefix = '', today = localTodayIso(
 
 export function validateQuoteFields(fields, { today = localTodayIso() } = {}) {
   const errors = {};
+  // These optional enums are checked raw: never trim, truncate or coerce an
+  // untrusted value into a valid selection or attribution value.
+  if (fields?.serviceIntent != null && !SERVICE_INTENT_OPTIONS.some(({ value }) => value === fields.serviceIntent)) {
+    errors.serviceIntent = 'Choose a listed travel situation, or leave it unselected.';
+  }
+  if (fields?.source !== undefined && fields.source !== '' && !CONVERSION_SOURCES.includes(fields.source)) {
+    errors.source = 'Choose a valid request source.';
+  }
   const rawTripType = legacyTripTypes[fields?.tripType] || String(fields?.tripType || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
   const tripType = normalizeTripType(fields?.tripType);
   const travelers = Number(fields?.travelers);

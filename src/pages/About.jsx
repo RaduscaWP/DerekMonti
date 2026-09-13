@@ -1,55 +1,71 @@
 import { useRef } from 'react';
-import { ArrowRight, Compass, FileCheck2, MessageCircle, Scale } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import FinalCta from '../components/common/FinalCta.jsx';
-import SectionHeader from '../components/common/SectionHeader.jsx';
 import { evaluationItems, imagery } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
+import { getWhatsappUrl } from '../utils/message.js';
+import styles from './About.module.scss';
 
-const principles = [
+const conversationDetails = [
   {
-    icon: MessageCircle,
-    title: 'A direct conversation',
-    body: 'The trip brief stays connected to the person reviewing it, so priorities can be clarified in context.',
+    title: 'The reason for the trip',
+    body: 'A client meeting, a family journey, or a long-awaited escape changes what a good itinerary needs to do.',
   },
   {
-    icon: Scale,
-    title: 'Tradeoffs made visible',
-    body: 'Schedule, cabin, routing, flexibility, and fare conditions are easier to weigh when differences are stated plainly.',
+    title: 'What cannot move',
+    body: 'Essential dates, arrival times, airports, and commitments set the boundaries for a useful review.',
   },
   {
-    icon: Compass,
-    title: 'The journey stays central',
-    body: 'The purpose of the trip and the traveler’s real constraints shape the comparison—not a generic ranking.',
+    title: 'Where comfort matters',
+    body: 'The longest segment, an overnight flight, or the need to arrive ready can carry more weight than a cabin label.',
   },
   {
-    icon: FileCheck2,
-    title: 'A clear next step',
-    body: 'A quote request begins a review. It does not create a booking or promise an outcome before real options exist.',
+    title: 'What needs explaining',
+    body: 'Connections, mixed cabins, and fare conditions should be understood before an option becomes a decision.',
+  },
+];
+
+const decisionSteps = [
+  {
+    number: '01',
+    title: 'You share',
+    body: 'The route, dates, cabin preference, flexibility, and the details that matter to your journey.',
+  },
+  {
+    number: '02',
+    title: 'Derek reviews',
+    body: 'The itinerary as a whole, with the practical differences placed beside the premium experience.',
+  },
+  {
+    number: '03',
+    title: 'You decide',
+    body: 'A request starts a conversation. Nothing is reserved or committed before you review a real option.',
   },
 ];
 
 export default function About() {
   const pageRef = useRef(null);
+  const whatsapp = getWhatsappUrl({ requestTitle: 'Premium flight conversation' });
 
   usePageMotion(pageRef);
 
   return (
-    <div ref={pageRef}>
-      <section className="editorial-hero editorial-hero--about" aria-labelledby="about-title">
-        <div className="container editorial-hero__inner">
-          <div className="editorial-hero__copy" data-reveal>
-            <p className="eyebrow eyebrow--light">About Derek</p>
-            <h1 id="about-title">The person behind the request.</h1>
-            <p>
-              Fly with Derek is built around a simple idea: premium travel decisions are easier when one person can
-              understand the full trip and explain the tradeoffs clearly.
+    <div className={styles.page} ref={pageRef}>
+      <section className={styles.hero} aria-labelledby="about-title">
+        <div className={styles.heroInner}>
+          <div className={styles.heroCopy} data-reveal data-reveal-y="20">
+            <p className={styles.eyebrow}>About <span aria-hidden="true">/</span> Derek Monti</p>
+            <h1 id="about-title">One journey.<br />One person<br /><span>listening.</span></h1>
+            <p className={styles.heroText}>
+              Derek brings the route, cabin, timing, flexibility, and ticket conditions into one clear conversation.
             </p>
-            <Link className="text-link text-link--light" to="/#request-form">
-              Share your trip <ArrowRight aria-hidden="true" size={17} />
+            <Link className={styles.primaryLink} to="/#request-form">
+              Share your trip <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>
-          <figure className="about-portrait" data-reveal>
+
+          <figure className={styles.portrait} data-reveal data-reveal-y="28">
+            <span className={styles.monogram} aria-hidden="true">DM</span>
             <img
               src={imagery.derekPortrait}
               alt="Derek Monti"
@@ -57,102 +73,123 @@ export default function About() {
               height="1402"
               loading="eager"
               decoding="async"
+              fetchpriority="high"
             />
             <figcaption>
               <strong>Derek Monti</strong>
-              <span>Personal premium-flight advisor</span>
+              <span>Personal flight advisor</span>
             </figcaption>
           </figure>
         </div>
+
+        <ol className={styles.heroPrinciples} aria-label="Derek's service approach">
+          <li><span>01</span> Listen before searching</li>
+          <li><span>02</span> Review the complete itinerary</li>
+          <li><span>03</span> Explain the real tradeoffs</li>
+        </ol>
       </section>
 
-      <section className="about-intro" aria-labelledby="about-approach-title">
-        <div className="container about-intro__layout">
-          <div data-reveal>
-            <p className="eyebrow">The operating approach</p>
-            <h2 id="about-approach-title">A human review, without the mythology.</h2>
+      <section className={styles.opening} aria-labelledby="opening-title">
+        <div className={styles.inner}>
+          <div className={styles.openingHeading} data-reveal>
+            <p className={styles.eyebrow}>The point of view</p>
+            <h2 id="opening-title">The work begins<br />with listening.</h2>
           </div>
-          <div className="about-intro__copy" data-reveal>
+          <div className={styles.openingCopy} data-reveal>
+            <p className={styles.lead}>Premium travel is full of details that look small until they change the whole trip.</p>
             <p>
-              The website does not present live inventory, guaranteed pricing, airline endorsements, or a substitute
-              for the conditions attached to a real ticket. It gives travelers a structured way to share a premium
-              itinerary for personal review.
+              A seat can be excellent while the itinerary around it is wrong. An awkward departure, a long connection,
+              or restrictive conditions can matter more than the name on the cabin.
             </p>
             <p>
-              Derek’s role is to bring the request into one coherent comparison: what must stay fixed, what can move,
-              where the cabin matters most, and which fare conditions deserve attention before a decision.
+              Fly with Derek gives those details one place to live. You explain the journey you need to take; Derek
+              personally reviews how the pieces fit together and makes the differences easier to understand.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="principles-section" aria-labelledby="principles-title">
-        <div className="container">
-          <SectionHeader
-            eyebrow="Service philosophy"
-            title="What the experience is designed to protect."
-            text="A calm process, clear boundaries, and enough context to make a premium itinerary understandable."
-          />
-          <h2 className="sr-only" id="principles-title">
-            Service principles
-          </h2>
-          <div className="principles-grid">
-            {principles.map((principle) => {
-              const Icon = principle.icon;
-              return (
-                <article key={principle.title} data-reveal>
-                  <Icon aria-hidden="true" size={22} />
-                  <h3>{principle.title}</h3>
-                  <p>{principle.body}</p>
-                </article>
-              );
-            })}
-          </div>
+      <section className={styles.conversation} aria-labelledby="conversation-title">
+        <div className={styles.inner}>
+          <header className={styles.sectionHeading} data-reveal>
+            <div>
+              <p className={styles.eyebrow}>The working relationship</p>
+              <h2 id="conversation-title">What stays in the<br />same conversation.</h2>
+            </div>
+            <p>Your priorities remain visible from the first brief to the final comparison.</p>
+          </header>
+
+          <ol className={styles.conversationList}>
+            {conversationDetails.map((item, index) => (
+              <li key={item.title} data-reveal>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section className="about-method" aria-labelledby="about-method-title">
-        <div className="container about-method__layout">
-          <div className="about-method__header" data-reveal>
-            <p className="eyebrow eyebrow--light">The review lens</p>
-            <h2 id="about-method-title">Six questions before one recommendation.</h2>
-            <p>Each lens keeps the discussion anchored to the complete journey.</p>
+      <section className={styles.method} aria-labelledby="method-title">
+        <div className={styles.inner}>
+          <div className={styles.methodHeading} data-reveal>
+            <p className={styles.eyebrow}>Derek's review</p>
+            <h2 id="method-title">Six lenses.<br /><span>One complete trip.</span></h2>
+            <p>A premium seat is one part of the decision. The journey around it deserves the same attention.</p>
+            <div className={styles.reviewPath} aria-label="Review sequence">
+              <span>Your brief</span><ArrowRight size={16} aria-hidden="true" />
+              <span>Derek's review</span><ArrowRight size={16} aria-hidden="true" />
+              <span>Your decision</span>
+            </div>
           </div>
-          <div className="about-method__list">
+
+          <ol className={styles.methodList}>
             {evaluationItems.map((item) => (
-              <article key={item.title} data-reveal>
+              <li key={item.number} data-reveal>
                 <span>{item.number}</span>
                 <div>
                   <h3>{item.title}</h3>
                   <p>{item.body}</p>
                 </div>
-              </article>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      <section className="about-boundary" aria-labelledby="about-boundary-title">
-        <div className="container about-boundary__inner" data-reveal>
-          <p className="eyebrow">Clear expectations</p>
-          <h2 id="about-boundary-title">What a request does—and does not do.</h2>
+      <section className={styles.decision} aria-labelledby="decision-title">
+        <div className={styles.inner}>
+          <header data-reveal>
+            <p className={styles.eyebrow}>Clear boundaries</p>
+            <h2 id="decision-title">You remain<br />in control.</h2>
+          </header>
+          <ol className={styles.decisionList}>
+            {decisionSteps.map((step) => (
+              <li key={step.number} data-reveal>
+                <span>{step.number}</span>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className={styles.final} aria-labelledby="about-final-title">
+        <div className={styles.inner} data-reveal>
           <div>
-            <p>
-              It gives Derek the route, dates, cabin preference, flexibility, and traveler priorities needed for an
-              initial review.
-            </p>
-            <p>
-              It does not reserve a seat, lock a fare, guarantee availability, or imply a relationship with any
-              airline. Those details can only be assessed against real options and their applicable rules.
-            </p>
+            <p className={styles.eyebrow}>Start with a conversation</p>
+            <h2 id="about-final-title">Bring Derek the trip<br />you actually need to take.</h2>
+          </div>
+          <div className={styles.finalActions}>
+            <Link to="/#request-form">Plan my trip <ArrowRight size={19} aria-hidden="true" /></Link>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer">
+              Talk to Derek on WhatsApp <ArrowUpRight size={17} aria-hidden="true" />
+            </a>
           </div>
         </div>
       </section>
-
-      <FinalCta
-        title="Have a premium trip in mind?"
-        text="Share the itinerary and the constraints that matter. The next step is a personal review, not an automated booking."
-      />
     </div>
   );
 }

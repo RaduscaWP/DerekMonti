@@ -2,6 +2,7 @@ import { resolveLocation } from './_iataLookup.js';
 import {
   getCabinLabel,
   getComfortPreferenceLabel,
+  getServiceIntentLabel,
   getContactPreferenceLabel,
   getFlexibilityLabel,
   getItineraryLegs,
@@ -185,6 +186,7 @@ function renderTicketHtml(fields, meta) {
               </td>
             </tr>
             ${notesBlock(fields.comfortPreference ? getComfortPreferenceLabel(fields.comfortPreference) : '', 'Comfort preference')}
+            ${notesBlock(fields.serviceIntent ? getServiceIntentLabel(fields.serviceIntent) : '', 'Travel situation')}
             ${notesBlock(fields.notes)}
             <tr>
               <td style="background:#07111F;padding:22px 24px 24px;border-radius:0 0 24px 24px;">

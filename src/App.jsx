@@ -12,10 +12,12 @@ import Terms from './pages/Terms.jsx';
 import NotFound from './pages/NotFound.jsx';
 import CoreLanding from './pages/CoreLanding.jsx';
 import { corePages } from './data/corePages.js';
+import { TripBriefProvider } from './context/TripBriefProvider.jsx';
+import { MotionPreferenceProvider } from './context/MotionPreferenceProvider.jsx';
 import SeoHead from './seo/SeoHead.jsx';
 
 function RouteFocus() {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, key } = useLocation();
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -45,7 +47,7 @@ function RouteFocus() {
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [pathname, hash]);
+  }, [pathname, hash, key]);
 
   return null;
 }
@@ -58,7 +60,7 @@ function SiteAnalytics() {
 
 export default function App() {
   return (
-    <>
+    <TripBriefProvider><MotionPreferenceProvider>
       <SeoHead />
       <Layout>
         <RouteFocus />
@@ -77,6 +79,6 @@ export default function App() {
         </Routes>
       </Layout>
       <SiteAnalytics />
-    </>
+    </MotionPreferenceProvider></TripBriefProvider>
   );
 }

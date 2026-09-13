@@ -318,3 +318,55 @@ test('customer confirmation failure preserves advisor delivery success and repor
   assert.equal(response.payload.confirmationSent, false);
   assert.equal(calls.emails.length, 2);
 });
+
+test('Services enums are raw, backward-compatible and reject coercion before delivery', async (t) => {
+  const calls = mockQuoteServices(t);
+  const invalid = {
+    serviceIntent: ['', 'TIME_SENSITIVE', ' time_sensitive', 'time_sensitive ', 'time_sensitive\u0000', ['time_sensitive'], { value: 'time_sensitive' }, 0, false, 'unknown'],
+    source: [null, 'Services', ' services', 'services ', 'services\u0000', ['services'], { value: 'services' }, 0, false, 'https://example.com', 'services' + 'x'.repeat(100)],
+  };
+  for (const [field, values] of Object.entries(invalid)) for (const value of values) {
+    const fields = submission({ [field]: value });
+    assert.ok(validateQuoteFields(fields, { today: '2030-01-01' })[field]);
+    const response = await invokeQuoteApi(fields);
+    assert.equal(response.statusCode, 400, `${field}: ${JSON.stringify(value)}`);
+    assert.ok(response.payload.fieldErrors[field]);
+  }
+  assert.deepEqual(calls, { emails: [], challenges: [], unexpected: [] });
+});
+
+test('Services selections and valid attribution reach advisor/customer email without changing notes', async (t) => {
+  const calls = mockQuoteServices(t);
+  const cases = [
+    ['single_destination', 'One clear journey'], ['complex_itinerary', 'Several connected stops'],
+    ['time_sensitive', 'Departure is close'], ['personal_advisor', 'Personal flight advisor'],
+  ];
+  for (const [serviceIntent, label] of cases) {
+    const notes = 'Keep my notes intact.';
+    const response = await invokeQuoteApi(submission({ serviceIntent, source: 'services', notes }));
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.payload.ok, true);
+    assert.ok(response.payload.reference);
+    for (const email of calls.emails.slice(-2)) {
+      assert.ok(email.text.includes('Source: services'));
+      assert.ok(email.text.includes(`Travel situation: ${label}`));
+      assert.ok(email.text.includes(`Notes:\n${notes}`));
+      assert.ok(email.html.includes(label));
+    }
+    assert.ok(buildQuoteMessage({ serviceIntent }).includes(label));
+  }
+  for (const source of [undefined, '', 'homepage', 'services']) {
+    const response = await invokeQuoteApi(submission({ source }));
+    assert.equal(response.statusCode, 200);
+    assert.doesNotMatch(calls.emails.at(-1).text + calls.emails.at(-1).html, /Travel situation/);
+  }
+  assert.deepEqual(calls.unexpected, []);
+});
+
+test('oversized parsed and string Services requests are rejected without trusting Content-Length', async (t) => {
+  const calls = mockQuoteServices(t);
+  const fields = submission({ serviceIntent: 'time_sensitive', source: 'services', notes: 'x'.repeat(13 * 1024) });
+  assert.equal((await invokeQuoteApi(fields)).statusCode, 413);
+  assert.equal((await invokeQuoteApi(JSON.stringify(fields))).statusCode, 413);
+  assert.deepEqual(calls, { emails: [], challenges: [], unexpected: [] });
+});
