@@ -18,7 +18,7 @@ export default function FinalCta({
           <p>{text}</p>
         </div>
         <div className="final-cta__actions">
-          <Button href="/#request-form" size="lg">
+          <Button to="/#request-form" size="lg">
             Request a personal review
           </Button>
           <a href={whatsapp} target="_blank" rel="noopener noreferrer">

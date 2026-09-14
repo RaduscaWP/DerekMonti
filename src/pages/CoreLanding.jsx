@@ -28,11 +28,6 @@ function Breadcrumbs({ items }) {
 function Hero({ page }) {
   return (
     <section className={styles.hero} aria-labelledby={`${page.id}-title`}>
-      <div className={styles.heroAtmosphere} aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
       <div className={`container ${styles.heroInner}`}>
         <Breadcrumbs items={page.breadcrumbs} />
         <div className={styles.heroCopy} data-reveal data-reveal-y="24">
@@ -40,21 +35,30 @@ function Hero({ page }) {
           <h1 id={`${page.id}-title`}>{page.h1}</h1>
           <p className={styles.heroSummary}>{page.heroSummary}</p>
           <div className={styles.heroActions}>
-            <Button href="/#request-form">Request a Personal Review</Button>
+            <Button to="/#request-form">Request a Personal Review</Button>
             <Link className={styles.quietLink} to="/about">
               About Derek
               <ArrowUpRight aria-hidden="true" size={17} />
             </Link>
           </div>
         </div>
-        <ul className={styles.heroPoints} aria-label="Review focus" data-reveal data-reveal-y="18">
+        <aside className={styles.heroDossier} aria-label="Guide overview" data-reveal data-reveal-y="18">
+          <p className={styles.dossierLabel}>Your itinerary, considered</p>
+          <ul className={styles.heroPoints} aria-label="Review focus">
           {page.heroPoints.map((point, index) => (
             <li key={point}>
               <span>{String(index + 1).padStart(2, '0')}</span>
               <strong>{point}</strong>
             </li>
           ))}
-        </ul>
+          </ul>
+          <nav className={styles.contents} aria-label="On this page">
+            <p>Inside this guide</p>
+            <a href={`#${page.id}-context`}>The request in context <ArrowUpRight size={16} aria-hidden="true" /></a>
+            <a href={`#${page.id}-review`}>What Derek evaluates <ArrowUpRight size={16} aria-hidden="true" /></a>
+            <a href={`#${page.id}-questions`}>Questions before requesting <ArrowUpRight size={16} aria-hidden="true" /></a>
+          </nav>
+        </aside>
       </div>
     </section>
   );
@@ -62,7 +66,7 @@ function Hero({ page }) {
 
 function Introduction({ page }) {
   return (
-    <section className={styles.introduction} aria-labelledby={`${page.id}-intro-title`}>
+    <section id={`${page.id}-context`} className={styles.introduction} aria-labelledby={`${page.id}-intro-title`}>
       <div className={`container ${styles.introGrid}`}>
         <div className={styles.introCopy} data-reveal>
           <p className="eyebrow">The request in context</p>
@@ -92,8 +96,8 @@ function Introduction({ page }) {
 
 function Evaluation({ page }) {
   return (
-    <section className={styles.evaluation} aria-label={page.evaluationTitle}>
-      <div className="container">
+    <section id={`${page.id}-review`} className={styles.evaluation} aria-label={page.evaluationTitle}>
+      <div className={`container ${styles.reviewLayout}`}>
         <SectionHeader
           eyebrow="Itinerary Review"
           title={page.evaluationTitle}
@@ -190,7 +194,7 @@ function RelatedPages({ page }) {
 
 function FrequentlyAskedQuestions({ page }) {
   return (
-    <section className={`faq-section ${styles.faq}`} aria-labelledby={`${page.id}-faq-title`}>
+    <section id={`${page.id}-questions`} className={`faq-section ${styles.faq}`} aria-labelledby={`${page.id}-faq-title`}>
       <div className={`container faq-section__inner ${styles.faqInner}`}>
         <div data-reveal>
           <p className="eyebrow">Questions before requesting</p>
@@ -218,7 +222,7 @@ function FinalCallToAction() {
             the request does not create a reservation.
           </p>
         </div>
-        <Button href="/#request-form">Request a Personal Review</Button>
+        <Button to="/#request-form">Request a Personal Review</Button>
       </div>
     </section>
   );
