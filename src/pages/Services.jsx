@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 import { useTripBrief } from '../context/TripBriefProvider.jsx';
 import { useMotionPreference } from '../context/MotionPreferenceProvider.jsx';
 import { evaluationItems, servicesFaqs } from '../data/siteData.js';
+import { editorialImages } from '../data/editorialData.js';
+import { changeTripType } from '../components/homepage/tripState.js';
+import ItineraryComparison from '../components/editorial/ItineraryComparison.jsx';
 import styles from './Services.module.scss';
 
 const situations = [
@@ -17,6 +20,13 @@ const routeIndex = [
   { title: 'Choose your cabin', links: [['Business class', '/business-class-flights'], ['First class', '/first-class-flights']] },
   { title: 'Shape your request', links: [['Complex itineraries', '/services/complex-itineraries'], ['Last-minute travel', '/services/last-minute-business-class'], ['Personal flight advisor', '/services/premium-flight-advisor']] },
   { title: 'Plan by journey', links: [['US to Europe', '/business-class-flights/europe'], ['Europe to the US', '/business-class-flights/usa']] },
+];
+
+const serviceExperiences = [
+  { id: 'business', label: 'Business class', title: 'Arrive with more left in you.', image: '/images/homepage/comfort-rested.webp', alt: 'Illustrative premium cabin with a reclining seat beside the window', intent: 'single_destination', cabin: 'business', href: '/business-class-flights', summary: 'Rest, a useful schedule, and the cabin that makes sense for the longest part of the trip.', detail: 'Compare the seat on each segment, overnight timing, and the connection around it. The best fit depends on the actual route, aircraft, dates, and ticket conditions.', points: ['Long-haul rest', 'Cabin on every segment', 'Arrival that fits your plans'] },
+  { id: 'first', label: 'First class', title: 'A little more space. A different pace.', ...editorialImages.tokyo, intent: 'single_destination', cabin: 'first', href: '/first-class-flights', summary: 'Privacy and space, considered alongside the route and the experience actually offered.', detail: 'First class has a narrower footprint than business class. Derek reviews the specific product, the cabin across connections, and whether the extra space suits your journey.', points: ['Product-specific review', 'Privacy and personal space', 'Business and first compared'] },
+  { id: 'complex', label: 'Complex itineraries', title: 'Several stops. One considered journey.', ...editorialImages.rome, intent: 'complex_itinerary', href: '/services/complex-itineraries', summary: 'Multi-city, open-jaw, and mixed cabins with the important commitments kept in order.', detail: 'List the stops that must happen and the dates that cannot move. Derek considers how each leg affects the next, including airports, connection time, cabin changes, and room between commitments.', points: ['Two to six flight legs in your brief', 'Fixed stops and flexible gaps', 'Mixed-cabin continuity'] },
+  { id: 'urgent', label: 'Last-minute travel', title: 'When the arrival cannot wait.', ...editorialImages.newYork, intent: 'time_sensitive', href: '/services/last-minute-business-class', summary: 'Begin with the latest arrival you can accept, then make the workable alternatives clear.', detail: 'A complete brief helps when time is short. Share exact dates, the latest acceptable arrival, airport flexibility, cabin preference, and a reliable contact method. Availability still requires confirmation.', points: ['Clear departure and arrival limits', 'Workable airport alternatives', 'Direct contact with Derek'] },
 ];
 
 function RouteDrawing({ situation }) {
@@ -42,7 +52,7 @@ function RouteDrawing({ situation }) {
 
 export default function Services() {
   const firstChoice = useRef(null);
-  const { trip, selectServiceIntent, markConversionSource } = useTripBrief();
+  const { trip, setTrip, selectServiceIntent, markConversionSource } = useTripBrief();
   const { reduced, motionReady } = useMotionPreference();
   const selected = situations.find(({ value }) => value === trip.serviceIntent);
   const markServices = () => markConversionSource('services');
@@ -51,6 +61,12 @@ export default function Services() {
     window.requestAnimationFrame(() => firstChoice.current?.focus());
   };
   const continueLink = (className) => <Link className={className} to="/#request-form" onClick={markServices}>Continue my trip brief <ArrowRight size={18} aria-hidden="true" /></Link>;
+  const chooseExperience = (experience) => {
+    selectServiceIntent(experience.intent);
+    if (experience.cabin) setTrip((value) => ({ ...value, cabin: experience.cabin }));
+    if (experience.intent === 'complex_itinerary') setTrip((value) => changeTripType(value, 'multi_city'));
+    markServices();
+  };
 
   return (
     <div className={styles.page} data-motion={motionReady && !reduced ? 'full' : 'reduced'}>
@@ -88,15 +104,28 @@ export default function Services() {
           <a className={styles.explore} href="#review-framework">A closer look at the review <ArrowDown size={16} aria-hidden="true" /></a>
         </div>
       </section>
-      <section className={styles.boundaries} aria-labelledby="boundaries-title"><div className={`${styles.inner} ${styles.boundaryLayout}`}>
-        <div><p className={styles.eyebrow}>Room to work</p><h2 id="boundaries-title">What is fixed.<br />What can move.</h2><p>A useful brief makes the difference clear.</p></div>
-        <dl className={styles.boundaryDetails}><div><dt><span aria-hidden="true">01</span> Fixed</dt><dd>{selected?.fixed || 'The commitments, destinations, and dates your trip must respect.'}</dd></div><div><dt><span aria-hidden="true">02</span> Flexible</dt><dd>{selected?.flexible || 'The nearby dates, airports, or preferences you are open to exploring.'}</dd></div></dl>
-        <p className={styles.boundaryNote}>Set your actual dates and flexibility in the trip brief. Choosing a starting point does not change them.</p>
+      <section className={styles.experiences} aria-labelledby="experiences-title">
+        <div className={styles.inner}>
+          <header className={styles.experienceHeading}><div><p className={styles.eyebrow}>Your kind of journey</p><h2 id="experiences-title">The details change.<br />The attention stays personal.</h2></div><p>Choose what matters to this trip. Explore the details, or take that starting point straight into your brief.</p></header>
+          <div className={styles.experienceGrid}>
+            {serviceExperiences.map((experience) => <article className={styles.experience} key={experience.id}>
+              <Link className={styles.experiencePhoto} to={experience.href} aria-label={`Explore ${experience.label.toLowerCase()}`}><img src={experience.image} alt={experience.alt} width={experience.id === 'business' ? '1200' : '1800'} height={experience.id === 'complex' || experience.id === 'first' ? '2700' : experience.id === 'urgent' ? '1350' : '1200'} loading="lazy" decoding="async" /><span>{experience.label}<ArrowRight size={19} aria-hidden="true" /></span></Link>
+              <div className={styles.experienceBody}><h3>{experience.title}</h3><p>{experience.summary}</p>
+                <details className={styles.experienceDetails}><summary>What we consider <Plus size={17} aria-hidden="true" /></summary><div><p>{experience.detail}</p><ul>{experience.points.map((point) => <li key={point}>{point}</li>)}</ul><Link to={experience.href}>Read the {experience.label.toLowerCase()} guide <ArrowRight size={16} aria-hidden="true" /></Link></div></details>
+                <Link className={styles.experienceAction} to="/#request-form" onClick={() => chooseExperience(experience)}>Plan this kind of trip <ArrowRight size={18} aria-hidden="true" /></Link>
+              </div>
+            </article>)}
+          </div>
+          <p className={styles.photoNote}>Cabin imagery is illustrative. The product on your flights is confirmed for your route and dates.</p>
+        </div>
+      </section>
+      <section className={styles.planningBoundaries} aria-labelledby="boundaries-title"><div className={styles.inner}>
+        <header><p className={styles.eyebrow}>Room to work</p><h2 id="boundaries-title">Keep the essentials fixed.<br />Give the rest some room.</h2></header>
+        <dl><div><dt>What cannot move</dt><dd>{selected?.fixed || 'The commitments, destinations, and dates your trip must respect.'}</dd></div><div><dt>What could change</dt><dd>{selected?.flexible || 'The nearby dates, airports, or preferences you are open to exploring.'}</dd></div></dl>
+        <p>Set your actual dates and flexibility in the trip brief. A starting point leaves those details in your hands.</p>
       </div></section>
-      <section className={styles.review} id="review-framework" aria-labelledby="review-title"><div className={styles.inner}>
-        <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>How Derek reviews</p><h2 id="review-title">Six lenses.<br />One complete trip.</h2></div><p>A premium seat is one part of the decision. The rest of the journey deserves the same attention.</p></div>
-        <div className={styles.reviewList}>{evaluationItems.map((item) => <article key={item.number}><span>{item.number}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>
-      </div></section>
+      <div id="review-framework" className={styles.comparisonAnchor}><span id="comparison" className={styles.comparisonTarget} aria-hidden="true" /><ItineraryComparison compact={false} /></div>
+      <section className={styles.reviewNotes} aria-labelledby="review-title"><div className={styles.inner}><h2 id="review-title">The complete trip, considered.</h2><div>{evaluationItems.map((item) => <details key={item.number}><summary>{item.title}<Plus size={16} aria-hidden="true" /></summary><p>{item.body}</p></details>)}</div></div></section>
       <nav className={styles.index} aria-labelledby="route-index-title"><div className={styles.inner}><p className={styles.eyebrow}>Explore the details</p><h2 id="route-index-title">Find your way in.</h2><div className={styles.indexColumns}>{routeIndex.map((group) => <div key={group.title}><h3>{group.title}</h3>{group.links.map(([title, href]) => <Link key={href} to={href}>{title}<ArrowRight size={17} aria-hidden="true" /></Link>)}</div>)}</div></div></nav>
       <section className={styles.faq} aria-labelledby="services-faq-title"><div className={`${styles.inner} ${styles.faqLayout}`}><div><p className={styles.eyebrow}>Before you begin</p><h2 id="services-faq-title">A few useful answers.</h2></div><div>{servicesFaqs.map((item) => <details key={item.question}><summary>{item.question}<Plus size={18} aria-hidden="true" /></summary><p>{item.answer}</p></details>)}</div></div></section>
       <section className={styles.final} aria-labelledby="services-final-title"><div className={styles.inner}><p className={styles.eyebrow}>Your next step</p><h2 id="services-final-title">Bring the journey<br />into focus.</h2><p>Share the route, dates, and priorities. Leave room for the details you still want to discuss.</p>{continueLink(styles.primary)}</div></section>

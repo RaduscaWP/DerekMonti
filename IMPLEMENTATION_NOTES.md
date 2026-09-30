@@ -1,5 +1,48 @@
 # Fly with Derek — Implementation Notes
 
+## 2026-09-30 — Master PRD implementation and protected-hero redesign
+
+The execution source is `FlyWithDerek_Codex_Master_PRD.md` supplied in Downloads. The user's explicit exception preserves the existing hero. The existing navy/burgundy, Syne/DM Sans system is retained under PRD §5's permission to keep a strong existing system. No framework migration, new vendor, pricing, legal-language edit, or external publication was performed.
+
+### Implemented
+
+- Home now follows the PRD sequence: service capabilities, truthful itinerary evaluation, personal service/arrival priorities, three-step process, journey discovery and finished planning hubs, existing trip form, native FAQ, pictured guides, final CTA and footer.
+- `HomeEditorial` scopes every new below-hero composition; the original hero markup, media and stylesheet are unchanged. Animation failures clear optional reveal styles; a route error boundary provides contact recovery and resets on navigation.
+- Services uses four photographic experiences with keyboard/touch disclosures and always-visible quote links. Selection transfers cabin, service intent or multi-city structure to the shared brief. About focuses on the supplied portrait and the review process, without invented milestones. The seven existing core pages retain their individual content and use distinct below-hero layouts.
+- Blog has filters derived from the three real articles, a photographic lead story and secondary stories. Article layouts retain content, anchors and calculated reading times, with a mobile contents control and the same trip-brief continuation. Social metadata now uses each article's visible image.
+- Shared FAQ and Home FAQ use native details/summary, including no-JavaScript operation. Navigation-only below-hero CTAs remain real links. The no-JavaScript form fallback offers email and WhatsApp.
+- The form adds keyboard/announced airport suggestions from a bounded local list, with free-text entry still accepted. API failures retain entries and offer complete prefilled email/WhatsApp messages. Receipt copy distinguishes advisor delivery from customer confirmation.
+- The legacy August draft is migrated only when the modern draft is absent, and only bounded itinerary/preferences are recovered. Contact data, notes, consent, removed support fields and codes are excluded.
+- Custom conversion events use the existing Vercel Analytics library and an explicit `VITE_ANALYTICS_EVENTS_ENABLED=true` opt-in. SSR and localhost emit no events. Both keys and categorical values are allowlisted; contact details, routes, dates, notes, references and raw errors cannot pass the helper. Production configuration remains unverified.
+
+### August functionality reconciliation
+
+The actual August commit is `f6f56b4e3e85712b5091688c56a394ad3929f879`; its predecessor is `15510d6840ebf40939be1bbb09bb1b0cda543e56`. Historical interactions were adapted to the strict Master PRD: carousel controls became curated journey selection, blog filters use real categories, service flips became accessible disclosures, and native date/select controls retain their functionality. Existing round-trip, one-way, multi-city, shared state, API guards and delivery contract remain intact.
+
+The Guidance Package, accrued-miles upsell, private-code module and their old payload fields remain absent because PRD §7 and §21 explicitly prohibit them. Unsupported historical fare examples, reviews, counters and airline-partnership claims were not republished. Five unsupported old articles retain honest 404 decisions.
+
+### New ideas added
+
+| Addition | Rationale | Risk/control |
+|---|---|---|
+| Curated destination selector | A visual starting point that feeds the existing brief | Described as a route to explore, never a fare or availability claim; preserves unrelated trip fields |
+| Interactive itinerary lenses | Explains why a whole-trip comparison matters | Questions only; no invented flights, schedules or prices; substantive first lens remains in static HTML |
+| Pictured shared journal module | Gives the three real guides a stronger editorial hierarchy | Local licensed images, honest reading times, unchanged articles/slugs |
+| Local airport combobox | Reduces typing without a new provider | Selected-airport coverage is disclosed; keyboard support and free text remain available |
+| Native disclosures and recovery boundary | Keeps meaningful content/contact paths available on failure | No-JavaScript and keyboard verification; no error payload logging |
+| Optional compressed local preview | Separates transfer compression from rendering cost in QA | Local-only flag; does not claim production/CDN behavior |
+| Two local critical-font preloads | Makes the existing hero display and body fonts discoverable before CSS finishes | Existing licensed font files only; production URLs resolved by Vite; final hero pixels remain checked |
+
+Home FAQ grouping is entirely native, without a React state update for opening an answer. Article contents is also a native disclosure; mobile JavaScript collapses it after hydration, while static HTML exposes the section links. This preserves navigation when JavaScript is disabled.
+
+### Verified facts and required owner input
+
+Current routes, source articles, form behavior, source/license records and local test evidence are repository-verified. New destination photography is recorded in `public/images/editorial/sources.json`; inherited media provenance is linked in `CONTENT_SOURCE_LOG.md`.
+
+No new business facts are asserted. The configured phone, WhatsApp and `Derek@travelbusinessclass.com` are retained to preserve contact delivery; ownership and the relationship to the Fly with Derek domain still need owner confirmation. Verified biography, article bylines/review dates, publishable fare examples, review ownership, operating/support commitments and legal review remain missing. The PRD's 35-page roadmap is not bulk-published: future route, destination and airline pages require substantive sourced content and human factual review. Live Resend/Turnstile/Upstash delivery, approved analytics configuration and field Core Web Vitals require an approved production/test environment.
+
+## Historical implementation record
+
 ## Homepage production integration — 2026-09-12
 
 The root route now renders the approved cinematic personal-advisor experience from `src/components/homepage/`. It uses the fixed-cabin hero composition, a 12-second muted cloud-view loop with matching poster, Derek's supplied portrait, an interactive comfort studio, a focused three-step process, the production trip-request flow, FAQ, closing action, and a homepage-specific header/footer. Other routes retain the established shared layout.

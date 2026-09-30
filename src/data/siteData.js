@@ -133,6 +133,10 @@ export const discoveryLinks = [
 
 export const homeFaqs = [
   {
+    question: 'Does a request reserve a flight or lock a fare?',
+    answer: 'No. A request starts a review; it does not reserve a flight or lock a price. Availability, the fare and the ticket conditions need to be confirmed before you decide to proceed.',
+  },
+  {
     question: 'What happens after I submit a quote request?',
     answer:
       'Your trip details are delivered for personal review. Derek can then use the contact method you provide to clarify priorities and discuss relevant options. Submitting a request is not a booking or a guarantee of availability.',

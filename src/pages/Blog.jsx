@@ -1,15 +1,23 @@
-import { useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { blogPosts } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
+import { useTripBrief } from '../context/TripBriefProvider.jsx';
+import { useMotionPreference } from '../context/MotionPreferenceProvider.jsx';
+import JournalFeature from '../components/editorial/JournalFeature.jsx';
 import styles from './Blog.module.scss';
 
 export default function Blog() {
   const pageRef = useRef(null);
   usePageMotion(pageRef);
+  const { markConversionSource } = useTripBrief();
+  const { reduced, motionReady } = useMotionPreference();
+  const [category, setCategory] = useState('all');
+  const categories = useMemo(() => [...new Set(blogPosts.map((post) => post.category))], []);
+  const visiblePosts = category === 'all' ? blogPosts : blogPosts.filter((post) => post.category === category);
   return (
-    <div ref={pageRef} className={styles.page}>
+    <div ref={pageRef} className={styles.page} data-motion={motionReady && !reduced ? 'full' : 'reduced'}>
       <section className={styles.hero} aria-labelledby="guides-page-title">
         <div className={styles.inner}>
           <div className={styles.masthead}><p className={styles.eyebrow}>Derek Monti <span>/</span> The journal</p><span>Premium travel, considered.</span></div>
@@ -21,20 +29,21 @@ export default function Blog() {
         </div>
       </section>
       <section id="guide-library" className={styles.library} aria-labelledby="guide-list-title">
-        <div className={`${styles.inner} ${styles.libraryLayout}`}>
-          <aside className={styles.libraryIntro} data-reveal><p className={styles.eyebrow}>Current library</p><h2 id="guide-list-title">Start with<br />a real decision.</h2><p>Each guide has one purpose, an honest reading time based on its word count, and a request path that matches the topic.</p><span className={styles.libraryCount}>{String(blogPosts.length).padStart(2, '0')} guides to explore</span></aside>
-          <div className={styles.list}>
-            {blogPosts.map((post, index) => (
-              <article key={post.slug} className={styles.guide} data-reveal>
-                <span className={styles.number} aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                <Link to={`/blog/${post.slug}`}><div className={styles.metadata}><span>{post.category}</span><span>{post.readTime}</span></div><h3>{post.title}</h3><p>{post.excerpt}</p><span className={styles.readLink}>Read the guide <ArrowRight aria-hidden="true" size={19} /></span></Link>
-              </article>
-            ))}
-          </div>
+        <div className={`${styles.inner} ${styles.libraryHeader}`}>
+          <div><p className={styles.eyebrow}>A considered departure</p><h2 id="guide-list-title">Read before you go.</h2></div>
+          <p>Cabin choices, better comparisons, and a clear plan when time is short.</p>
         </div>
+        <div className={`${styles.inner} ${styles.filterBar}`}>
+          <div className={styles.filters} role="group" aria-label="Filter guides by topic">
+            <button type="button" aria-pressed={category === 'all'} onClick={() => setCategory('all')}>All guides <span>{blogPosts.length}</span></button>
+            {categories.map((item) => <button type="button" key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>{item}<span>{blogPosts.filter((post) => post.category === item).length}</span></button>)}
+          </div>
+          <p className={styles.resultCount} aria-live="polite" aria-atomic="true">{visiblePosts.length} {visiblePosts.length === 1 ? 'guide' : 'guides'}</p>
+        </div>
+        <div key={category} className={styles.guideSelection}><JournalFeature posts={visiblePosts} heading={null} showAllLink={false} /></div>
+        <p className={`${styles.inner} ${styles.editorialNote}`}>Flight details, availability, and ticket conditions depend on your actual itinerary.</p>
       </section>
-      <section className={styles.standard} aria-labelledby="editorial-note-title"><div className={`${styles.inner} ${styles.standardLayout}`} data-reveal><p className={styles.eyebrow}>Editorial standard</p><div><h2 id="editorial-note-title">Facts that change need a source and a review date.</h2><p>These initial guides focus on durable decision frameworks. Schedule, aircraft, lounge, fare-rule, and airline-product claims are not published here without a maintainable source and factual review.</p></div></div></section>
-      <section className={styles.final} aria-labelledby="journal-cta-title"><div className={`${styles.inner} ${styles.finalLayout}`}><div><p className={styles.eyebrow}>From reading to planning</p><h2 id="journal-cta-title">Your trip.<br />Personally considered.</h2></div><div className={styles.finalActions}><p>Share the itinerary, the fixed constraints, and the priorities you want Derek to weigh.</p><Link to="/#request-form">Request a personal review <ArrowRight aria-hidden="true" size={19} /></Link></div></div></section>
+      <section className={styles.final} aria-labelledby="journal-cta-title"><div className={`${styles.inner} ${styles.finalLayout}`}><div><p className={styles.eyebrow}>A conversation with Derek</p><h2 id="journal-cta-title">Let's talk about<br />your next journey.</h2></div><div className={styles.finalActions}><p>Bring your route, dates, and the details that matter to you. Derek considers them together.</p><Link to="/#request-form" onClick={() => markConversionSource('blog')}>Start your trip brief <ArrowRight aria-hidden="true" size={19} /></Link></div></div></section>
     </div>
   );
 }

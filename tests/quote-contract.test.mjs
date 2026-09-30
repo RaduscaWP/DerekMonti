@@ -355,10 +355,23 @@ test('Services selections and valid attribution reach advisor/customer email wit
     }
     assert.ok(buildQuoteMessage({ serviceIntent }).includes(label));
   }
-  for (const source of [undefined, '', 'homepage', 'services']) {
+  for (const source of [undefined, '', 'homepage', 'services', 'blog']) {
     const response = await invokeQuoteApi(submission({ source }));
     assert.equal(response.statusCode, 200);
     assert.doesNotMatch(calls.emails.at(-1).text + calls.emails.at(-1).html, /Travel situation/);
+  }
+  assert.deepEqual(calls.unexpected, []);
+});
+
+test('editorial attribution reaches both email summaries without adding new data collection', async (t) => {
+  const calls = mockQuoteServices(t);
+  const response = await invokeQuoteApi(submission({ source: 'blog', comfortPreference: 'rested' }));
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.payload.ok, true);
+  assert.equal(calls.emails.length, 2);
+  for (const email of calls.emails) {
+    assert.match(email.text, /Source: blog/);
+    assert.doesNotMatch(email.text + email.html, /Guidance Package|Accrued Miles|Private Code|Selected Support/i);
   }
   assert.deepEqual(calls.unexpected, []);
 });

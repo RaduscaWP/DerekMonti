@@ -15,6 +15,32 @@ export {
 } from '../../utils/quoteRequest.js';
 
 export const MAX_TRIP_LEGS = 6;
+// A deliberately small suggestion list, independent of flight availability.
+// The city/code pairs already exist in the repository's curated IATA lookup.
+// Visitors can always enter an airport or city outside this list.
+export const AIRPORT_SUGGESTIONS = [
+  ['JFK', 'New York'], ['LAX', 'Los Angeles'], ['ORD', 'Chicago'], ['MIA', 'Miami'],
+  ['SFO', 'San Francisco'], ['BOS', 'Boston'], ['IAD', 'Washington'], ['PHL', 'Philadelphia'],
+  ['SEA', 'Seattle'], ['DFW', 'Dallas'], ['ATL', 'Atlanta'], ['DEN', 'Denver'],
+  ['IAH', 'Houston'], ['YYZ', 'Toronto'], ['YUL', 'Montreal'], ['YVR', 'Vancouver'],
+  ['LHR', 'London'], ['CDG', 'Paris'], ['FRA', 'Frankfurt'], ['AMS', 'Amsterdam'],
+  ['MAD', 'Madrid'], ['BCN', 'Barcelona'], ['FCO', 'Rome'], ['MXP', 'Milan'],
+  ['MUC', 'Munich'], ['ZRH', 'Zurich'], ['VIE', 'Vienna'], ['BRU', 'Brussels'],
+  ['CPH', 'Copenhagen'], ['ARN', 'Stockholm'], ['OSL', 'Oslo'], ['HEL', 'Helsinki'],
+  ['DUB', 'Dublin'], ['LIS', 'Lisbon'], ['ATH', 'Athens'], ['BER', 'Berlin'],
+  ['IST', 'Istanbul'], ['DXB', 'Dubai'], ['DOH', 'Doha'], ['AUH', 'Abu Dhabi'],
+  ['HND', 'Tokyo'], ['NRT', 'Tokyo Narita'], ['SIN', 'Singapore'], ['HKG', 'Hong Kong'],
+  ['SYD', 'Sydney'], ['MEL', 'Melbourne'], ['JNB', 'Johannesburg'], ['CPT', 'Cape Town'],
+].map(([code, city]) => ({ code, city, label: `${city} ${code}` }));
+
+export function findAirportSuggestions(query) {
+  if (typeof query !== 'string' || query.trim().length < 2) return [];
+  const terms = query.trim().toLowerCase().split(/\s+/);
+  const normalize = (text) => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return AIRPORT_SUGGESTIONS.filter(({ label }) => terms.every((term) => normalize(label).includes(normalize(term))))
+    .sort((a, b) => Number(b.code.toLowerCase() === query.trim().toLowerCase()) - Number(a.code.toLowerCase() === query.trim().toLowerCase()))
+    .slice(0, 6);
+}
 export const COMFORT_OPTIONS = [
   { value: 'rested', label: 'Rested', description: 'Rest and a considered arrival time matter most.' },
   { value: 'work', label: 'Ready to work', description: 'A usable work environment matters.' },
@@ -161,6 +187,22 @@ export async function submitTripRequest(trip, {
 }
 
 export const TRIP_PROGRESS_STORAGE_KEY = 'fly-with-derek:homepage-trip-progress:v1';
+export const LEGACY_TRIP_PROGRESS_STORAGE_KEY = 'fly-with-derek:quote-progress:v2';
+
+export function readTripProgress(storage) {
+  try {
+    const current = storage.getItem(TRIP_PROGRESS_STORAGE_KEY);
+    // An existing modern draft always wins, including an intentionally empty one.
+    if (current !== null) return JSON.parse(current);
+    const legacy = JSON.parse(storage.getItem(LEGACY_TRIP_PROGRESS_STORAGE_KEY) || 'null');
+    if (!legacy || typeof legacy !== 'object' || Array.isArray(legacy)) return null;
+    const safe = safeTripProgress(restoreTripProgress(createInitialTrip(), legacy));
+    // Remove the legacy entry only after the safe replacement is stored.
+    storage.setItem(TRIP_PROGRESS_STORAGE_KEY, JSON.stringify(safe));
+    storage.removeItem(LEGACY_TRIP_PROGRESS_STORAGE_KEY);
+    return safe;
+  } catch { return null; }
+}
 
 // The allowlist intentionally excludes contact information, free text and consent.
 export function safeTripProgress(trip) {

@@ -1,6 +1,7 @@
 import { createReadStream } from 'node:fs';
 import { access, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
+import { createGzip } from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +9,7 @@ const rootDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)),
 const distDirectory = path.join(rootDirectory, 'dist');
 const portArgument = Number.parseInt(process.argv[2] || '', 10);
 const port = Number.isInteger(portArgument) && portArgument > 0 ? portArgument : 4173;
+const compressedPreview = process.argv.includes('--compress');
 
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
@@ -73,11 +75,16 @@ function sendFile(request, response, filePath, statusCode = 200) {
   response.statusCode = statusCode;
   response.setHeader('Content-Type', contentTypes.get(path.extname(filePath).toLowerCase()) || 'application/octet-stream');
   response.setHeader('X-Content-Type-Options', 'nosniff');
+  const compress = compressedPreview && /gzip/.test(request.headers['accept-encoding'] || '') && /\.(?:html|css|js|json|xml|txt|svg)$/.test(filePath);
+  if (compressedPreview) response.setHeader('Vary', 'Accept-Encoding');
+  if (compress) response.setHeader('Content-Encoding', 'gzip');
   if (request.method === 'HEAD') {
     response.end();
     return;
   }
-  createReadStream(filePath).pipe(response);
+  const stream = createReadStream(filePath);
+  if (compress) stream.pipe(createGzip()).pipe(response);
+  else stream.pipe(response);
 }
 
 await access(path.join(distDirectory, 'index.html'));

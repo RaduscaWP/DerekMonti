@@ -130,3 +130,80 @@
  .routeLine,.unselectedLine,.node,.timeWindow { stroke:CanvasText; }
  .node,.timeWindow,.verticalRoute li>span:first-child { fill:Canvas; background:Canvas; }
 }
+
+/* The itinerary desk above is retained; editorial scenes begin below it. */
+.experiences { padding:100px 0 75px; background:#fff; color:#0b1929; }
+.experienceHeading { display:grid; grid-template-columns:1.4fr 1fr; align-items:end; gap:70px; margin-bottom:55px; }
+.experienceHeading .eyebrow { color:#8a194f; }
+.experienceHeading h2 { max-width:640px; font-size:clamp(34px,4vw,58px); line-height:1.09; letter-spacing:-.045em; }
+.experienceHeading>p { max-width:360px; justify-self:end; color:#4a5568; font-size:16px; line-height:1.75; }
+.experienceGrid { display:grid; grid-template-columns:1fr 1fr; gap:70px 48px; }
+.experience { min-width:0; }
+.experience:nth-child(even) { margin-top:75px; }
+.experiencePhoto { display:block; position:relative; overflow:hidden; aspect-ratio:1.48; background:#0b1929; }
+.experiencePhoto img { width:100%; height:100%; object-fit:cover; transition:transform 550ms cubic-bezier(.19,1,.22,1); }
+.experiencePhoto::after { content:''; position:absolute; inset:45% 0 0; background:linear-gradient(transparent,rgba(8,16,26,.7)); pointer-events:none; }
+.experiencePhoto>span { position:absolute; z-index:1; left:25px; right:25px; bottom:23px; display:flex; align-items:center; justify-content:space-between; color:#fff; font-size:14px; font-weight:600; }
+.experienceBody { padding:25px 0 0; }
+.experienceBody h3 { max-width:460px; font-size:clamp(25px,2.6vw,37px); line-height:1.17; letter-spacing:-.035em; }
+.experienceBody>p { margin-top:15px; color:#4a5568; font-size:15px; line-height:1.75; max-width:465px; }
+.experienceDetails { margin-top:21px; border-top:1px solid rgba(11,25,41,.2); border-bottom:1px solid rgba(11,25,41,.2); }
+.experienceDetails summary { display:flex; align-items:center; justify-content:space-between; gap:20px; min-height:53px; font-size:13px; font-weight:600; list-style:none; cursor:pointer; }
+.experienceDetails summary::-webkit-details-marker { display:none; }
+.experienceDetails[open] summary svg { transform:rotate(45deg); }
+.experienceDetails>div { padding-bottom:23px; font-size:14px; color:#4a5568; line-height:1.8; }
+.experienceDetails ul { margin:16px 0; padding-left:18px; }
+.experienceDetails>div>a { display:inline-flex; align-items:center; gap:13px; min-height:44px; color:#8a194f; font-weight:600; }
+.experienceAction { display:inline-flex; align-items:center; justify-content:space-between; gap:35px; min-height:50px; margin-top:18px; padding:13px 18px; color:#fff; background:#8a194f; font-size:13px; font-weight:600; transition:background-color 180ms ease-out; }
+.experienceAction:hover { background:#6e1340; }
+.photoNote { margin-top:45px; color:#4a5568; font-size:12px; line-height:1.7; }
+.planningBoundaries { padding:64px 0; background:#f5f5f7; }
+.planningBoundaries .inner { display:grid; grid-template-columns:1fr 1.1fr; gap:24px 80px; }
+.planningBoundaries h2 { font-size:clamp(26px,2.7vw,38px); }
+.planningBoundaries .eyebrow { color:#8a194f; }
+.planningBoundaries dl { display:grid; grid-template-columns:1fr 1fr; gap:35px; }
+.planningBoundaries dt { padding-bottom:13px; border-bottom:1px solid rgba(11,25,41,.22); font-size:14px; font-weight:600; }
+.planningBoundaries dd { margin-top:13px; font-size:14px; line-height:1.75; color:#4a5568; }
+.planningBoundaries .inner>p { grid-column:2; color:#4a5568; font-size:12px; line-height:1.7; }
+.comparisonAnchor { scroll-margin-top:var(--sticky-offset,120px); }
+.comparisonTarget { display:block; scroll-margin-top:var(--sticky-offset,120px); }
+.reviewNotes { padding:0 0 70px; background:#fff; }
+.reviewNotes .inner { display:grid; grid-template-columns:1fr 2fr; gap:60px; }
+.reviewNotes h2 { max-width:290px; font-size:25px; }
+.reviewNotes .inner>div { display:grid; grid-template-columns:1fr 1fr; gap:0 35px; }
+.reviewNotes details { border-top:1px solid rgba(11,25,41,.2); }
+.reviewNotes summary { display:flex; align-items:center; justify-content:space-between; min-height:55px; font-size:14px; list-style:none; cursor:pointer; }
+.reviewNotes summary::-webkit-details-marker { display:none; }
+.reviewNotes details[open] summary svg { transform:rotate(45deg); }
+.reviewNotes details p { padding:0 0 22px; font-size:14px; line-height:1.75; color:#4a5568; }
+@media(hover:hover) and (pointer:fine) { .page[data-motion='full'] .experiencePhoto:hover img { transform:scale(1.04); } }
+@media(max-width:1000px) {
+ .experienceHeading { gap:40px; }
+ .experienceGrid { gap:50px 30px; }
+ .experience:nth-child(even) { margin-top:50px; }
+ .planningBoundaries .inner { gap:25px 40px; }
+}
+@media(max-width:700px) {
+ .experiences { padding:62px 0 48px; }
+ .experienceHeading { grid-template-columns:1fr; gap:22px; margin-bottom:34px; }
+ .experienceHeading>p { justify-self:start; max-width:440px; font-size:15px; }
+ .experienceHeading h2 { font-size:35px; }
+ .experienceGrid { grid-template-columns:1fr; gap:45px; }
+ .experience:nth-child(even) { margin-top:0; }
+ .experiencePhoto { aspect-ratio:1.38; }
+ .experienceBody h3 { font-size:29px; }
+ .experienceAction { width:100%; }
+ .planningBoundaries { padding:45px 0; }
+ .planningBoundaries .inner { grid-template-columns:1fr; gap:25px; }
+ .planningBoundaries dl { gap:25px; }
+ .planningBoundaries .inner>p { grid-column:1; }
+ .reviewNotes { padding-bottom:45px; }
+ .reviewNotes .inner { grid-template-columns:1fr; gap:25px; }
+ .reviewNotes .inner>div { grid-template-columns:1fr; }
+}
+@media(prefers-reduced-motion:reduce) { .experiencePhoto img { transition:none; } }
+@media(forced-colors:active) {
+ .experienceAction { border:1px solid ButtonText; }
+ .experiencePhoto>span { background:Canvas; color:CanvasText; padding:10px; }
+ .experiencePhoto::after { display:none; }
+}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, CheckCircle2, ChevronRight, LoaderCircle, Moon, Pencil, Plane, Plus, Trash2, Users } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, CheckCircle2, ChevronRight, LoaderCircle, Mail, MessageCircle, Moon, Pencil, Plane, Plus, Trash2, Users } from 'lucide-react';
 import {
   addTripLeg,
   CABIN_OPTIONS,
@@ -7,6 +7,7 @@ import {
   COMFORT_OPTIONS,
   CONTACT_PREFERENCE_OPTIONS,
   fieldStep,
+  findAirportSuggestions,
   FLEXIBILITY_OPTIONS,
   getCabinLabel,
   getContactPreferenceLabel,
@@ -15,6 +16,7 @@ import {
   localTodayIso,
   MAX_TRIP_LEGS,
   removeTripLeg,
+  serializeTrip,
   submitTripRequest,
   TRIP_TYPE_OPTIONS,
   validateTrip,
@@ -24,6 +26,8 @@ import TurnstileWidget from '../common/TurnstileWidget.jsx';
 import './trip-form.scss';
 import { useTripBrief } from '../../context/TripBriefProvider.jsx';
 import { SERVICE_INTENT_OPTIONS, getServiceIntentLabel } from '../../utils/quoteRequest.js';
+import { getMailto, getWhatsappUrl } from '../../utils/message.js';
+import { trackEvent } from '../../utils/analytics.js';
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';
 const STEPS = ['Your journey', 'Your preferences', 'Contact & review'];
@@ -62,6 +66,67 @@ function Field({ name, label, error, hint, wide = false, children }) {
   </div>;
 }
 
+function AirportInput({ value, onChange, ...props }) {
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
+  const input = useRef(null);
+  const list = useRef(null);
+  const suggestions = findAirportSuggestions(value);
+  const expanded = open && suggestions.length > 0;
+  const listId = `${props.id}-suggestions`;
+  const statusId = `${props.id}-airport-status`;
+
+  useEffect(() => { setActive(-1); }, [value]);
+
+  useEffect(() => {
+    if (expanded && active >= 0) list.current?.children[active]?.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+  }, [expanded, active]);
+
+  function choose(option) {
+    onChange(option.label);
+    setOpen(false);
+    setActive(-1);
+    input.current?.focus({ preventScroll: true });
+  }
+
+  function keyDown(event) {
+    if (event.key === 'Escape') {
+      if (open) event.preventDefault();
+      setOpen(false);
+      setActive(-1);
+    } else if (event.key === 'Tab') {
+      setOpen(false);
+      setActive(-1);
+    } else if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && suggestions.length) {
+      event.preventDefault();
+      setOpen(true);
+      const next = event.key === 'ArrowDown' ? active + 1 : active < 0 ? suggestions.length - 1 : active - 1;
+      setActive((next + suggestions.length) % suggestions.length);
+    } else if (event.key === 'Enter' && expanded && active >= 0) {
+      event.preventDefault();
+      choose(suggestions[active]);
+    }
+  }
+
+  return <div className="trip-airport">
+    <input {...props} ref={input} role="combobox" aria-autocomplete="list" aria-expanded={expanded}
+      aria-controls={listId} aria-activedescendant={expanded && active >= 0 ? `${listId}-${active}` : undefined}
+      aria-describedby={[props['aria-describedby'], statusId].filter(Boolean).join(' ')}
+      value={value} onChange={(event) => { onChange(event.target.value); setActive(-1); setOpen(true); }}
+      onFocus={() => { setActive(-1); setOpen(true); }} onKeyDown={keyDown}
+      onBlur={(event) => { setOpen(false); setActive(-1); props.onBlur?.(event); }} />
+    <p id={statusId} className="trip-sr-only" role="status" aria-live="polite" aria-atomic="true">
+      {open && value.trim().length >= 2 ? suggestions.length ? `${suggestions.length} airport suggestion${suggestions.length === 1 ? '' : 's'}. Use the arrow keys to explore and Enter to select. You can also keep your own city or airport.` : 'No matching airport suggestion. You can keep the city or airport you entered.' : 'Enter a city or airport code. Suggestions cover selected airports; other cities and airports are welcome.'}
+    </p>
+    <ul ref={list} id={listId} role="listbox" aria-label="Airport suggestions" className="trip-airport-list" hidden={!expanded}>
+      {suggestions.map((option, index) => <li key={option.code} id={`${listId}-${index}`} role="option" aria-selected={active === index}
+        onMouseDown={(event) => event.preventDefault()} onClick={() => choose(option)}>
+        <span>{option.city}</span><strong>{option.code}</strong>
+      </li>)}
+    </ul>
+  </div>;
+}
+
 export default function TripForm({ trip, setTrip, step, setStep, onBusyChange }) {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle');
@@ -80,10 +145,23 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
   const mounted = useRef(true);
   const submissionLock = useRef(false);
   const pendingFocus = useRef(null);
+  const shellRef = useRef(null);
+  const viewed = useRef(false);
+  const started = useRef(false);
+  const eventTrip = useRef(trip);
+  eventTrip.current = trip;
   const busy = status === 'submitting';
   const received = status === 'success';
   const summaryTrip = received ? result.trip : trip;
   const comfort = COMFORT_OPTIONS.find(({ value }) => value === summaryTrip.comfort);
+  const recoveryDetails = serializeTrip(trip);
+  const eventProperties = () => ({ trip_type: eventTrip.current.tripType, cabin: eventTrip.current.cabin === 'either' ? 'mixed' : eventTrip.current.cabin, source: eventTrip.current.source || 'homepage' });
+
+  function markStarted() {
+    if (started.current) return;
+    started.current = true;
+    trackEvent('quote_form_start', eventProperties());
+  }
 
   const registerTurnstileReset = useCallback((resetFn) => { turnstileReset.current = resetFn; }, []);
   const handleTurnstileToken = useCallback((token) => {
@@ -106,6 +184,17 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
   useEffect(() => {
     formStartedAt.current = Date.now();
     setToday(localTodayIso());
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || viewed.current) return;
+      viewed.current = true;
+      trackEvent('quote_form_view', eventProperties());
+      observer.disconnect();
+    }, { threshold: .15 });
+    if (shellRef.current) observer.observe(shellRef.current);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => () => onBusyChange?.(false), [onBusyChange]);
@@ -175,15 +264,18 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
   function showErrors(nextErrors) {
     setErrors(nextErrors);
     const first = Object.keys(nextErrors)[0];
+    if (first) trackEvent('quote_form_validation_error', { ...eventProperties(), field_category: first === 'turnstile' ? 'verification' : ['journey', 'preferences', 'contact'][fieldStep(first)] });
     if (first) setStep(fieldStep(first));
     requestFocus(() => errorRef.current);
   }
 
   function navigate(target) {
     if (submissionLock.current || received) return;
+    markStarted();
     if (target > step) {
       const nextErrors = Object.assign({}, ...Array.from({ length: target }, (_, index) => validateTripStep(trip, index)));
       if (Object.keys(nextErrors).length) { showErrors(nextErrors); return; }
+      trackEvent('quote_form_step_complete', { ...eventProperties(), step: ['journey', 'preferences', 'contact'][step] });
     }
     setErrors({});
     setStep(target);
@@ -207,12 +299,14 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
     setCompanyWebsite('');
     setTurnstileToken('');
     formStartedAt.current = Date.now();
+    started.current = false;
     requestFocus(() => headingRef.current);
   }
 
   async function submit(event) {
     event.preventDefault();
     if (submissionLock.current) return;
+    markStarted();
     if (step < 2) { navigate(step + 1); return; }
     const nextErrors = validateTrip(trip);
     if (TURNSTILE_SITE_KEY && !turnstileToken) nextErrors.turnstile = 'Complete the human-verification challenge.';
@@ -223,6 +317,8 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
     setSubmissionError('');
     setStatus('submitting');
     const submittedTrip = { ...trip, legs: trip.legs.map((leg) => ({ ...leg })) };
+    trackEvent('quote_form_step_complete', { ...eventProperties(), step: 'contact' });
+    trackEvent('quote_form_submit', eventProperties());
     try {
       const receipt = await submitTripRequest(submittedTrip, { turnstileToken, companyWebsite, formStartedAt: formStartedAt.current });
       if (!mounted.current) return;
@@ -230,6 +326,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
       setResult({ ...receipt, trip: submittedTrip });
       clearConfirmedDraft();
       setStatus('success');
+      trackEvent('quote_form_success', eventProperties());
     } catch (error) {
       if (!mounted.current) return;
       if (error.code === 'FORM_TIMING') formStartedAt.current = Date.now();
@@ -237,6 +334,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
       else requestFocus(() => errorRef.current);
       setSubmissionError(error.message);
       setStatus('error');
+      trackEvent('quote_form_server_error', eventProperties());
     } finally {
       submissionLock.current = false;
       if (mounted.current) {
@@ -252,7 +350,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
     const edit = (name, value) => index === null ? update(name, value) : updateLeg(index, name, value);
     return <>
       {['from', 'to'].map((name) => <Field key={name} name={`${prefix}${name}`} label={name === 'from' ? 'From' : 'To'} error={errors[`${prefix}${name}`]}>
-        <input {...inputProps(`${prefix}${name}`)} autoComplete="off" maxLength={80} value={leg[name]} onChange={(event) => edit(name, event.target.value)} placeholder={name === 'from' ? 'City or airport' : 'Your destination'} required />
+        <AirportInput {...inputProps(`${prefix}${name}`)} autoComplete="off" maxLength={80} value={leg[name]} onChange={(value) => edit(name, value)} placeholder={name === 'from' ? 'City or airport' : 'Your destination'} required />
       </Field>)}
       <Field name={`${prefix}departure`} label="Departure" error={errors[`${prefix}departure`]}>
         <input {...inputProps(`${prefix}departure`)} type="date" value={leg.departure} min={index > 0 ? (trip.legs[index - 1].departure || today) : today} onChange={(event) => edit('departure', event.target.value)} required />
@@ -262,7 +360,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
 
   const itinerary = summaryTrip.tripType === 'multi_city' ? summaryTrip.legs : [{ from: summaryTrip.from, to: summaryTrip.to, departure: summaryTrip.departure }];
 
-  return <div className="trip-shell">
+  return <div ref={shellRef} className="trip-shell">
     <div className="trip-main">
       <nav className="trip-steps" aria-label="Trip request steps">
         {STEPS.map((label, index) => <button type="button" key={label} aria-current={step === index ? 'step' : undefined} onClick={() => navigate(index)} disabled={busy || received}>
@@ -280,7 +378,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
         {result.confirmationSent === true && <p>A confirmation has been sent to {result.trip.email}.</p>}
         {result.confirmationSent === false && <p>Your request was received. An email confirmation could not be sent; please keep your reference.</p>}
         <button type="button" className="trip-button trip-button--primary" onClick={startAnotherRequest}>Start another request <ArrowRight size={16} aria-hidden="true" /></button>
-      </div> : <form className="trip-form" noValidate onSubmit={submit} aria-busy={busy}>
+      </div> : <form className="trip-form" noValidate onSubmit={submit} onChange={markStarted} aria-busy={busy}>
         <div className="trip-honeypot" aria-hidden="true">
           <label htmlFor={fieldId('companyWebsite')}>Company website</label>
           <input id={fieldId('companyWebsite')} name="companyWebsite" value={companyWebsite} onChange={(event) => setCompanyWebsite(event.target.value)} tabIndex={-1} autoComplete="off" maxLength={120} />
@@ -293,6 +391,12 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
         {(submissionError || Object.keys(errors).length > 0) && <div className="trip-errors" tabIndex={-1} ref={errorRef} role="alert">
           <strong>{submissionError || 'A few details need your attention.'}</strong>
           <ul>{Object.entries(errors).map(([name, message]) => <li key={name}><button type="button" onClick={() => focusField(name)}>{fieldLabel(name)}: {message}</button></li>)}</ul>
+        </div>}
+
+        {status === 'error' && <div className="trip-recovery" aria-labelledby="trip-recovery-title">
+          <h4 id="trip-recovery-title">Continue directly with Derek.</h4>
+          <p>Your entries are kept here. Open a message with your trip details, then review it before sending. If receipt was uncertain, mention the earlier attempt.</p>
+          <div><a href={getWhatsappUrl(recoveryDetails)} onClick={() => trackEvent('contact_method_click', { ...eventProperties(), method: 'whatsapp' })} target="_blank" rel="noopener noreferrer"><MessageCircle size={17} aria-hidden="true" /> Continue on WhatsApp</a><a href={getMailto(recoveryDetails)} onClick={() => trackEvent('contact_method_click', { ...eventProperties(), method: 'email' })}><Mail size={17} aria-hidden="true" /> Email your trip details</a></div>
         </div>}
 
         {/* Each step owns a fresh set of native controls; values remain in shared React state. */}
@@ -371,7 +475,7 @@ export default function TripForm({ trip, setTrip, step, setStep, onBusyChange })
           <button type="submit" className="trip-button trip-button--primary" disabled={busy}>{busy ? <>Sending your request <LoaderCircle className="trip-loader" size={17} aria-hidden="true" /></> : <>{step === 2 ? (status === 'error' ? 'Try again' : 'Send my trip request') : 'Continue'} <ArrowRight size={17} aria-hidden="true" /></>}</button>
         </div>
         <div className="trip-request-note">
-          <p>No booking commitment. Derek reviews your request personally.</p>
+          <p>Derek uses these details to respond to your flight request. No booking commitment. <a href="/privacy">Privacy Policy</a></p>
         </div>
       </form>}
       <span className="trip-sr-only" role="status">{busy ? 'Sending your request to Derek. Please wait for your reference.' : ''}</span>

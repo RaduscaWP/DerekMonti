@@ -1,5 +1,61 @@
 # Fly with Derek — QA Report
 
+## 2026-09-30 — Final protected-hero redesign verification
+
+Scope: existing 16 canonical routes, the shared quote flow, static rendering, below-hero visual redesign and PRD reconciliation. This is local evidence, not a production deployment or a live-delivery claim.
+
+### Final results
+
+| Check | Result | Evidence |
+|---|---|---|
+| `npm.cmd test` | 51 passed, 0 failed | `output/playwright/2026-09-30-redesign/tests.log` |
+| `npm.cmd run build` | Client, SSR, 16-page prerender plus 404, SEO validation passed | `output/playwright/2026-09-30-redesign/build.log` |
+| `git diff --check` | Passed; only Git line-ending warnings | `output/playwright/2026-09-30-redesign/diff-check.log` |
+| Protected hero | Original JSX and both original stylesheets unchanged; desktop and mobile first-view pixels identical | `output/playwright/2026-09-30-redesign/hero-preservation.json` |
+| Browser audit | 16 pages at 1440px; 15 additional route/width checks at 320/390/768px; no overflow or page exceptions | `verification.json` in the redesign evidence folder |
+| Automated accessibility | axe-core 4.10.3: 0 WCAG A/AA violations across all 16 desktop routes and the Home mobile scan | Same verification file; browser evidence only, not an accessibility certification |
+| No-JavaScript | All 16 routes contain substantive HTML, one H1 and working link navigation | Same verification file |
+| Interaction smoke | 13 checks passed: journey selection/prefill, comparison lenses, comfort persistence, cross-page brief, grouped FAQ, contact fallback, final CTA and native article contents | Same verification file |
+| Internal links | 20 unique root-relative links/assets checked; no 4xx/5xx result | Same verification file |
+| Images | All referenced images decoded successfully; no missing source files | Local capture forces image decode after its scroll tour to separate lazy-load timing from asset failures |
+| Keyboard/mobile/zoom | Native article contents, mobile menu/Escape, and a 200% CSS-zoom reflow spot check passed | `spot-checks.json`; not a substitute for physical browser/device testing |
+| Form fixture | Safe August migration; keyboard combobox; retained failure entries; complete recovery messages; identical retry; receipt/confirmation distinction; reset; 390/320px layout passed | `output/playwright/2026-09-30-form/fixture-results.json` |
+| Analytics privacy boundary | PII/trip details and prototype keys excluded, categorical values retained, unknown events rejected, localhost emits nothing | `analytics-policy.json`; mocked transport, no real events |
+
+No separate lint or typecheck command is configured in this JavaScript repository. The existing test/build/SEO commands are the configured engineering checks.
+
+The form fixture runs in Chrome with every API submission intercepted. The site-wide audit runs in Edge Chromium with external requests blocked and WebGL explicitly unavailable. No real lead, email or WhatsApp message was sent. The prior sub-agent visual checks also covered Services/About plus all seven core pages at 1440/390/320px and real Blog filters/brief continuation; captures are in `output/playwright/2026-09-30-secondary/` and `output/playwright/2026-09-30-editorial/`.
+
+### Local HTTP and SEO
+
+`scripts/serve-prerender.mjs` served the built files on localhost. All 16 canonical routes returned HTML with 200. `/robots.txt` returned 200/plain text and `/sitemap.xml` returned 200/XML. The branded unknown route and all five unsupported old article URLs returned HTML/404. `/services/` returned 308 with `Location: /services`. All 25 individual status/content-type records are in `verification.json`.
+
+Build validation checks unique title/description/H1, production canonicals, page-appropriate JSON-LD, preview noindex protection, canonical sitemap membership and the real 404 artifact. Article images now match the visible illustrations/photographs. No author, date, affiliation, review, savings, fare or credential was invented. No removed upsell/code state or payload logic was found in the active homepage/form/API paths.
+
+### Performance measurements and budgets
+
+Budget used for this pass: main JavaScript <=180 kB gzip; CSS <=40 kB gzip; critical hero poster plus avatar <=250 kB; no essential WebGL or external media/font requests. Current build: JavaScript **499.27 kB / 162.40 kB gzip**, CSS **188.63 kB / 31.76 kB gzip**. The two existing critical fonts are preloaded; new destination images remain local WebP and lazy-loaded.
+
+Final cold-load lab probe used 1.6 Mbps download, 150 ms latency, 4x CPU slowdown, reduced motion and negotiated gzip from the optional local `--compress` server. Measurements are from browser PerformanceObserver, not Lighthouse or production field data:
+
+| Viewport | LCP | CLS | Longest observed interaction event | Initial transfer |
+|---|---:|---:|---:|---:|
+| Mobile 390px | 2.108 s | 0.000418 | 96 ms | 550,092 bytes |
+| Desktop 1440px | 2.096 s | 0.000673 | 160 ms | 685,458 bytes |
+
+Exact resource records are in `output/playwright/2026-09-30-redesign/performance-compressed.json`. The longest observed event is a lab interaction indicator, **not verified field INP**. Earlier compressed runs ranged from 2.256–2.628 s on mobile before critical-font/native-FAQ optimization, with one 224 ms desktop event. The deliberately uncompressed static-server run measured 4.896 s mobile and 4.740 s desktop; it is retained separately in `performance.json`. These differences show why compression, competing CPU load and lab variability must be stated.
+
+The final local LCP/CLS measurements meet the PRD target values; the production 75th percentile and field INP remain unmeasured. Verify actual compression/cache headers on a preview/production deployment, then measure real-device and field results. If targets are missed, prioritize route-level JS/CSS splitting with preserved SSR stylesheet output, critical-font/asset scheduling and owner-approved avatar optimization. The frozen hero was not recompressed or visually changed to improve a score.
+
+### Remaining verification boundaries
+
+- Live Resend, Turnstile, Upstash, confirmation delivery and approved analytics configuration were not tested with real credentials/leads. Existing guards fail honestly and fixture/unit paths passed.
+- Production status codes, caching/compression, CSP headers, robots/sitemap delivery and Search Console coverage are not established by localhost. No external publication or sitemap submission was performed.
+- Safari/iOS, Firefox, physical Android/iOS, a real screen reader and a complete assistive-technology matrix remain release checks; automated axe and keyboard checks do not prove all WCAG criteria.
+- Business/contact ownership, the email/domain relationship, portrait rights, author/review dates, legal approval and future route/airline facts remain owner/reviewer inputs. Future PRD roadmap pages are not published without unique sourced content and approval.
+
+## Historical verification record
+
 ## Homepage release update — 2026-09-12
 
 The approved cinematic homepage is now integrated into the production application. The August 31 report below remains as the historical PRD baseline; its 12-test count, bundle measurements, homepage description, and deployment status describe that older build.

@@ -1,0 +1,38 @@
+[
+  {
+    "file": "/images/editorial/tokyo.webp",
+    "sourcePage": "https://unsplash.com/photos/city-skyline-during-night-time--e8dPjbn_lE",
+    "photographer": "Tim Marshall",
+    "assetUrl": "https://images.unsplash.com/photo-1629460244940-1fc26ea27a33?auto=format&fit=crop&w=1800&q=83&fm=webp",
+    "license": "https://unsplash.com/license",
+    "retrieved": "2026-09-30",
+    "bytes": 502380
+  },
+  {
+    "file": "/images/editorial/london.webp",
+    "sourcePage": "https://unsplash.com/photos/big-ben-and-river-thames-with-boats-at-sunset-hnQVv9cnZp8",
+    "photographer": "Ziyao Xiong",
+    "assetUrl": "https://images.unsplash.com/photo-1758453067758-c48cee19641d?auto=format&fit=crop&w=1800&q=83&fm=webp",
+    "license": "https://unsplash.com/license",
+    "retrieved": "2026-09-30",
+    "bytes": 201286
+  },
+  {
+    "file": "/images/editorial/rome.webp",
+    "sourcePage": "https://unsplash.com/photos/two-people-watch-the-sunset-over-rome-0bArovre6cQ",
+    "photographer": "Cheng Lin",
+    "assetUrl": "https://images.unsplash.com/photo-1742161627294-2c46bbd9b7e1?auto=format&fit=crop&w=1800&q=83&fm=webp",
+    "license": "https://unsplash.com/license",
+    "retrieved": "2026-09-30",
+    "bytes": 134532
+  },
+  {
+    "file": "/images/editorial/new-york.webp",
+    "sourcePage": "https://unsplash.com/photos/new-york-city-skyline-on-a-cloudy-day-bvmZDUoLeuM",
+    "photographer": "Pavol Duracka",
+    "assetUrl": "https://images.unsplash.com/photo-1776000513670-5f6e407910e7?auto=format&fit=crop&w=1800&q=83&fm=webp",
+    "license": "https://unsplash.com/license",
+    "retrieved": "2026-09-30",
+    "bytes": 322554
+  }
+]

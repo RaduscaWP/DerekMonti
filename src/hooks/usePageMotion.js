@@ -17,7 +17,10 @@ export function usePageMotion(scopeRef) {
       return undefined;
     }
 
-    const ctx = gsap.context(() => {
+    let ctx;
+    try {
+    ctx = gsap.context(() => {}, scope);
+    ctx.add(() => {
       gsap.utils.toArray('[data-reveal]').forEach((element) => {
         gsap.from(element, {
           y: Number(element.dataset.revealY || 44),
@@ -31,11 +34,14 @@ export function usePageMotion(scopeRef) {
           },
         });
       });
-    }, scope);
+    });
+    } catch {
+      try { ctx?.revert(); } catch { /* Motion is optional. */ }
+      scope.querySelectorAll('[data-reveal]').forEach(element => { element.style.removeProperty('opacity'); element.style.removeProperty('transform'); });
+    }
 
     return () => {
-      ctx.revert();
-      ScrollTrigger.refresh();
+      try { ctx?.revert(); ScrollTrigger.refresh(); } catch { /* Navigation stays usable when motion fails. */ }
     };
   }, [scopeRef, reduced, motionReady]);
 }

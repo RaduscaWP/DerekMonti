@@ -1,10 +1,14 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Check, CircleDot, Compass } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, CircleDot, Plus } from 'lucide-react';
 import Button from '../components/common/Button.jsx';
 import FaqAccordion from '../components/common/FaqAccordion.jsx';
-import SectionHeader from '../components/common/SectionHeader.jsx';
 import { usePageMotion } from '../hooks/usePageMotion.js';
+import { useTripBrief } from '../context/TripBriefProvider.jsx';
+import { changeTripType } from '../components/homepage/tripState.js';
+import { contactConfig, imagery } from '../data/siteData.js';
+import { editorialImages } from '../data/editorialData.js';
+import { getWhatsappUrl } from '../utils/message.js';
 import styles from './CoreLanding.module.scss';
 
 function Breadcrumbs({ items }) {
@@ -64,56 +68,42 @@ function Hero({ page }) {
   );
 }
 
-function Introduction({ page }) {
+const pageScenes = {
+  'business-class-flights': { kind: 'business', image: '/images/homepage/comfort-rested.webp', alt: 'Illustrative reclining premium seat beside an aircraft window', caption: 'A cabin that fits the way you travel.', cabin: 'business', intent: 'single_destination', labels: ['Rest on the longest leg', 'A workable connection', 'An arrival that fits'] },
+  'first-class-flights': { kind: 'first', image: '/images/homepage/comfort-work.webp', alt: 'Illustrative premium cabin with a personal seat and work surface', caption: 'Space is only the beginning.', cabin: 'first', intent: 'single_destination', labels: ['The actual product', 'Cabin across each segment', 'The alternative worth considering'] },
+  'business-class-europe': { kind: 'eastbound', ...editorialImages.london, caption: 'The day after the Atlantic.', cabin: 'business', intent: 'single_destination', labels: ['Overnight priorities', 'Arrival day plans', 'Your final destination'] },
+  'business-class-usa': { kind: 'westbound', ...editorialImages.newYork, caption: 'Make the travel day work for you.', cabin: 'business', intent: 'single_destination', labels: ['Daytime travel', 'Your arrival airport', 'Onward commitments'] },
+  'complex-itineraries': { kind: 'complex', ...editorialImages.tokyo, caption: 'Every stop affects the next.', intent: 'complex_itinerary', labels: ['The stops that are fixed', 'Time between destinations', 'Cabin on every leg'] },
+  'last-minute-business-class': { kind: 'urgent', image: '/images/homepage/hero-window-video-poster.webp', alt: 'Airplane window with daylight over the horizon', caption: 'Begin with the arrival you need.', cabin: 'business', intent: 'time_sensitive', labels: ['Earliest workable departure', 'Latest acceptable arrival', 'Realistic alternatives'] },
+  'premium-flight-advisor': { kind: 'advisor', image: imagery.derekPortrait, alt: 'Derek Monti, personal flight advisor', caption: 'A conversation with the whole trip in view.', intent: 'personal_advisor', labels: ['Your reason for the trip', 'Your firm commitments', 'The options to discuss'] },
+};
+
+const sceneDimensions = {
+  business: [1200, 1200], first: [1200, 1200], eastbound: [1800, 992],
+  westbound: [1800, 1350], complex: [1800, 2700], urgent: [1536, 1024], advisor: [1122, 1402],
+};
+
+function Introduction({ page, scene, onChoose }) {
   return (
-    <section id={`${page.id}-context`} className={styles.introduction} aria-labelledby={`${page.id}-intro-title`}>
-      <div className={`container ${styles.introGrid}`}>
-        <div className={styles.introCopy} data-reveal>
-          <p className="eyebrow">The request in context</p>
-          <h2 id={`${page.id}-intro-title`}>{page.introTitle}</h2>
-          {page.intro.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
-        <div className={styles.audience} data-reveal>
-          <h3>{page.audienceTitle}</h3>
-          <ol>
-            {page.audience.map((item, index) => (
-              <li key={item.title}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <div>
-                  <strong>{item.title}</strong>
-                  <p>{item.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
+    <section id={`${page.id}-context`} className={`${styles.contextScene} ${styles[scene.kind]}`} aria-labelledby={`${page.id}-intro-title`}>
+      <div className={`container ${styles.sceneGrid}`}>
+        <figure className={styles.scenePhoto} data-reveal><img src={scene.image} alt={scene.alt} width={sceneDimensions[scene.kind][0]} height={sceneDimensions[scene.kind][1]} loading="lazy" decoding="async" /><figcaption>{scene.caption}</figcaption></figure>
+        <div className={styles.sceneCopy} data-reveal><p className="eyebrow">The request in context</p><h2 id={`${page.id}-intro-title`}>{page.introTitle}</h2>{page.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<Link className={styles.sceneAction} to="/#request-form" onClick={onChoose}>Start my {scene.cabin === 'first' ? 'first class ' : ''}trip brief <ArrowRight size={17} aria-hidden="true" /></Link></div>
+        {scene.kind === 'complex' && <div className={styles.stopSequence} aria-label="Organize the sequence of your journey"><p>Your stop sequence</p><ol><li>Departure</li><li>First stop</li><li>Next stop</li><li>Final arrival</li></ol><span>Add two to six legs in your trip brief. Set the dates that are fixed and note where the order can change.</span></div>}
+        {scene.kind === 'urgent' && <div className={styles.urgentContact}><div><p className="eyebrow">A direct conversation</p><strong>Have your time limits ready.</strong><p>Share the route, exact travel dates, and the latest arrival you can accept.</p></div><div><a href={`tel:${contactConfig.phoneHref}`}>Call {contactConfig.phoneLabel} <ArrowUpRight size={17} aria-hidden="true" /></a><a href={getWhatsappUrl({ serviceIntent: 'time_sensitive', cabin: 'business' })} target="_blank" rel="noopener noreferrer">Message Derek on WhatsApp <ArrowUpRight size={17} aria-hidden="true" /></a></div></div>}
+        <div className={styles.audienceBrief}><h3>{page.audienceTitle}</h3><div>{page.audience.map((item) => <details key={item.title}><summary>{item.title}<Plus size={16} aria-hidden="true" /></summary><p>{item.body}</p></details>)}</div></div>
+        {scene.kind !== 'advisor' && <p className={styles.sceneDisclaimer}>Cabin imagery is illustrative. Any flight product, routing, and availability must be confirmed for your dates.</p>}
       </div>
     </section>
   );
 }
 
-function Evaluation({ page }) {
+function Evaluation({ page, scene }) {
   return (
-    <section id={`${page.id}-review`} className={styles.evaluation} aria-label={page.evaluationTitle}>
-      <div className={`container ${styles.reviewLayout}`}>
-        <SectionHeader
-          eyebrow="Itinerary Review"
-          title={page.evaluationTitle}
-          text={page.evaluationIntro}
-          align="left"
-          light
-        />
-        <div className={styles.evaluationGrid}>
-          {page.evaluation.map((item, index) => (
-            <article key={item.title} data-reveal>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
+    <section id={`${page.id}-review`} className={styles.decisionDesk} aria-labelledby={`${page.id}-review-title`}>
+      <div className={`container ${styles.decisionGrid}`}>
+        <header><p className="eyebrow">Itinerary review</p><h2 id={`${page.id}-review-title`}>{page.evaluationTitle}</h2><p>{page.evaluationIntro}</p><ul className={styles.focusLabels}>{scene.labels.map((label) => <li key={label}><Check size={16} aria-hidden="true" />{label}</li>)}</ul><Link to="/services#review-framework">See the itinerary comparison <ArrowRight size={17} aria-hidden="true" /></Link></header>
+        <div className={styles.reviewDisclosures}>{page.evaluation.map((item, index) => <details key={item.title} open={index === 0 || undefined}><summary>{item.title}<Plus size={17} aria-hidden="true" /></summary><p>{item.body}</p></details>)}</div>
       </div>
     </section>
   );
@@ -147,12 +137,7 @@ function Process({ page }) {
   return (
     <section className={styles.process} aria-label="How it works">
       <div className="container">
-        <SectionHeader
-          eyebrow="How It Works"
-          title="Three steps from request to decision"
-          text="The process stays focused on the trip information and the tradeoffs that can be confirmed."
-          align="left"
-        />
+        <header className={styles.processHeader}><p className="eyebrow">How it works</p><h2>From your brief to a clear decision.</h2></header>
         <ol className={styles.processList}>
           {page.process.map((step, index) => (
             <li key={step.title} data-reveal>
@@ -172,9 +157,8 @@ function RelatedPages({ page }) {
     <section className={styles.related} aria-labelledby={`${page.id}-related-title`}>
       <div className={`container ${styles.relatedInner}`}>
         <div className={styles.relatedIntro} data-reveal>
-          <Compass aria-hidden="true" size={26} />
           <p className="eyebrow">Continue planning</p>
-          <h2 id={`${page.id}-related-title`}>Explore the next relevant guide</h2>
+          <h2 id={`${page.id}-related-title`}>Keep the journey in view.</h2>
         </div>
         <nav className={styles.relatedLinks} aria-label="Related planning pages" data-reveal>
           {page.related.map((item) => (
@@ -210,7 +194,7 @@ function FrequentlyAskedQuestions({ page }) {
   );
 }
 
-function FinalCallToAction() {
+function FinalCallToAction({ onChoose }) {
   return (
     <section className={styles.finalCta} aria-labelledby="core-landing-cta-title">
       <div className={`container ${styles.finalCtaInner}`} data-reveal>
@@ -222,7 +206,7 @@ function FinalCallToAction() {
             the request does not create a reservation.
           </p>
         </div>
-        <Button to="/#request-form">Request a Personal Review</Button>
+        <Button to="/#request-form" onClick={onChoose}>Request a Personal Review</Button>
       </div>
     </section>
   );
@@ -234,18 +218,26 @@ export default function CoreLanding({ page }) {
   }
 
   const pageRef = useRef(null);
+  const { setTrip, selectServiceIntent, markConversionSource } = useTripBrief();
+  const scene = pageScenes[page.id] || pageScenes['business-class-flights'];
+  const choosePage = () => {
+    selectServiceIntent(scene.intent);
+    if (scene.cabin) setTrip((value) => ({ ...value, cabin: scene.cabin }));
+    if (scene.intent === 'complex_itinerary') setTrip((value) => changeTripType(value, 'multi_city'));
+    markConversionSource('services');
+  };
   usePageMotion(pageRef);
 
   return (
     <div className={styles.page} ref={pageRef}>
       <Hero page={page} />
-      <Introduction page={page} />
-      <Evaluation page={page} />
+      <Introduction page={page} scene={scene} onChoose={choosePage} />
+      <Evaluation page={page} scene={scene} />
       <Limitations page={page} />
       <Process page={page} />
       <RelatedPages page={page} />
       <FrequentlyAskedQuestions page={page} />
-      <FinalCallToAction />
+      <FinalCallToAction onChoose={choosePage} />
     </div>
   );
 }

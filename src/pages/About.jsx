@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { evaluationItems, imagery } from '../data/siteData.js';
+import { imagery } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
 import { getWhatsappUrl } from '../utils/message.js';
 import styles from './About.module.scss';
@@ -89,92 +89,35 @@ export default function About() {
         </ol>
       </section>
 
-      <section className={styles.opening} aria-labelledby="opening-title">
-        <div className={styles.inner}>
-          <div className={styles.openingHeading} data-reveal>
-            <p className={styles.eyebrow}>The point of view</p>
-            <h2 id="opening-title">The work begins<br />with listening.</h2>
-          </div>
-          <div className={styles.openingCopy} data-reveal>
-            <p className={styles.lead}>Premium travel is full of details that look small until they change the whole trip.</p>
-            <p>
-              A seat can be excellent while the itinerary around it is wrong. An awkward departure, a long connection,
-              or restrictive conditions can matter more than the name on the cabin.
-            </p>
-            <p>
-              Fly with Derek gives those details one place to live. You explain the journey you need to take; Derek
-              personally reviews how the pieces fit together and makes the differences easier to understand.
-            </p>
+      <section className={styles.letter} aria-labelledby="opening-title">
+        <div className={styles.letterInner}>
+          <aside data-reveal><p className={styles.eyebrow}>A note from Derek</p><p className={styles.letterSide}>A good journey<br />starts with<br />your priorities.</p><Link to="/services">Visit the itinerary desk <ArrowRight size={17} aria-hidden="true" /></Link></aside>
+          <div className={styles.letterCopy} data-reveal>
+            <h2 id="opening-title">Tell me what this<br />trip needs to do.</h2>
+            <p className={styles.letterLead}>The arrival matters as much as the flight.</p>
+            <p>A morning meeting, time with family, or a few days away each asks something different of a journey. Start there. Tell me what cannot move and where you have room to explore.</p>
+            <p>I look at the cabin together with the departure, the connection, the arrival, and the ticket conditions. A beautiful seat is only useful when the trip around it works for you.</p>
+            <p>My role is to put those differences into a clear conversation, so you can decide with the whole picture in view.</p>
+            <div className={styles.signature}><strong>Derek Monti</strong><span>Personal flight advisor</span></div>
           </div>
         </div>
       </section>
 
-      <section className={styles.conversation} aria-labelledby="conversation-title">
-        <div className={styles.inner}>
-          <header className={styles.sectionHeading} data-reveal>
-            <div>
-              <p className={styles.eyebrow}>The working relationship</p>
-              <h2 id="conversation-title">What stays in the<br />same conversation.</h2>
-            </div>
-            <p>Your priorities remain visible from the first brief to the final comparison.</p>
-          </header>
-
-          <ol className={styles.conversationList}>
-            {conversationDetails.map((item, index) => (
-              <li key={item.title} data-reveal>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
+      <section className={styles.perspective} aria-labelledby="method-title">
+        <figure className={styles.perspectivePhoto} data-reveal><img src="/images/homepage/comfort-together.webp" alt="Illustrative neighboring premium seats beside an aircraft window" width="1200" height="1200" loading="lazy" decoding="async" /><figcaption><span className={styles.eyebrow}>Beyond the seat</span><h2 id="method-title">A little attention<br />changes the whole journey.</h2><p>Comfort in the cabin. Clarity about everything around it.</p></figcaption></figure>
+        <div className={styles.perspectiveNotes}><p><strong>The arrival</strong>A useful time to land, with the day ahead in mind.</p><p><strong>The connection</strong>The airport, the time between flights, and the energy it takes.</p><p><strong>The conditions</strong>What changes or cancellations would mean for the specific ticket.</p></div>
+        <p className={styles.imageCaption}>Cabin image for atmosphere. Your actual product is confirmed for the individual itinerary.</p>
       </section>
 
-      <section className={styles.method} aria-labelledby="method-title">
-        <div className={styles.inner}>
-          <div className={styles.methodHeading} data-reveal>
-            <p className={styles.eyebrow}>Derek's review</p>
-            <h2 id="method-title">Six lenses.<br /><span>One complete trip.</span></h2>
-            <p>A premium seat is one part of the decision. The journey around it deserves the same attention.</p>
-            <div className={styles.reviewPath} aria-label="Review sequence">
-              <span>Your brief</span><ArrowRight size={16} aria-hidden="true" />
-              <span>Derek's review</span><ArrowRight size={16} aria-hidden="true" />
-              <span>Your decision</span>
-            </div>
-          </div>
+      <section className={styles.relationship} aria-labelledby="conversation-title"><div className={styles.inner}>
+        <header data-reveal><p className={styles.eyebrow}>The working relationship</p><h2 id="conversation-title">One person to<br />bring the details to.</h2><p>Your priorities stay in the same conversation. The brief can be precise where it needs to be, and open where you still want advice.</p></header>
+        <div className={styles.relationshipDetails}>{conversationDetails.map((item) => <details key={item.title}><summary>{item.title}<ArrowRight size={17} aria-hidden="true" /></summary><p>{item.body}</p></details>)}<Link to="/services#review-framework">See how an itinerary is compared <ArrowUpRight size={17} aria-hidden="true" /></Link></div>
+      </div></section>
 
-          <ol className={styles.methodList}>
-            {evaluationItems.map((item) => (
-              <li key={item.number} data-reveal>
-                <span>{item.number}</span>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className={styles.decision} aria-labelledby="decision-title">
-        <div className={styles.inner}>
-          <header data-reveal>
-            <p className={styles.eyebrow}>Clear boundaries</p>
-            <h2 id="decision-title">You remain<br />in control.</h2>
-          </header>
-          <ol className={styles.decisionList}>
-            {decisionSteps.map((step) => (
-              <li key={step.number} data-reveal>
-                <span>{step.number}</span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <section className={styles.personalProcess} aria-labelledby="decision-title"><div className={styles.inner}>
+        <header><p className={styles.eyebrow}>From a first conversation</p><h2 id="decision-title">A clear way forward.</h2></header>
+        <ol>{decisionSteps.map((step) => <li key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}</ol>
+      </div></section>
 
       <section className={styles.final} aria-labelledby="about-final-title">
         <div className={styles.inner} data-reveal>

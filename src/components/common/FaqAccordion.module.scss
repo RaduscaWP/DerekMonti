@@ -1,0 +1,21 @@
+.item { min-width:0; }
+.summary {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:1rem;
+  width:100%;
+  min-height:72px;
+  padding:1rem 0;
+  list-style:none;
+  cursor:pointer;
+  text-align:left;
+}
+.summary::-webkit-details-marker { display:none; }
+.summary h3 { margin:0; overflow-wrap:break-word; line-height:1.6; }
+.summary svg { color:#8a194f; flex-shrink:0; transition:transform 180ms ease-out; }
+.summary:focus-visible { outline:3px solid #8a194f; outline-offset:4px; }
+.item[open]>.summary svg { transform:rotate(45deg); }
+.item p { font-size:1rem; line-height:1.75; overflow-wrap:break-word; }
+@media(prefers-reduced-motion:reduce) { .summary svg { transition:none; } }
+@media(forced-colors:active) { .summary svg { color:CanvasText; } .summary:focus-visible { outline-color:Highlight; } }

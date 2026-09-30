@@ -1,5 +1,6 @@
 import { blogPosts } from '../data/siteData.js';
 import { corePages } from '../data/corePages.js';
+import { articleVisuals } from '../data/editorialData.js';
 
 export const SITE_NAME = 'Fly with Derek';
 export const SITE_ORIGIN = 'https://www.flywithderek.com';
@@ -77,7 +78,7 @@ const articleRoutes = blogPosts.map((post) => ({
   title: `${post.title} | Fly with Derek`,
   description: post.excerpt,
   type: 'article',
-  image: post.image || DEFAULT_SOCIAL_IMAGE,
+  image: post.image || (articleVisuals[post.slug] ? `${SITE_ORIGIN}${articleVisuals[post.slug].image}` : DEFAULT_SOCIAL_IMAGE),
   publishedTime: post.publishedTime || post.date || null,
   priority: 0.7,
 }));

@@ -1,5 +1,13 @@
 # Fly with Derek — Redirect Map
 
+## 2026-09-30 verification update
+
+No existing canonical URL changed during this redesign. There is therefore no new one-to-one replacement requiring a 301. The five unsupported legacy article removals below remain 404 decisions; none redirects to an unrelated page or the homepage.
+
+The final local static build is checked for all 16 canonical 200 pages, the branded unknown-path 404, all five removed-article 404s and `/services/` → `/services` with 308 under the existing no-trailing-slash policy. Exact status/content-type evidence is stored in `output/playwright/2026-09-30-redesign/verification.json`. This does not verify the production host.
+
+## Historical decisions retained
+
 Status date: 2026-08-31  
 Canonical URL style: no trailing slash, except `https://www.flywithderek.com/`  
 Configured custom redirects in `vercel.json`: none

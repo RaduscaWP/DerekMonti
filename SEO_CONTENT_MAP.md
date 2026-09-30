@@ -1,5 +1,17 @@
 # Fly with Derek — SEO Content Map
 
+## 2026-09-30 update
+
+All 16 existing canonical routes and indexation flags are retained. The individual metadata/content rows below remain authoritative; no new keyword-targeted route was published. Existing breadcrumb, Service/WebPage/Article schema and preview noindex protection remain in place. No author or publication date was invented. Reading time still derives from article word count at 220 words per minute.
+
+Home now visibly links to all seven finished planning hubs through curated journeys, the discovery area and the itinerary desk. Article links preserve their slugs. Open Graph/Twitter images for the three articles match their visible London, illustrative cabin and New York images. New photography is descriptive, without airline or partnership claims.
+
+The future 35-page/keyword roadmap remains a quality-controlled editorial backlog. Owner-approved biography, article author/reviewer dates, route/airline facts and publishable fare examples are prerequisites where applicable; a template/data object alone does not approve publication.
+
+Local final-build crawler, metadata, sitemap, real-404 and no-JavaScript evidence is recorded in `QA_REPORT.md`. Production approval and deployment checks are not implied by local verification.
+
+## Existing page-by-page map
+
 Status date: 2026-08-31  
 Canonical host configured in code: `https://www.flywithderek.com`  
 URL convention: lowercase, hyphenated, no trailing slash except the root URL

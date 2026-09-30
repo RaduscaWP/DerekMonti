@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {
   addTripLeg, changeTripType, COMFORT_OPTIONS, createInitialTrip, localTodayIso,
   removeTripLeg, serializeTrip, submitTripRequest, validateTrip, validateTripStep, restoreTripProgress, safeTripProgress, fieldStep,
+  findAirportSuggestions, readTripProgress, TRIP_PROGRESS_STORAGE_KEY, LEGACY_TRIP_PROGRESS_STORAGE_KEY,
 } from '../src/components/homepage/tripState.js';
+import { buildQuoteMessage, getMailto, getWhatsappUrl } from '../src/utils/message.js';
 
 const dateOptions = { today: '2030-01-01' };
 function validTrip(overrides = {}) {
@@ -311,4 +313,76 @@ test('Services attribution and intent survive validation failure, recoverable fa
   assert.deepEqual(requests[0], requests[1]);
   assert.equal(requests[1].source, 'services');
   assert.equal(requests[1].serviceIntent, 'time_sensitive');
+});
+
+test('airport suggestions support city/code queries without restricting free-text itineraries', () => {
+  assert.deepEqual(findAirportSuggestions('L'), []);
+  assert.equal(findAirportSuggestions('lhr')[0].label, 'London LHR');
+  assert.equal(findAirportSuggestions(' New  York ')[0].code, 'JFK');
+  assert.equal(findAirportSuggestions('san francisco')[0].code, 'SFO');
+  assert.deepEqual(findAirportSuggestions('Airport not in the curated list'), []);
+  assert.deepEqual(findAirportSuggestions(null), []);
+  assert.ok(findAirportSuggestions('on').length <= 6);
+  assert.deepEqual(validateTrip(validTrip({ from: 'Eugene EUG', to: 'Brisbane BNE' }), dateOptions), {});
+});
+
+function memoryStorage(entries = {}) {
+  const values = new Map(Object.entries(entries));
+  return {
+    getItem: (key) => values.has(key) ? values.get(key) : null,
+    setItem: (key, value) => values.set(key, value),
+    removeItem: (key) => values.delete(key),
+  };
+}
+
+test('legacy August draft migrates only safe travel fields and erases its superseded record', () => {
+  const legacy = validTrip({ notes: 'Private medical request', phone: '+1 212 555 1234', serviceIntent: 'complex_itinerary', source: 'blog' });
+  legacy.promoCode = 'PRIVATE-REFERRAL';
+  legacy.selectedService = 'guidance_package';
+  legacy.companyWebsite = 'must not copy';
+  const storage = memoryStorage({ [LEGACY_TRIP_PROGRESS_STORAGE_KEY]: JSON.stringify(legacy) });
+  const migrated = readTripProgress(storage);
+  assert.equal(migrated.from, 'New York JFK');
+  assert.equal(migrated.serviceIntent, 'complex_itinerary');
+  assert.equal(migrated.source, 'blog');
+  assert.equal(storage.getItem(LEGACY_TRIP_PROGRESS_STORAGE_KEY), null);
+  assert.deepEqual(JSON.parse(storage.getItem(TRIP_PROGRESS_STORAGE_KEY)), migrated);
+  for (const key of ['fullName', 'email', 'phone', 'notes', 'privacyAcknowledged', 'promoCode', 'selectedService', 'companyWebsite']) {
+    assert.equal(key in migrated, false, key);
+  }
+});
+
+test('modern draft wins over legacy data and inaccessible or malformed storage is optional', () => {
+  const legacy = JSON.stringify(safeTripProgress(validTrip({ from: 'OLD' })));
+  const storage = memoryStorage({ [TRIP_PROGRESS_STORAGE_KEY]: JSON.stringify({ from: 'Current choice' }), [LEGACY_TRIP_PROGRESS_STORAGE_KEY]: legacy });
+  assert.deepEqual(readTripProgress(storage), { from: 'Current choice' });
+  assert.equal(storage.getItem(LEGACY_TRIP_PROGRESS_STORAGE_KEY), legacy);
+  const malformed = memoryStorage({ [TRIP_PROGRESS_STORAGE_KEY]: 'broken JSON', [LEGACY_TRIP_PROGRESS_STORAGE_KEY]: legacy });
+  assert.equal(readTripProgress(malformed), null);
+  assert.equal(malformed.getItem(LEGACY_TRIP_PROGRESS_STORAGE_KEY), legacy);
+  assert.equal(readTripProgress({ getItem() { throw new Error('Storage denied'); } }), null);
+  for (const value of ['[]', '42', 'null', 'broken JSON']) {
+    assert.equal(readTripProgress(memoryStorage({ [LEGACY_TRIP_PROGRESS_STORAGE_KEY]: value })), null);
+  }
+});
+
+test('failed multi-city submission offers complete recovery messages while retaining its state', async () => {
+  const trip = validTrip({ tripType: 'multi_city', comfort: 'work', source: 'blog', serviceIntent: 'complex_itinerary', notes: 'Keep the second line.\nNo airport change.', legs: [
+    { from: 'New York JFK', to: 'London LHR', departure: '2030-05-01' },
+    { from: 'London LHR', to: 'Paris CDG', departure: '2030-05-05' },
+  ] });
+  const snapshot = structuredClone(trip);
+  await assert.rejects(submitTripRequest(trip, { ...dateOptions, fetchImpl: async () => mockResponse({ error: 'Delivery unavailable' }, false) }), /Delivery unavailable/);
+  const fields = serializeTrip(trip);
+  const message = buildQuoteMessage(fields);
+  assert.ok(message.includes('Source: blog'));
+  assert.ok(message.includes('Flight 1: New York JFK to London LHR'));
+  assert.ok(message.includes('Flight 2: London LHR to Paris CDG'));
+  assert.ok(message.includes('Comfort preference: Ready to work'));
+  assert.ok(message.includes('Travel situation: Several connected stops'));
+  assert.ok(message.includes('Email: alex@example.com'));
+  assert.ok(message.endsWith(`Notes: ${trip.notes}`));
+  assert.equal(new URL(getMailto(fields)).searchParams.get('body'), message);
+  assert.equal(new URL(getWhatsappUrl(fields)).searchParams.get('text'), message);
+  assert.deepEqual(trip, snapshot);
 });

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { createInitialTrip, mergeRestoredTrip, safeTripProgress, TRIP_PROGRESS_STORAGE_KEY } from '../components/homepage/tripState.js';
+import { createInitialTrip, mergeRestoredTrip, readTripProgress, safeTripProgress, TRIP_PROGRESS_STORAGE_KEY, LEGACY_TRIP_PROGRESS_STORAGE_KEY } from '../components/homepage/tripState.js';
 import { SERVICE_INTENT_OPTIONS, CONVERSION_SOURCES } from '../utils/quoteRequest.js';
 
 const TripBriefContext = createContext(null);
@@ -27,7 +27,7 @@ export function TripBriefProvider({ children }) {
     if (restored.current) return;
     restored.current = true;
     try {
-      const stored = JSON.parse(window.sessionStorage.getItem(TRIP_PROGRESS_STORAGE_KEY) || 'null');
+      const stored = readTripProgress(window.sessionStorage);
       const next = mergeRestoredTrip(current.current, stored, dirty.current);
       current.current = next;
       commitTrip(next);
@@ -61,7 +61,10 @@ export function TripBriefProvider({ children }) {
     current.current = next;
     commitTrip(next);
     setStep(0);
-    try { window.sessionStorage.removeItem(TRIP_PROGRESS_STORAGE_KEY); } catch { /* Optional storage. */ }
+    try {
+      window.sessionStorage.removeItem(TRIP_PROGRESS_STORAGE_KEY);
+      window.sessionStorage.removeItem(LEGACY_TRIP_PROGRESS_STORAGE_KEY);
+    } catch { /* Optional storage. */ }
   }, []);
 
   const startNewRequest = useCallback(() => {
@@ -71,7 +74,10 @@ export function TripBriefProvider({ children }) {
     current.current = next;
     commitTrip(next);
     setStep(0);
-    try { window.sessionStorage.removeItem(TRIP_PROGRESS_STORAGE_KEY); } catch { /* Optional storage. */ }
+    try {
+      window.sessionStorage.removeItem(TRIP_PROGRESS_STORAGE_KEY);
+      window.sessionStorage.removeItem(LEGACY_TRIP_PROGRESS_STORAGE_KEY);
+    } catch { /* Optional storage. */ }
   }, []);
 
   return <TripBriefContext.Provider value={{ trip, step, setStep, setTrip, updateTrip: setTrip, selectServiceIntent, markConversionSource, clearConfirmedDraft, startNewRequest }}>{children}</TripBriefContext.Provider>;

@@ -1,5 +1,24 @@
 # Fly with Derek — Content and Source Log
 
+## 2026-09-30 editorial media and factual boundaries
+
+The destination images were downloaded from individual Unsplash photo pages, visually inspected and served locally as WebP. Their source pages state free use under the [Unsplash License](https://unsplash.com/license). No Unsplash+ asset is used. The machine-readable manifest records each source URL, photographer, delivered image URL, retrieval date and file size in `public/images/editorial/sources.json`.
+
+| Local asset | Photographer | Primary source |
+|---|---|---|
+| `/images/editorial/london.webp` | Ziyao Xiong | https://unsplash.com/photos/big-ben-and-river-thames-with-boats-at-sunset-hnQVv9cnZp8 |
+| `/images/editorial/tokyo.webp` | Tim Marshall | https://unsplash.com/photos/city-skyline-during-night-time--e8dPjbn_lE |
+| `/images/editorial/rome.webp` | Cheng Lin | https://unsplash.com/photos/two-people-watch-the-sunset-over-rome-0bArovre6cQ |
+| `/images/editorial/new-york.webp` | Pavol Duracka | https://unsplash.com/photos/new-york-city-skyline-on-a-cloudy-day-bvmZDUoLeuM |
+
+These images illustrate destinations. The selected route pairs are planning inputs, not evidence of a flight, fare, schedule, saving or current availability.
+
+Inherited production images are not newly sourced here: Derek's supplied portraits remain repository-provided material; the generated comfort-seat illustrations remain explicitly labeled illustrative; the protected hero remains the existing generated cabin plate/Mixkit-window composite. The existing provenance records are `prototype/homepage/asset-sources.md` and `prototype/homepage/hero-media.md`. They cover the inherited masters, fonts and video. Owner approval/portrait rights are not independently established by this implementation.
+
+The local airport list supplies typing suggestions and city/IATA labels only. It makes no route, flight, terminal, fare or airline-product claim. Free text remains accepted. Article authors, dates, testimonials, ratings, business affiliations, operational response times and prices remain omitted unless verified separately. Existing legal wording was not expanded.
+
+## Historical claim register
+
 Status date: 2026-08-31  
 Maintainer: unassigned; owner must designate a content/factual reviewer  
 Purpose: track the origin, approval, review date, and expiry of business, route, airport, airline, product, fare-rule, legal, and other changing claims

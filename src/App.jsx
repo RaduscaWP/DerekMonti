@@ -15,6 +15,7 @@ import { corePages } from './data/corePages.js';
 import { TripBriefProvider } from './context/TripBriefProvider.jsx';
 import { MotionPreferenceProvider } from './context/MotionPreferenceProvider.jsx';
 import SeoHead from './seo/SeoHead.jsx';
+import RouteErrorBoundary from './components/common/RouteErrorBoundary.jsx';
 
 function RouteFocus() {
   const { pathname, hash, key } = useLocation();
@@ -58,13 +59,18 @@ function SiteAnalytics() {
   return isLocalPreview ? null : <Analytics />;
 }
 
+function PageBoundary({ children }) {
+  const { pathname } = useLocation();
+  return <RouteErrorBoundary key={pathname}>{children}</RouteErrorBoundary>;
+}
+
 export default function App() {
   return (
     <TripBriefProvider><MotionPreferenceProvider>
       <SeoHead />
       <Layout>
         <RouteFocus />
-        <Routes>
+        <PageBoundary><Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
           <Route path="/about" element={<About />} />
@@ -76,7 +82,7 @@ export default function App() {
             <Route path={page.path} element={<CoreLanding page={page} />} key={page.path} />
           ))}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+        </Routes></PageBoundary>
       </Layout>
       <SiteAnalytics />
     </MotionPreferenceProvider></TripBriefProvider>

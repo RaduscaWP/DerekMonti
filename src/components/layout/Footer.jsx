@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { contactConfig } from '../../data/siteData.js';
 import { primaryNavigation, planningNavigation } from '../../data/siteNavigation.js';
 import { useMotionPreference } from '../../context/MotionPreferenceProvider.jsx';
+import styles from './Footer.module.scss';
 
 export default function Footer() {
   const { reduced, systemReduced, setQuietMotion } = useMotionPreference();
-  return <footer className="site-footer"><div className="section-wrap">
+  return <footer className={`site-footer ${styles.footer}`}><div className="section-wrap">
     <div className="footer-main">
       <div className="footer-brand"><Link className="brand brand--light" to="/">Fly with <strong>Derek</strong></Link><p>Business & first class.<br />Personally arranged.</p></div>
       <nav aria-label="Footer navigation"><span className="footer-label">Explore</span>{primaryNavigation.map(({ label, to }) => <Link key={to} to={to}>{label}</Link>)}</nav>

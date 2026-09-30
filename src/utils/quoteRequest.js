@@ -35,7 +35,7 @@ export const SERVICE_INTENT_OPTIONS = [
   { value: 'time_sensitive', label: 'Departure is close' },
   { value: 'personal_advisor', label: 'Personal flight advisor' },
 ];
-export const CONVERSION_SOURCES = ['homepage', 'services'];
+export const CONVERSION_SOURCES = ['homepage', 'services', 'blog'];
 export function getServiceIntentLabel(value) {
   return optionLabel(SERVICE_INTENT_OPTIONS, value, 'Not specified');
 }
