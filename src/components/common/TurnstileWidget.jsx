@@ -10,24 +10,25 @@ function loadScript() {
 
   scriptPromise = new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src^="${TURNSTILE_SRC.split('?')[0]}"]`);
-    if (existing) {
-      existing.addEventListener('load', () => resolve(window.turnstile));
-      existing.addEventListener('error', () => reject(new Error('turnstile script failed to load')));
-      return;
-    }
-    const script = document.createElement('script');
+    const script = existing || document.createElement('script');
+    let timer;
+    const cleanup = () => { clearTimeout(timer); script.removeEventListener('load', loaded); script.removeEventListener('error', failed); };
+    const failed = () => { cleanup(); script.remove(); reject(new Error('turnstile script unavailable')); };
+    const loaded = () => { if (!window.turnstile) return failed(); cleanup(); resolve(window.turnstile); };
+    script.addEventListener('load', loaded);
+    script.addEventListener('error', failed);
+    timer = setTimeout(failed, 8000);
+    if (existing) return;
     script.src = TURNSTILE_SRC;
     script.async = true;
     script.defer = true;
-    script.addEventListener('load', () => resolve(window.turnstile));
-    script.addEventListener('error', () => reject(new Error('turnstile script failed to load')));
     document.head.appendChild(script);
-  });
+  }).catch((error) => { scriptPromise = null; throw error; });
 
   return scriptPromise;
 }
 
-export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, registerReset, className = '', size = 'normal' }) {
+export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, registerReset, className = '', size = 'normal', language = 'en' }) {
   const hostRef = useRef(null);
   const widgetIdRef = useRef(null);
   const callbacksRef = useRef({ onToken, onExpire, onError });
@@ -45,6 +46,8 @@ export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, r
         widgetId = turnstile.render(hostRef.current, {
           sitekey: siteKey,
           size,
+          action: 'quote_request',
+          language,
           callback: (token) => callbacksRef.current.onToken?.(token),
           'expired-callback': () => callbacksRef.current.onExpire?.(),
           'error-callback': () => callbacksRef.current.onError?.(),
@@ -74,8 +77,9 @@ export default function TurnstileWidget({ siteKey, onToken, onExpire, onError, r
         }
       }
       widgetIdRef.current = null;
+      registerReset?.(null);
     };
-  }, [siteKey, registerReset, size]);
+  }, [siteKey, registerReset, size, language]);
 
   if (!siteKey) return null;
 

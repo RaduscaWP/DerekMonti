@@ -1,6 +1,9 @@
 import { blogPosts } from '../data/siteData.js';
 import { corePages } from '../data/corePages.js';
 import { articleVisuals } from '../data/editorialData.js';
+import { contentRoutes, contentEntityForPath, localeDetails, localeFromPath } from '../i18n/locales.js';
+import { seoTranslations } from '../i18n/seoCopy.js';
+import { localizedIndexingApproved, localizedReviewStatus } from '../i18n/reviewStatus.js';
 
 export const SITE_NAME = 'Fly with Derek';
 export const SITE_ORIGIN = 'https://www.flywithderek.com';
@@ -94,6 +97,8 @@ const p0LandingRoutes = corePages.map((page) => ({
 }));
 
 function finalizeRoute(route) {
+  const locale = route.locale || 'en';
+  const contentEntity = contentEntityForPath(route.pathname);
   return Object.freeze({
     image: DEFAULT_SOCIAL_IMAGE,
     ...route,
@@ -101,14 +106,45 @@ function finalizeRoute(route) {
     image: route.image || DEFAULT_SOCIAL_IMAGE,
     pathname: normalizePathname(route.pathname),
     canonical: canonicalUrl(route.pathname),
+    locale,
+    openGraphLocale: localeDetails(locale).openGraph,
+    contentId: contentEntity?.id || route.contentId || route.pathname,
+    reviewStatus: locale === 'en' ? 'approved-source' : localizedReviewStatus,
   });
 }
 
 // Add future P0 landing pages to coreRoutes. Blog articles are derived from the
 // existing content source so routing, metadata, prerendering, and the sitemap stay aligned.
-export const routeManifest = Object.freeze(
-  [...coreRoutes, ...p0LandingRoutes, ...articleRoutes].map(finalizeRoute),
-);
+const englishRoutes = [...coreRoutes, ...p0LandingRoutes, ...articleRoutes].map(finalizeRoute);
+const localizedRoutes = contentRoutes.flatMap((entity) => {
+  const source = englishRoutes.find((route) => route.pathname === entity.paths.en);
+  return ['ro', 'ru', 'de'].map((locale) => finalizeRoute({
+    ...source,
+    ...seoTranslations[locale][entity.id],
+    pathname: entity.paths[locale],
+    locale,
+    contentId: entity.id,
+    indexable: localizedIndexingApproved,
+  }));
+});
+
+const initialRoutes = [...englishRoutes, ...localizedRoutes];
+export function withLanguageAlternates(routes) {
+  return Object.freeze(routes.map((route) => {
+    const equivalents = routes.filter((candidate) => (
+      candidate.contentId === route.contentId && candidate.indexable
+    ));
+    const englishEquivalent = equivalents.find((candidate) => candidate.locale === 'en');
+    const alternates = route.indexable && equivalents.length > 1 && englishEquivalent
+      ? [
+        ...equivalents.map((candidate) => ({ language: candidate.locale, href: candidate.canonical })),
+        { language: 'x-default', href: englishEquivalent.canonical },
+      ]
+      : [];
+    return Object.freeze({ ...route, alternates: Object.freeze(alternates) });
+  }));
+}
+export const routeManifest = withLanguageAlternates(initialRoutes);
 
 export const notFoundMetadata = Object.freeze({
   pathname: '/404',
@@ -118,13 +154,22 @@ export const notFoundMetadata = Object.freeze({
   image: DEFAULT_SOCIAL_IMAGE,
   canonical: null,
   indexable: false,
+  locale: 'en',
+  openGraphLocale: 'en_US',
+  alternates: [],
 });
 
 const routeByPathname = new Map(routeManifest.map((route) => [route.pathname, route]));
 
 export function getRouteMetadata(urlOrPathname) {
   const url = new URL(urlOrPathname || '/', SITE_ORIGIN);
-  return routeByPathname.get(normalizePathname(url.pathname)) || notFoundMetadata;
+  const route = routeByPathname.get(normalizePathname(url.pathname));
+  if (route) return route;
+  const locale = localeFromPath(url.pathname);
+  return locale === 'en' ? notFoundMetadata : {
+    ...notFoundMetadata, ...seoTranslations[locale].notFound,
+    locale, openGraphLocale: localeDetails(locale).openGraph,
+  };
 }
 
 export function routeOutputPath(pathname) {

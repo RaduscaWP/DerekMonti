@@ -1,10 +1,11 @@
 // SECURITY: RESEND_API_KEY is server-only. Never expose it to the client.
 // Use .env for local development and Vercel Sensitive Environment Variables in production.
 
-import { Resend } from 'resend';
 import { ensureEnv } from './_loadEnv.js';
-import { renderTicketHtml, renderTicketSubject, generateReference, todayFormatted } from './_emailTemplate.js';
-import { checkRateLimit, verifyTurnstile } from './_security.js';
+import { renderTicketHtml, generateReference } from './_emailTemplate.js';
+import { checkRateLimit, checkRequestContext, getRedis, isPublicDeployment, verifyTurnstile } from './_security.js';
+import { createRequestRegistry, PROVIDER_RETRY_WINDOW_MS, VALID_REQUEST_ID } from './_requestRegistry.js';
+import { confirmationEmail, sendEmail } from './_sendEmail.js';
 import {
   CABIN_OPTIONS,
   CONTACT_PREFERENCE_OPTIONS,
@@ -25,19 +26,9 @@ import {
 } from '../src/utils/quoteRequest.js';
 
 const DEREK_EMAIL = 'Derek@travelbusinessclass.com';
-const FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || 'Derek Monti <onboarding@resend.dev>';
 const MAX_BODY_BYTES = 12 * 1024;
 const MAX_FORM_AGE_MS = 24 * 60 * 60 * 1000;
 const MIN_FORM_AGE_MS = 800;
-
-function sanitizeLogError(error) {
-  if (!error) return { category: 'email-service-error' };
-  return {
-    name: error.name,
-    code: error.code,
-    statusCode: error.statusCode,
-  };
-}
 
 function cleanText(value, max, { multiline = false } = {}) {
   let text = String(value ?? '')
@@ -220,13 +211,28 @@ async function readJsonBody(req) {
 }
 
 export default async function handler(req, res) {
+  res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (process.env.NODE_ENV === 'production' && !(await checkRateLimit(req))) {
-    return res.status(429).json({ error: 'Too many requests. Please try again in a few minutes.' });
+  const context = checkRequestContext(req);
+  if (!context.ok) return res.status(context.status).json({ error: 'This request could not be accepted. Submit the form from this website.', code: context.code });
+
+  const unavailable = (code = 'INTAKE_UNAVAILABLE') => {
+    res.setHeader('Retry-After', '60');
+    return res.status(503).json({ error: 'Automatic requests are temporarily unavailable. Your entries are kept. Try again later or contact Derek directly.', code, retryAfter: 60 });
+  };
+  const limited = (retryAfter) => {
+    res.setHeader('Retry-After', String(retryAfter));
+    return res.status(429).json({ error: 'Please wait before trying again. Your entries are kept; you can contact Derek directly.', code: 'RATE_LIMITED', retryAfter });
+  };
+  const redis = getRedis();
+  if (isPublicDeployment()) {
+    const admission = await checkRateLimit(req, { redis });
+    if (!admission.available) return unavailable();
+    if (!admission.ok) return limited(admission.retryAfter);
   }
 
   let rawFields;
@@ -237,11 +243,11 @@ export default async function handler(req, res) {
     return res.status(status).json({ error: status === 413 ? 'Request is too large.' : 'Invalid request payload.' });
   }
 
-  const fields = normalizeFields(rawFields || {});
-  const meta = { reference: generateReference(), issued: todayFormatted(), submittedAt: new Date().toISOString() };
+  if (!rawFields || typeof rawFields !== 'object' || Array.isArray(rawFields)) return res.status(400).json({ error: 'Invalid request payload.', code: 'INVALID_PAYLOAD' });
+  const fields = normalizeFields(rawFields);
 
   if (fields.companyWebsite) {
-    return res.status(200).json({ ok: true, reference: meta.reference });
+    return res.status(200).json({ ok: true, reference: generateReference() });
   }
 
   if (!formTimingIsValid(fields.formStartedAt)) {
@@ -260,11 +266,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Review the highlighted fields.', fieldErrors });
   }
 
+  const requestId = rawFields.requestId;
+  const requestCreatedAt = Number(rawFields.requestCreatedAt);
+  const requestAge = Date.now() - requestCreatedAt;
+  if (typeof requestId !== 'string' || !VALID_REQUEST_ID.test(requestId) || !Number.isFinite(requestCreatedAt) || requestAge < -60_000 || requestAge >= PROVIDER_RETRY_WINDOW_MS) {
+    return res.status(400).json({ error: 'This request attempt cannot be retried safely. Your entries are kept. Contact Derek directly about the earlier attempt.', code: 'REQUEST_ID_INVALID' });
+  }
+
   const turnstileResult = await verifyTurnstile(rawFields?.turnstileToken, req);
   if (!turnstileResult.ok) {
-    console.warn('[api/quote] turnstile rejected:', turnstileResult.reason);
+    if (turnstileResult.unavailable) return unavailable('VERIFICATION_UNAVAILABLE');
     return res.status(400).json({
-      error: 'Human verification could not be completed. Reload the page and try again.',
+      error: 'Human verification could not be completed. Retry the verification or contact Derek directly.',
+      code: 'VERIFICATION_FAILED',
       fieldErrors: { turnstile: 'Complete the human-verification challenge again.' },
     });
   }
@@ -272,60 +286,60 @@ export default async function handler(req, res) {
   ensureEnv();
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error('[api/quote] transactional email is not configured');
-    return res.status(500).json({
-      error: 'Email delivery is unavailable right now. Use WhatsApp or email Derek directly.',
-    });
+    return unavailable();
   }
 
-  const resend = new Resend(apiKey);
-  const subject = renderTicketSubject(fields, meta);
+  const registry = createRequestRegistry(redis);
+  let claim;
+  try { claim = await registry.claim(requestId.toLowerCase(), fields); }
+  catch { return unavailable(); }
+  if (claim.status === 'conflict') return res.status(409).json({ error: 'This request identity was already used with different details. Your entries are kept. Contact Derek about the earlier attempt.', code: 'REQUEST_CONFLICT' });
+  if (claim.status === 'expired') return res.status(409).json({ error: 'Receipt of the earlier request is still unconfirmed and its safe retry window has ended. Contact Derek directly; your entries are kept.', code: 'RETRY_WINDOW_EXPIRED' });
+  if (claim.status === 'busy') {
+    res.setHeader('Retry-After', '60');
+    return res.status(409).json({ error: 'The earlier attempt is still being processed. Keep this page open and retry in a minute, or contact Derek directly.', code: 'REQUEST_IN_PROGRESS', retryAfter: 60 });
+  }
+  const receipt = (confirmationSent) => res.status(200).json({ ok: true, reference: claim.record.reference, confirmationSent });
+  if (claim.status === 'received') return receipt(claim.record.confirmationSent === true);
+
+  const release = async (changes) => { try { await registry.update(claim, { ...changes, leaseUntil: 0 }); } catch { /* Keep the claim until its bounded lease expires. */ } };
+  if (isPublicDeployment()) {
+    const budget = await checkRateLimit(req, { redis, recipient: fields.email });
+    if (!budget.available || !budget.ok) {
+      await release({});
+      return budget.available ? limited(budget.retryAfter) : unavailable();
+    }
+  }
+  const meta = claim.record;
+  const from = process.env.MAIL_FROM_ADDRESS || 'Derek Monti <onboarding@resend.dev>';
   const html = renderTicketHtml(fields, meta);
   const plain = buildPlainSummary(fields, meta);
   const route = routeSummary(fields);
 
-  let derekResult;
-  try {
-    derekResult = await resend.emails.send({
-      from: FROM_ADDRESS,
+  const derekResult = await sendEmail({
+      from,
       to: [DEREK_EMAIL],
-      replyTo: fields.email,
+      reply_to: fields.email,
       subject: `[NEW QUOTE] ${meta.reference} - ${route.from} to ${route.to}`,
       html,
       text: plain,
-    });
-  } catch (error) {
-    console.error('Advisor notification failed:', sanitizeLogError(error));
+    }, `quote-advisor/${requestId.toLowerCase()}`);
+  if (derekResult.outcome !== 'accepted') {
+    await release({ advisorState: derekResult.outcome });
     return res.status(502).json({
-      error: 'The request could not be delivered. Your entries have been kept; please try again or contact Derek directly.',
+      error: derekResult.outcome === 'unknown'
+        ? 'Receipt could not be confirmed. Your entries are kept. Retry this same request later or contact Derek about the earlier attempt.'
+        : 'The email service declined the request. Your entries are kept. Try again later or contact Derek directly.',
+      code: derekResult.outcome === 'unknown' ? 'DELIVERY_UNCONFIRMED' : 'DELIVERY_REJECTED',
     });
   }
-
-  if (derekResult.error) {
-    console.error('Advisor notification failed:', sanitizeLogError(derekResult.error));
-    return res.status(502).json({
-      error: 'The request could not be delivered. Your entries have been kept; please try again or contact Derek directly.',
-    });
-  }
-
-  let confirmationSent = true;
+  // Persist acceptance before a second side effect. Receipt means provider acceptance,
+  // not delivery into an inbox. No retry of this receipt resends the advisor message.
   try {
-    const customerResult = await resend.emails.send({
-      from: FROM_ADDRESS,
-      to: [fields.email],
-      replyTo: DEREK_EMAIL,
-      subject,
-      html,
-      text: plain,
-    });
-    if (customerResult.error) {
-      confirmationSent = false;
-      console.error('Customer confirmation failed:', sanitizeLogError(customerResult.error));
-    }
-  } catch (error) {
-    confirmationSent = false;
-    console.error('Customer confirmation failed:', sanitizeLogError(error));
-  }
-
-  return res.status(200).json({ ok: true, reference: meta.reference, confirmationSent });
+    await registry.update(claim, { advisorState: 'accepted' });
+  } catch { return receipt(false); }
+  const customerResult = await sendEmail(confirmationEmail(meta.reference, from, DEREK_EMAIL, fields.email), `quote-confirmation/${requestId.toLowerCase()}`);
+  const confirmationSent = customerResult.outcome === 'accepted';
+  await release({ advisorState: 'accepted', confirmationSent });
+  return receipt(confirmationSent);
 }

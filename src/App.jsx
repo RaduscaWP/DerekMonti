@@ -16,6 +16,9 @@ import { TripBriefProvider } from './context/TripBriefProvider.jsx';
 import { MotionPreferenceProvider } from './context/MotionPreferenceProvider.jsx';
 import SeoHead from './seo/SeoHead.jsx';
 import RouteErrorBoundary from './components/common/RouteErrorBoundary.jsx';
+import { contentRoutes } from './i18n/locales.js';
+
+const localizedPageComponents = { home: Home, services: Services, about: About, privacy: Privacy, terms: Terms };
 
 function RouteFocus() {
   const { pathname, hash, key } = useLocation();
@@ -81,6 +84,10 @@ export default function App() {
           {corePages.map((page) => (
             <Route path={page.path} element={<CoreLanding page={page} />} key={page.path} />
           ))}
+          {contentRoutes.flatMap((entity) => ['ro', 'ru', 'de'].map((locale) => {
+            const Page = localizedPageComponents[entity.id];
+            return <Route path={entity.paths[locale]} element={<Page />} key={entity.paths[locale]} />;
+          }))}
           <Route path="*" element={<NotFound />} />
         </Routes></PageBoundary>
       </Layout>

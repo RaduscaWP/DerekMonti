@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SITE_NAME, getRouteMetadata } from './routeManifest.js';
+import { localeDetails } from '../i18n/locales.js';
 import {
   DEPLOYMENT_NOINDEX_META_NAME,
   isMetadataIndexable,
@@ -27,11 +28,12 @@ export default function SeoHead() {
     );
     const indexable = isMetadataIndexable(metadata, deploymentNoindex);
     document.title = metadata.title;
+    document.documentElement.lang = metadata.locale || 'en';
 
     setMeta('name', 'description', metadata.description);
     setMeta('name', 'robots', indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow');
     setMeta('property', 'og:site_name', SITE_NAME);
-    setMeta('property', 'og:locale', 'en_US');
+    setMeta('property', 'og:locale', metadata.openGraphLocale || 'en_US');
     setMeta('property', 'og:type', metadata.type === 'article' ? 'article' : 'website');
     setMeta('property', 'og:title', metadata.title);
     setMeta('property', 'og:description', metadata.description);
@@ -52,6 +54,26 @@ export default function SeoHead() {
       canonical.setAttribute('href', metadata.canonical);
     } else {
       canonical?.remove();
+    }
+
+    // Navigation can leave an equivalent cluster. Clear its annotations first
+    // so an English article never inherits another page's language alternates.
+    document.head.querySelectorAll('link[rel="alternate"][hreflang], meta[property="og:locale:alternate"]')
+      .forEach((element) => element.remove());
+    if (indexable) {
+      for (const { language, href } of metadata.alternates || []) {
+        const alternate = document.createElement('link');
+        alternate.rel = 'alternate';
+        alternate.hreflang = language;
+        alternate.href = href;
+        document.head.appendChild(alternate);
+        if (language !== metadata.locale && language !== 'x-default') {
+          const alternateLocale = document.createElement('meta');
+          alternateLocale.setAttribute('property', 'og:locale:alternate');
+          alternateLocale.content = localeDetails(language).openGraph;
+          document.head.appendChild(alternateLocale);
+        }
+      }
     }
 
     let structuredData = document.getElementById('page-structured-data');

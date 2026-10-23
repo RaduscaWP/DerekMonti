@@ -1,0 +1,15 @@
+{
+  "mode": "redis-expiry",
+  "syntheticProvidersOnly": true,
+  "simulatedRedisExpiryFailure": true,
+  "results": [
+    true,
+    true,
+    true,
+    false
+  ],
+  "acceptedAfterWindowElapsed": false,
+  "expireAttempts": 1,
+  "redisCount": 5,
+  "realNetworkCalls": 0
+}

@@ -1,0 +1,342 @@
+[
+  {
+    "path": "scripts\\validate-prerender.mjs",
+    "sha256": "98F7FE3828EFA1F6A4E4CBAF4AD4954185A39B46B849643777F75437C18DAC18"
+  },
+  {
+    "path": "scripts\\serve-prerender.mjs",
+    "sha256": "6276188835C6A46F0118CE233544CD5E0A52E6AD491131C69DA33978D34C3044"
+  },
+  {
+    "path": "scripts\\serve-homepage-qa.mjs",
+    "sha256": "8264302052BE120410564368ADA74B834D818429EF14F2808651BDB8D2FB63E5"
+  },
+  {
+    "path": "scripts\\prerender.mjs",
+    "sha256": "CEF6A1315A480A470DCD0EFD89876E865C77D57FF0D7F0C921FDFB7BCC57331F"
+  },
+  {
+    "path": "api\\quote.js",
+    "sha256": "CB5B8DB1C8012B9C3456AD6FD00DBCDF8D06E1C50BFB0A61BDF16A3B8FAF1536"
+  },
+  {
+    "path": "api\\_emailTemplate.js",
+    "sha256": "6586903BFB5DF7DBB5906093695F2867C424B4B472DBA9C05224B6A539A39F56"
+  },
+  {
+    "path": "api\\_security.js",
+    "sha256": "A9D492D3D4E1F0E8DA3FDC8EF349E361119FB0C440770B94BCAC266EBDCBB311"
+  },
+  {
+    "path": "api\\_loadEnv.js",
+    "sha256": "2A3F04FAE20DDA786E3289A5CE647B13450B4C51D0A327FD80363D975ABE5D32"
+  },
+  {
+    "path": "api\\_iataLookup.js",
+    "sha256": "F8D0E412F467F3A98F2BDCFA2682839BF520EFF3B956161E96A04D0559C7C572"
+  },
+  {
+    "path": "tests\\seo-deployment.test.mjs",
+    "sha256": "D57271DD65B14D9080199CF6BFC8D9FD8182CBB15610705AD25630D0DB3145EE"
+  },
+  {
+    "path": "tests\\quote-contract.test.mjs",
+    "sha256": "859AB14215BF33DD1202965A724050609AEED46402BFD31DF92EDC47B724CDF0"
+  },
+  {
+    "path": "tests\\homepage-trip.test.mjs",
+    "sha256": "B3EEABE25874547D6649A7C54F3A2D8A6EFA1BF25B9C525D7308C841C25ECB56"
+  },
+  {
+    "path": "src\\App.jsx",
+    "sha256": "C16543F78BEE3020512A94A3B6BD409F581426B408A0C025BDA84F5F3EB1DB37"
+  },
+  {
+    "path": "src\\main.jsx",
+    "sha256": "FAC1562811A9BBE81A93A1E82C1B8C001362F84C5C5BF96F674AAAEB260DB3E0"
+  },
+  {
+    "path": "src\\utils\\threeParticles.js",
+    "sha256": "62FD38BCE0C1FF9B1BF431810B85FB4AD4633B2B3C6C3B87DE6A213451A86DA5"
+  },
+  {
+    "path": "src\\utils\\quoteRequest.js",
+    "sha256": "EC2F20E03E48188EDE6905E91DB7FB9CB172CCF5266768142C5D7927B0006C56"
+  },
+  {
+    "path": "src\\utils\\message.js",
+    "sha256": "5A4589159BAA5F6756340767CF47EE4E77540AF24D579B2E675423869080C436"
+  },
+  {
+    "path": "src\\utils\\analytics.js",
+    "sha256": "4A0B57ECD5D18A6957274342498A59A3AFEB0579D3609F533DE5BE20470B70E1"
+  },
+  {
+    "path": "src\\context\\MotionPreferenceProvider.jsx",
+    "sha256": "1C3C496D64CD43B0E305317FCCBC45E50FB5964232C07C7E8E17093D28DF267D"
+  },
+  {
+    "path": "src\\context\\TripBriefProvider.jsx",
+    "sha256": "2EC3C54BF66A0E7B4C14DEDCE48FBE2C7A808E5628BD53C88BACEE623A51D033"
+  },
+  {
+    "path": "src\\entry-server.jsx",
+    "sha256": "2C804D4E2F8560F7071C1DA01A867FEC5A93D7FD9007A8D7AFF6E245301A7445"
+  },
+  {
+    "path": "src\\styles\\_variables.scss",
+    "sha256": "C44D5660D1F1236A7527FD7E6CFA89CCC1DE4CE3DFC2AFF6B92D4842B966D2FC"
+  },
+  {
+    "path": "src\\styles\\_reset.scss",
+    "sha256": "97DD2058DFB13ABC49697BB5BFB3E78B12C1CB46DA774223170F34A99B73808D"
+  },
+  {
+    "path": "src\\styles\\_mixins.scss",
+    "sha256": "F901197AA281D79B841D443F3D7F2DED1A9CE530A788B23A6C30C7063695A733"
+  },
+  {
+    "path": "src\\styles\\_legacy.scss",
+    "sha256": "1D80047096B7408AADE15DCE5589A4F72A03CA48123928DDC4ABF34FABA2E271"
+  },
+  {
+    "path": "src\\styles\\restoration.scss",
+    "sha256": "21DB9CBB79A6641407371BA62DCAB0D6C52FBFFC997A433CC303D1DB1AA35D0F"
+  },
+  {
+    "path": "src\\styles\\global.scss",
+    "sha256": "48492E1D508466BC14A3813724CE27005EF6CC3579C4093C05B762D6F8A1F0B8"
+  },
+  {
+    "path": "src\\seo\\SeoHead.jsx",
+    "sha256": "EFEE2554F5841DBE6C36178ABC3A92F0D46B96345B38FFB9724D4D8C1F4C7753"
+  },
+  {
+    "path": "src\\seo\\routeManifest.js",
+    "sha256": "E90129B49CA5CE64FD74EDDC13C3FE33A8DF0F0F1F2D91760D0E3F9B6AAC2604"
+  },
+  {
+    "path": "src\\seo\\head.js",
+    "sha256": "C5A1D785FF8796C52984A0E844AF247ECF75B733A9CC7E00D2F4A09A42BF3124"
+  },
+  {
+    "path": "src\\seo\\deployment.js",
+    "sha256": "4E9528665424ADA0B7CB206EA7B813E2D0E8294CEBBEA1269E78C60DC52851B5"
+  },
+  {
+    "path": "src\\data\\siteNavigation.js",
+    "sha256": "ED1DA4BA9392322154D7E0F251086FF5C2C1D2FB89BE17608327BD6BD4563196"
+  },
+  {
+    "path": "src\\components\\layout\\AnnouncementBar.jsx",
+    "sha256": "6A3CC37D813FD9795B9B9F4F764E094532A1DE1A08DFAC1AEB7A8F7AE362DAF6"
+  },
+  {
+    "path": "src\\components\\layout\\Footer.jsx",
+    "sha256": "1C0435BC8EF2F7BEFD3292EEBD63DFD191BC44F4390E3254B76BDA202A250CEA"
+  },
+  {
+    "path": "src\\components\\layout\\Footer.module.scss",
+    "sha256": "B01FC0967D8FFE403354B58187DCB970A99AD9D234C5FDA2585074552DC38733"
+  },
+  {
+    "path": "src\\pages\\BlogArticle.jsx",
+    "sha256": "0EDE66B88EB7071A896D944F541476603D87709149C283809C9B69E65108741F"
+  },
+  {
+    "path": "src\\data\\siteData.js",
+    "sha256": "0643A265244872DD05F91EF2A74EC8A706C4EEE716B1C10E857BB051FB51B992"
+  },
+  {
+    "path": "src\\pages\\Blog.module.scss",
+    "sha256": "B14BF6F0E5B29AB636670B7531C7527CE3024B0C6B2E0983F79C382DAEA66F5F"
+  },
+  {
+    "path": "src\\pages\\Blog.jsx",
+    "sha256": "B8595F8174AD2E0EA2E025AEFDCE679FFDBBA5CB717B9C5178C7907E752BB63E"
+  },
+  {
+    "path": "src\\pages\\About.module.scss",
+    "sha256": "3565524784669944A677D8EB26D90544BCF01A7CE919075C334B23261695B2DB"
+  },
+  {
+    "path": "src\\pages\\About.jsx",
+    "sha256": "B75E944CA43C88B6AF0F24C3B14FF0AF4B9DAD0600B8A58D4BDF1CBEA3486993"
+  },
+  {
+    "path": "src\\components\\layout\\Layout.jsx",
+    "sha256": "85909B318905BFD48F67BD552E078BA7779DB05C709E39E7C221C6A1D00EF266"
+  },
+  {
+    "path": "src\\components\\layout\\LegacyNavbar.jsx",
+    "sha256": "A2C879008EC13906D0527A7290691E30094C73465365E816167C6C1520410D49"
+  },
+  {
+    "path": "src\\pages\\Home.jsx",
+    "sha256": "FB7942547938BE80778BA66A02D04C6E4A5AD702EC269D6878516AF6B6D07DEC"
+  },
+  {
+    "path": "src\\pages\\CoreLanding.module.scss",
+    "sha256": "F7E54D644C003A55CF40C2ED0B4E23F738691BACAEF1DDDF94253831E91CD491"
+  },
+  {
+    "path": "src\\pages\\CoreLanding.jsx",
+    "sha256": "33ADDEE417DE41E7A671C5503A22A0C176819F560BEED7A21B0661941BF0ADF9"
+  },
+  {
+    "path": "src\\pages\\BlogArticle.module.scss",
+    "sha256": "D2F0E63161AF1236BCD943880F2770FA72C1ED557CC35F75596AED3CBDE1677C"
+  },
+  {
+    "path": "src\\pages\\Legal.module.scss",
+    "sha256": "4118A81450E3E55355BBD6600D559AA02CEA4463DD385D0ABF7986311DD9CB62"
+  },
+  {
+    "path": "src\\pages\\HomeSections.jsx",
+    "sha256": "A30EA278285E2EED5BE50C9842B881A1795856B47753F345B6F3A88A28CB3A02"
+  },
+  {
+    "path": "src\\pages\\NotFound.jsx",
+    "sha256": "7B1D099CC0386F5C7187913906382243EC280A16675B8D75CA37C6FE6E29BDE5"
+  },
+  {
+    "path": "src\\pages\\Privacy.jsx",
+    "sha256": "867F9B4DE47AF4010BA03B8B3183F39EACAD1369AEC914AA898BF3622508A5A6"
+  },
+  {
+    "path": "src\\data\\corePages.js",
+    "sha256": "618A5340F7125BD63140159A90028CA4DE6746A232C812342280973139464C48"
+  },
+  {
+    "path": "src\\data\\editorialData.js",
+    "sha256": "246E6C852A7E48DA34F73409450FB8A0AEAC7E9E14EE20FB4FC06F1CCACB1206"
+  },
+  {
+    "path": "src\\pages\\Terms.jsx",
+    "sha256": "3A561CB06DADC50235ABA33B5DD4138166BC12D101A735A601B389B99ADB6443"
+  },
+  {
+    "path": "src\\pages\\Services.jsx",
+    "sha256": "9CAE88F63AFE4120AA8D2E9F7FD0E56F282CA241D0F206D28F34AA3A445437CB"
+  },
+  {
+    "path": "src\\components\\layout\\Navbar.jsx",
+    "sha256": "A611B6ECD4841E97EA7BFEC9801D12516D3C8160CEBA0E90008BA3FC176D09A9"
+  },
+  {
+    "path": "src\\components\\layout\\shared-shell.scss",
+    "sha256": "27145FBD1AF3D625A2BF1ABBFF286DC6414153AEA4854733C89038D048B9AEA6"
+  },
+  {
+    "path": "src\\pages\\Services.module.scss",
+    "sha256": "304B14A7A1696549F8502866D57586B59EC3541B769E8529FA73CABE5BB2204E"
+  },
+  {
+    "path": "src\\components\\editorial\\HomeEditorial.jsx",
+    "sha256": "CCD440571742953BFA1E85D5DF0238B5245DBD3FC1A8F9586ECD9D1BA1D1C909"
+  },
+  {
+    "path": "src\\components\\editorial\\HomeEditorial.module.scss",
+    "sha256": "602BE68AA6008D19142F6F5537925642194EA6E0FF54E1CFF2CD9D2DE421BFBE"
+  },
+  {
+    "path": "src\\components\\editorial\\ItineraryComparison.jsx",
+    "sha256": "567888267E8DABBB6C0D2863336798DE48361EB6D406201D8916ED0E13CDDB4D"
+  },
+  {
+    "path": "src\\components\\editorial\\JournalFeature.module.scss",
+    "sha256": "D314C8CB8AAEE3D6E292A030E462DE885728381DD2A2DA914EF6BA226BDD14F2"
+  },
+  {
+    "path": "src\\components\\editorial\\JournalFeature.jsx",
+    "sha256": "4EEA6F17676B5BAB81BC432FD0428A0AD16A28579908786C930619EBBBEE07FF"
+  },
+  {
+    "path": "src\\components\\editorial\\ItineraryComparison.module.scss",
+    "sha256": "5B39C2E1CA8B7D9CDBD343E7231AB16E4A124290D3E120DD89902F0FD05FC42B"
+  },
+  {
+    "path": "src\\components\\homepage\\tripState.js",
+    "sha256": "9F95F7427D81D07C404F5C42DDFF86BB565016618B0B95DF7D93A5363F2AFACD"
+  },
+  {
+    "path": "src\\components\\homepage\\TripForm.jsx",
+    "sha256": "042043E28BAF1DC749207CBA6408DD28080F7C5A59313AE60402AC61A400BAF3"
+  },
+  {
+    "path": "src\\components\\homepage\\trip-form.scss",
+    "sha256": "B9FC82B48C1695A8ED86543ECE53CD735CE8A964BFDB0F903419D2D3A3E07057"
+  },
+  {
+    "path": "src\\components\\homepage\\homepage.scss",
+    "sha256": "3E809AB2F7F9F7B92131454A67E388C9D7B2EF412002716F836209C89F9D12EF"
+  },
+  {
+    "path": "src\\components\\homepage\\Homepage.jsx",
+    "sha256": "9EB96DB6E31BDF711870834372366DA2F45404ECB51E2965C3133F61302F02AC"
+  },
+  {
+    "path": "src\\components\\homepage\\homepage-base.scss",
+    "sha256": "205C371B65CD800876EA87D304637455655C9D1D5C2B8435DFDDCF1D9CDBF80F"
+  },
+  {
+    "path": "src\\hooks\\usePageMotion.js",
+    "sha256": "1416973B9EE7055A9FC43EEA9A1B29A9CA155A46682DA803ED2490272F8DCB70"
+  },
+  {
+    "path": "src\\components\\common\\AnimatedCounter.jsx",
+    "sha256": "1D73DF50AB3854164135897905C5CAA991A96930A6691BE2B1F668A18100731B"
+  },
+  {
+    "path": "src\\components\\common\\AirlineMarquee.jsx",
+    "sha256": "286677374C3099318FA4819E08EB105FED88E79E001BF59FE8DFDFE565925717"
+  },
+  {
+    "path": "src\\components\\common\\Button.jsx",
+    "sha256": "BED5E16E1A4DE2200ECF784A3BA3AC3377483F5534C75C3764F85B25F07182DF"
+  },
+  {
+    "path": "src\\components\\common\\TurnstileWidget.jsx",
+    "sha256": "FB3B39CA4B2DD1A7C316E99BD9BD82F78D559CA3292E151533255CD257A499E3"
+  },
+  {
+    "path": "src\\components\\common\\SectionHeader.jsx",
+    "sha256": "7B1BF8047EFEE54659405133188C866497F1E3A0ED1BF5C82BC4EB403E805C19"
+  },
+  {
+    "path": "src\\components\\common\\ScenicBackdrop.jsx",
+    "sha256": "C3C4D719D1AA9E072F948D071790E08E82D47F56778D6413EE1102F3EDD95363"
+  },
+  {
+    "path": "src\\components\\common\\RouteErrorBoundary.jsx",
+    "sha256": "CA8737528CAD6BDD22719138A5F7B147D0EDBB732EEE1C571403A51AC9A92F04"
+  },
+  {
+    "path": "src\\components\\common\\RouteCarousel.jsx",
+    "sha256": "4BF97F0BA66FBC7CEC6C8C058732D1AD517EFE5ADA4A50CEB1E5E1649E0B5D2C"
+  },
+  {
+    "path": "src\\components\\common\\RouteCard.jsx",
+    "sha256": "BCA76FABA9DA01205BFA8A2B0B36F65976B202272C7E73BA2CE29F264794F8E5"
+  },
+  {
+    "path": "src\\components\\common\\ReviewCard.jsx",
+    "sha256": "C0FC71A2F84A2D4D681195187D33C978204ADEA62133EB25FE823786670305D5"
+  },
+  {
+    "path": "src\\components\\common\\QuoteForm.jsx",
+    "sha256": "0AFD4C12B0C7AF620F26BEB7608ADA7FA6FAC3414E84411CEE57BC9872C996EC"
+  },
+  {
+    "path": "src\\components\\common\\FinalCta.jsx",
+    "sha256": "A7B9F2D63ED7DD81702C57CEBA1527B57E7A3CE626D98319CE0C11A3652AF12E"
+  },
+  {
+    "path": "src\\components\\common\\FaqAccordion.module.scss",
+    "sha256": "A60C9C0530885C91518A40A4129D8E107675E32B831870024A44568D06E686CC"
+  },
+  {
+    "path": "src\\components\\common\\FaqAccordion.jsx",
+    "sha256": "CA1E8BBDDAA79C1A06EB8D0E4D490ED3CF7421B61CE9FA56B1F4FEE154D36E18"
+  }
+]

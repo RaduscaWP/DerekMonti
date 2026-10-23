@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { DEPLOYMENT_NOINDEX_META_NAME } from '../src/seo/head.js';
 import { SITE_ORIGIN, routeManifest, routeOutputPath } from '../src/seo/routeManifest.js';
 import { shouldNoindexDeployment } from '../src/seo/deployment.js';
+import { contentEntityForPath } from '../src/i18n/locales.js';
 
 const rootDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDirectory = path.join(rootDirectory, 'dist');
@@ -46,6 +47,8 @@ const seen = {
 function recordUnique(kind, value, pathname) {
   const existing = seen[kind].get(value);
   if (existing) {
+    const entity = contentEntityForPath(pathname);
+    if (kind === 'h1' && entity && entity.id === contentEntityForPath(existing)?.id) return;
     errors.push(`Duplicate ${kind} on ${existing} and ${pathname}: ${value}`);
   } else {
     seen[kind].set(value, pathname);
@@ -71,6 +74,21 @@ for (const route of routeManifest) {
     (match) => decodeEntities(match[1]),
   );
   const headings = matches(html, /<h1\b[^>]*>([\s\S]*?)<\/h1>/gi).map((match) => normalizeText(match[1]));
+  const documentLanguages = matches(html, /<html\s+lang="([^"]+)"/gi).map((match) => match[1]);
+  const openGraphLocales = matches(html, /<meta\s+property="og:locale"\s+content="([^"]+)"/gi).map((match) => match[1]);
+  const alternates = matches(html, /<link\s+rel="alternate"\s+hreflang="([^"]+)"\s+href="([^"]+)"\s*\/?>/gi)
+    .map((match) => ({ language: match[1], href: decodeEntities(match[2]) }));
+
+  if (JSON.stringify(documentLanguages) !== JSON.stringify([route.locale])) {
+    errors.push(`${route.pathname} must declare its actual document language ${route.locale}.`);
+  }
+  if (JSON.stringify(openGraphLocales) !== JSON.stringify([route.openGraphLocale])) {
+    errors.push(`${route.pathname} must declare its actual Open Graph locale.`);
+  }
+  const expectedAlternates = route.indexable && !noindexDeployment ? route.alternates : [];
+  if (JSON.stringify(alternates) !== JSON.stringify(expectedAlternates)) {
+    errors.push(`${route.pathname} hreflang annotations do not match its approved equivalent cluster.`);
+  }
 
   if (titles.length !== 1) errors.push(`${route.pathname} must contain exactly one title; found ${titles.length}.`);
   if (descriptions.length !== 1) {
@@ -106,8 +124,10 @@ for (const route of routeManifest) {
   );
   if (noindexDeployment && !containsNoindex) {
     errors.push(`${route.pathname} must contain noindex on a non-production deployment.`);
-  } else if (!noindexDeployment && containsNoindex) {
+  } else if (!noindexDeployment && route.indexable && containsNoindex) {
     errors.push(`${route.pathname} is indexable in the manifest but contains noindex.`);
+  } else if (!route.indexable && !containsNoindex) {
+    errors.push(`${route.pathname} is pending review and must contain noindex.`);
   }
   if (noindexDeployment && deploymentMarkers.length !== 1) {
     errors.push(`${route.pathname} must contain exactly one client noindex deployment marker.`);
@@ -138,6 +158,17 @@ if (JSON.stringify(sitemapUrls) !== JSON.stringify(expectedSitemapUrls)) {
 }
 if (new Set(sitemapUrls).size !== sitemapUrls.length) {
   errors.push('sitemap.xml contains duplicate URLs.');
+}
+
+for (const route of routeManifest.filter((entry) => entry.indexable && !noindexDeployment)) {
+  const block = matches(sitemap, /<url>([\s\S]*?)<\/url>/gi).find((match) => (
+    match[1].includes(`<loc>${route.canonical}</loc>`)
+  ));
+  const sitemapAlternates = block ? matches(block[1], /<xhtml:link\s+rel="alternate"\s+hreflang="([^"]+)"\s+href="([^"]+)"\s*\/?>/gi)
+    .map((match) => ({ language: match[1], href: decodeEntities(match[2]) })) : [];
+  if (JSON.stringify(sitemapAlternates) !== JSON.stringify(route.alternates)) {
+    errors.push(`${route.pathname} sitemap language annotations do not match its equivalent cluster.`);
+  }
 }
 
 const robots = await readFile(path.join(distDirectory, 'robots.txt'), 'utf8');

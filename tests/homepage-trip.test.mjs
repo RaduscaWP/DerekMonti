@@ -4,6 +4,7 @@ import {
   addTripLeg, changeTripType, COMFORT_OPTIONS, createInitialTrip, localTodayIso,
   removeTripLeg, serializeTrip, submitTripRequest, validateTrip, validateTripStep, restoreTripProgress, safeTripProgress, fieldStep,
   findAirportSuggestions, readTripProgress, TRIP_PROGRESS_STORAGE_KEY, LEGACY_TRIP_PROGRESS_STORAGE_KEY,
+  createTripSubmissionController, isTripSubmissionLocked, SAFE_RETRY_WINDOW_MS,
 } from '../src/components/homepage/tripState.js';
 import { buildQuoteMessage, getMailto, getWhatsappUrl } from '../src/utils/message.js';
 
@@ -385,4 +386,153 @@ test('failed multi-city submission offers complete recovery messages while retai
   assert.equal(new URL(getMailto(fields)).searchParams.get('body'), message);
   assert.equal(new URL(getWhatsappUrl(fields)).searchParams.get('text'), message);
   assert.deepEqual(trip, snapshot);
+});
+
+test('an uncertain attempt retries its frozen original payload and UUID even after edits are passed in', async () => {
+  const controller = createTripSubmissionController();
+  const trip = validTrip({ comfort: 'work', serviceIntent: 'complex_itinerary', notes: 'Original private note' });
+  const payloads = [];
+  const fetchImpl = async (_url, init) => {
+    payloads.push(JSON.parse(init.body));
+    if (payloads.length === 1) throw new Error('Response lost after possible acceptance');
+    return mockResponse({ ok: true, reference: 'DM-SAME-ATTEMPT', confirmationSent: false });
+  };
+  await assert.rejects(controller.submit(trip, { ...dateOptions, fetchImpl, turnstileToken: 'first' }), { code: 'NETWORK_UNCONFIRMED' });
+  const unresolved = controller.getSnapshot();
+  assert.equal(isTripSubmissionLocked(unresolved), true);
+  assert.equal(controller.reset(), false);
+  assert.equal(controller.clearError(), false);
+  assert.throws(() => { unresolved.attempt.trip.legs[0].from = 'Changed'; }, TypeError);
+  trip.email = 'changed@example.com';
+  trip.notes = 'Changed note';
+  const receipt = await controller.submit(trip, { ...dateOptions, fetchImpl, turnstileToken: 'fresh' });
+  assert.equal(payloads.length, 2);
+  const { turnstileToken: firstToken, ...first } = payloads[0];
+  const { turnstileToken: retryToken, ...retry } = payloads[1];
+  assert.deepEqual(retry, first);
+  assert.notEqual(firstToken, retryToken);
+  assert.equal(receipt.trip.email, 'alex@example.com');
+  assert.equal(receipt.trip.notes, 'Original private note');
+  assert.equal(controller.getSnapshot().status, 'success');
+  assert.equal(controller.getSnapshot().attempt.unresolved, false);
+  assert.equal(controller.reset(), true);
+});
+
+test('late acceptance survives form unsubscribe and remount without a second send', async () => {
+  const controller = createTripSubmissionController();
+  let release;
+  let calls = 0;
+  let mountedUpdates = 0;
+  const unsubscribe = controller.subscribe(() => { mountedUpdates += 1; });
+  const fetchImpl = async () => { calls += 1; return new Promise((resolve) => { release = resolve; }); };
+  const pending = controller.submit(validTrip(), { ...dateOptions, fetchImpl });
+  assert.equal(controller.getSnapshot().status, 'submitting');
+  assert.equal(isTripSubmissionLocked(controller.getSnapshot()), true);
+  assert.equal(controller.reset(), false);
+  const duplicate = controller.submit(validTrip({ to: 'Tokyo HND' }), { ...dateOptions, fetchImpl });
+  assert.equal(duplicate, pending);
+  unsubscribe();
+  release(mockResponse({ ok: true, reference: 'DM-LATE-ACCEPTANCE', confirmationSent: true }));
+  await pending;
+  assert.equal(mountedUpdates, 1);
+  const remounted = controller.getSnapshot();
+  assert.equal(remounted.status, 'success');
+  assert.equal(remounted.result.reference, 'DM-LATE-ACCEPTANCE');
+  assert.equal(remounted.result.trip.to, 'London LHR');
+  assert.equal(remounted.result.confirmationSent, true);
+  await controller.submit(validTrip({ to: 'Tokyo HND' }), { ...dateOptions, fetchImpl });
+  assert.equal(calls, 1);
+});
+
+test('late uncertain response stays bound across form unsubscribe and retry on return', async () => {
+  const controller = createTripSubmissionController();
+  let release;
+  const payloads = [];
+  const unsubscribe = controller.subscribe(() => {});
+  const fetchImpl = async (_url, init) => {
+    payloads.push(JSON.parse(init.body));
+    if (payloads.length === 1) return new Promise((resolve) => { release = resolve; });
+    return mockResponse({ ok: true, reference: 'DM-RETURNED-ATTEMPT', confirmationSent: false });
+  };
+  const pending = controller.submit(validTrip(), { ...dateOptions, fetchImpl });
+  const identity = controller.getSnapshot().attempt.identity;
+  unsubscribe();
+  release(mockResponse({ code: 'DELIVERY_UNCONFIRMED', error: 'Receipt unconfirmed' }, false));
+  await assert.rejects(pending, { code: 'DELIVERY_UNCONFIRMED' });
+  assert.equal(controller.getSnapshot().attempt.unresolved, true);
+  assert.equal(controller.getSnapshot().attempt.identity, identity);
+  await controller.submit(validTrip({ notes: 'Different on return' }), { ...dateOptions, fetchImpl });
+  assert.equal(payloads[1].requestId, payloads[0].requestId);
+  assert.equal(payloads[1].notes, payloads[0].notes);
+});
+
+test('a first explicit rejection releases editing but a later rejection never erases earlier uncertainty', async () => {
+  const first = createTripSubmissionController();
+  const rejectedPayloads = [];
+  const rejectOnce = async (_url, init) => {
+    rejectedPayloads.push(JSON.parse(init.body));
+    return rejectedPayloads.length === 1
+      ? mockResponse({ code: 'DELIVERY_REJECTED', error: 'Provider declined' }, false)
+      : mockResponse({ ok: true, reference: 'DM-EDITED-AFTER-REJECTION' });
+  };
+  await assert.rejects(first.submit(validTrip(), { ...dateOptions, fetchImpl: rejectOnce }), { code: 'DELIVERY_REJECTED' });
+  assert.equal(isTripSubmissionLocked(first.getSnapshot()), false);
+  assert.equal(first.clearError(), true);
+  await first.submit(validTrip({ notes: 'Allowed after definite rejection' }), { ...dateOptions, fetchImpl: rejectOnce });
+  assert.notEqual(rejectedPayloads[0].requestId, rejectedPayloads[1].requestId);
+
+  const earlierUnknown = createTripSubmissionController();
+  const payloads = [];
+  const unknownThenRejected = async (_url, init) => {
+    payloads.push(JSON.parse(init.body));
+    if (payloads.length === 1) throw new Error('Receipt lost');
+    return mockResponse({ code: 'DELIVERY_REJECTED', error: 'Latest retry declined' }, false);
+  };
+  await assert.rejects(earlierUnknown.submit(validTrip(), { ...dateOptions, fetchImpl: unknownThenRejected }), { code: 'NETWORK_UNCONFIRMED' });
+  await assert.rejects(earlierUnknown.submit(validTrip({ email: 'new@example.com' }), { ...dateOptions, fetchImpl: unknownThenRejected }), { code: 'DELIVERY_REJECTED' });
+  assert.equal(isTripSubmissionLocked(earlierUnknown.getSnapshot()), true);
+  assert.equal(earlierUnknown.reset(), false);
+  assert.equal(earlierUnknown.clearError(), false);
+  assert.equal(payloads[0].requestId, payloads[1].requestId);
+  assert.equal(payloads[0].email, payloads[1].email);
+});
+
+test('safe retry expiry cannot rotate an unresolved identity or issue another provider request', async (t) => {
+  const controller = createTripSubmissionController();
+  let calls = 0;
+  const fetchImpl = async () => { calls += 1; throw new Error('Lost receipt'); };
+  await assert.rejects(controller.submit(validTrip(), { ...dateOptions, fetchImpl }), { code: 'NETWORK_UNCONFIRMED' });
+  const identity = controller.getSnapshot().attempt.identity;
+  t.mock.method(Date, 'now', () => identity.requestCreatedAt + SAFE_RETRY_WINDOW_MS);
+  await assert.rejects(controller.submit(validTrip({ notes: 'Attempted expiry bypass' }), { ...dateOptions, fetchImpl }), { code: 'RETRY_WINDOW_EXPIRED' });
+  assert.equal(calls, 1);
+  assert.equal(controller.getSnapshot().attempt.identity, identity);
+  assert.equal(controller.getSnapshot().attempt.trip.notes, '');
+  assert.equal(controller.reset(), false);
+});
+
+test('original validation and verification failures after uncertainty retain the bound attempt and exclude it from saved drafts', async () => {
+  const controller = createTripSubmissionController();
+  const trip = validTrip({ notes: 'Private note', phone: '+1 202 555 0100' });
+  await assert.rejects(controller.submit(trip, { ...dateOptions, fetchImpl: async () => { throw new Error('Lost receipt'); } }), { code: 'NETWORK_UNCONFIRMED' });
+  const identity = controller.getSnapshot().attempt.identity;
+  await assert.rejects(controller.submit(trip, { today: '2030-05-02', fetchImpl: async () => { throw new Error('Must not dispatch invalid original'); } }), { code: 'VALIDATION' });
+  assert.equal(controller.getSnapshot().attempt.identity, identity);
+  assert.equal(controller.getSnapshot().attempt.unresolved, true);
+  await assert.rejects(controller.submit(trip, { ...dateOptions, fetchImpl: async () => mockResponse({ code: 'VERIFICATION_FAILED', error: 'Verify again', fieldErrors: { turnstile: 'Challenge required' } }, false) }), { code: 'VERIFICATION_FAILED' });
+  assert.equal(controller.getSnapshot().attempt.unresolved, true);
+  const draft = safeTripProgress(controller.getSnapshot().attempt.trip);
+  for (const field of ['fullName', 'email', 'phone', 'notes', 'privacyAcknowledged', 'requestId', 'requestCreatedAt', 'payloadKey', 'attempt']) assert.equal(field in draft, false, field);
+});
+
+test('server field validation permits correcting a first attempt without declaring a prior uncertain attempt failed', async () => {
+  const validationResponse = () => Response.json({ error: 'Review the highlighted fields.', fieldErrors: { email: 'Enter a valid email address.' } }, { status: 400 });
+  const first = createTripSubmissionController();
+  await assert.rejects(first.submit(validTrip(), { ...dateOptions, fetchImpl: async () => validationResponse() }), { code: 'VALIDATION' });
+  assert.equal(isTripSubmissionLocked(first.getSnapshot()), false);
+  assert.equal(first.getSnapshot().error.fieldErrors.email, 'Enter a valid email address.');
+  const uncertain = createTripSubmissionController();
+  await assert.rejects(uncertain.submit(validTrip(), { ...dateOptions, fetchImpl: async () => { throw new Error('Lost receipt'); } }), { code: 'NETWORK_UNCONFIRMED' });
+  await assert.rejects(uncertain.submit(validTrip(), { ...dateOptions, fetchImpl: async () => validationResponse() }), { code: 'VALIDATION' });
+  assert.equal(isTripSubmissionLocked(uncertain.getSnapshot()), true);
 });

@@ -1,9 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { renderTicketHtml } from '../api/_emailTemplate.js';
-import quoteHandler from '../api/quote.js';
+import { randomUUID } from 'node:crypto';
+import { SyntheticRedis, setSyntheticEnvironment } from './helpers/quoteMocks.mjs';
 import { validateQuoteFields } from '../src/utils/quoteRequest.js';
 import { buildQuoteMessage, getMailto, getWhatsappUrl } from '../src/utils/message.js';
+
+// Set synthetic configuration and block providers before API import (_loadEnv).
+setSyntheticEnvironment();
+const originalFetch = globalThis.fetch;
+globalThis.fetch = async () => { throw new Error('Unexpected network request blocked by test'); };
+const { default: quoteHandler } = await import('../api/quote.js');
+globalThis.fetch = originalFetch;
 
 const validRoundTrip = {
   tripType: 'round_trip',
@@ -40,7 +48,7 @@ async function invokeQuoteApi(body, method = 'POST', { headers = {}, ip = '127.0
       return this;
     },
   };
-  await quoteHandler({ method, headers, body, socket: { remoteAddress: ip } }, response);
+  await quoteHandler({ method, headers: { 'content-type': 'application/json', ...headers }, body, socket: { remoteAddress: ip } }, response);
   return response;
 }
 
@@ -50,9 +58,10 @@ function mockQuoteServices(t, { emailStatuses = [], verificationSucceeds = true,
   const overrides = {
     RESEND_API_KEY: 're_test_local_only',
     TURNSTILE_SECRET: 'test_turnstile_secret',
+    VITE_TURNSTILE_SITE_KEY: 'test_public_widget',
     NODE_ENV: production ? 'production' : 'test',
-    UPSTASH_REDIS_REST_URL: '',
-    UPSTASH_REDIS_REST_TOKEN: '',
+    UPSTASH_REDIS_REST_URL: production ? 'https://redis.synthetic.example' : '',
+    UPSTASH_REDIS_REST_TOKEN: production ? 'synthetic_redis_token' : '',
     KV_REST_API_URL: '',
     KV_REST_API_TOKEN: '',
   };
@@ -65,10 +74,12 @@ function mockQuoteServices(t, { emailStatuses = [], verificationSucceeds = true,
     }
   });
   const calls = { emails: [], challenges: [], unexpected: [] };
+  const redis = new SyntheticRedis();
   t.mock.method(globalThis, 'fetch', async (url, options) => {
+    if (String(url).startsWith('https://redis.synthetic.example')) return redis.rest(options);
     if (url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify') {
       calls.challenges.push(options.body);
-      return Response.json({ success: verificationSucceeds });
+      return Response.json({ success: verificationSucceeds, hostname: 'www.flywithderek.com', action: 'quote_request' });
     }
     if (url === 'https://api.resend.com/emails') {
       calls.emails.push(JSON.parse(options.body));
@@ -87,6 +98,7 @@ const submission = (overrides = {}) => ({
   ...validRoundTrip,
   formStartedAt: Date.now() - 2_000,
   turnstileToken: 'local-test-challenge',
+  requestId: randomUUID(), requestCreatedAt: Date.now(),
   ...overrides,
 });
 
@@ -223,7 +235,7 @@ test('API delivers each preference separately from unchanged notes and keeps old
     assert.deepEqual(advisor.to, ['Derek@travelbusinessclass.com']);
     assert.deepEqual(customer.to, ['ada@example.com']);
     assert.equal(advisor.reply_to, 'ada@example.com');
-    for (const email of [advisor, customer]) {
+    for (const email of [advisor]) {
       assert.ok(email.text.includes(`Notes:\n${notes}\n\nPrivacy acknowledgement`));
       assert.match(email.html, /&lt;script&gt;alert\(&quot;x&quot;\)&lt;\/script&gt;/);
       assert.doesNotMatch(email.html, /<script>/);
@@ -235,6 +247,8 @@ test('API delivers each preference separately from unchanged notes and keeps old
         assert.doesNotMatch(email.text + email.html, /Comfort preference/);
       }
     }
+    assert.doesNotMatch(customer.text + customer.html, /Notes:|Comfort preference|<script>/);
+    assert.ok(customer.text.includes(response.payload.reference));
   }
   assert.equal(calls.emails.length, 8);
   assert.equal(calls.challenges.length, 4);
@@ -290,8 +304,6 @@ test('failed human verification prevents email delivery with a selected comfort 
 test('production rate limit still stops comfort-enabled requests before delivery', async (t) => {
   const calls = mockQuoteServices(t, { production: true });
   const ip = '192.0.2.44';
-  globalThis.__derekQuoteRateBuckets.delete(ip);
-  t.after(() => globalThis.__derekQuoteRateBuckets.delete(ip));
   for (let index = 0; index < 8; index += 1) {
     const response = await invokeQuoteApi(submission({ comfortPreference: 'rested', companyWebsite: 'spam.example' }), 'POST', { ip });
     assert.equal(response.statusCode, 200);
@@ -301,12 +313,12 @@ test('production rate limit still stops comfort-enabled requests before delivery
   assert.deepEqual(calls, { emails: [], challenges: [], unexpected: [] });
 });
 
-test('advisor delivery failure remains a retryable failure without claiming submission success', async (t) => {
-  const calls = mockQuoteServices(t, { emailStatuses: [500] });
+test('explicit advisor rejection remains retryable without claiming submission success', async (t) => {
+  const calls = mockQuoteServices(t, { emailStatuses: [400] });
   const response = await invokeQuoteApi(submission({ comfortPreference: 'work' }));
   assert.equal(response.statusCode, 502);
   assert.equal(response.payload.ok, undefined);
-  assert.match(response.payload.error, /could not be delivered/);
+  assert.equal(response.payload.code, 'DELIVERY_REJECTED');
   assert.equal(calls.emails.length, 1);
 });
 
@@ -347,7 +359,7 @@ test('Services selections and valid attribution reach advisor/customer email wit
     assert.equal(response.statusCode, 200);
     assert.equal(response.payload.ok, true);
     assert.ok(response.payload.reference);
-    for (const email of calls.emails.slice(-2)) {
+    for (const email of calls.emails.slice(-2, -1)) {
       assert.ok(email.text.includes('Source: services'));
       assert.ok(email.text.includes(`Travel situation: ${label}`));
       assert.ok(email.text.includes(`Notes:\n${notes}`));
@@ -363,16 +375,17 @@ test('Services selections and valid attribution reach advisor/customer email wit
   assert.deepEqual(calls.unexpected, []);
 });
 
-test('editorial attribution reaches both email summaries without adding new data collection', async (t) => {
+test('editorial attribution reaches advisor summary and stays out of fixed confirmation', async (t) => {
   const calls = mockQuoteServices(t);
   const response = await invokeQuoteApi(submission({ source: 'blog', comfortPreference: 'rested' }));
   assert.equal(response.statusCode, 200);
   assert.equal(response.payload.ok, true);
   assert.equal(calls.emails.length, 2);
-  for (const email of calls.emails) {
+  for (const email of calls.emails.slice(0, 1)) {
     assert.match(email.text, /Source: blog/);
     assert.doesNotMatch(email.text + email.html, /Guidance Package|Accrued Miles|Private Code|Selected Support/i);
   }
+  assert.doesNotMatch(calls.emails[1].text + calls.emails[1].html, /Source:|Comfort preference/);
   assert.deepEqual(calls.unexpected, []);
 });
 

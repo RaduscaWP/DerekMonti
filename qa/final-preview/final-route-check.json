@@ -1,0 +1,157 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/services",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/about",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/blog",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/privacy",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/terms",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/business-class-flights",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/first-class-flights",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/business-class-flights/europe",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/business-class-flights/usa",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/services/last-minute-business-class",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/services/complex-itineraries",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/services/premium-flight-advisor",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/blog/why-travelers-overpay-business-class",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/blog/business-class-service-beyond-seat",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/blog/last-minute-business-class",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ro",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ru",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/de",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ro/servicii",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ru/uslugi",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/de/leistungen",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ro/despre-derek",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ru/o-dereke",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/de/ueber-derek",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ro/confidentialitate",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ru/konfidencialnost",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/de/datenschutz",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ro/termeni",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/ru/usloviya",
+    "status": 200,
+    "passed": true
+  },
+  {
+    "path": "/de/nutzungsbedingungen",
+    "status": 200,
+    "passed": true
+  }
+]

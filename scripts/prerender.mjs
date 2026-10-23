@@ -28,6 +28,7 @@ function assembleDocument(appHtml, metadata) {
   }
 
   return template
+    .replace(/<html\s+lang="[^"]*"/, `<html lang="${metadata.locale || 'en'}"`)
     .replace(
       /<!--seo-head:start-->[\s\S]*?<!--seo-head:end-->/,
       renderSeoHead(metadata, { deploymentNoindex: noindexDeployment }),
@@ -46,6 +47,9 @@ for (const route of routeManifest) {
   if (rendered.metadata.pathname !== route.pathname) {
     throw new Error(`SSR route metadata mismatch for ${route.pathname}.`);
   }
+  if (rendered.missingTranslations?.length) {
+    throw new Error(`Incomplete locale content at ${route.pathname}: ${rendered.missingTranslations.join(', ')}`);
+  }
   const emittedMetadata = noindexDeployment ? { ...route, indexable: false } : route;
   await writeRenderedPage(routeOutputPath(route.pathname), rendered.html, emittedMetadata);
 }
@@ -55,10 +59,15 @@ await writeRenderedPage('404.html', notFound.html, notFoundMetadata);
 
 const sitemapEntries = routeManifest
   .filter((route) => route.indexable && !noindexDeployment)
-  .map((route) => `  <url>\n    <loc>${route.canonical}</loc>\n  </url>`)
+  .map((route) => {
+    const alternates = (route.alternates || []).map(({ language, href }) => (
+      `\n    <xhtml:link rel="alternate" hreflang="${language}" href="${href}" />`
+    )).join('');
+    return `  <url>\n    <loc>${route.canonical}</loc>${alternates}\n  </url>`;
+  })
   .join('\n');
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${sitemapEntries}
 </urlset>
 `;

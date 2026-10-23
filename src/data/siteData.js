@@ -8,6 +8,14 @@ export const contactConfig = {
 export const imagery = {
   derekPortrait: '/images/derek-monti.jpg',
   derekAvatar: '/images/DMphoto.jpg',
+  hero: "/images/legacy/pexels-5645180.jpg",
+  servicesHero: "/images/legacy/pexels-23522837.jpg",
+  aboutHero: "/images/legacy/pexels-23522837.jpg",
+  cabin: "/images/legacy/pexels-11757933.jpg",
+  concierge: "/images/legacy/pexels-5645180.jpg",
+  lounge: "/images/legacy/pexels-11757933.jpg",
+  johannesburg: "/images/legacy/pexels-33702740.jpg",
+  cairo: "/images/legacy/pexels-29678689.jpg",
 };
 
 export const capabilities = [
@@ -354,3 +362,551 @@ export const blogPosts = articleDrafts.map((article) => {
     readTime: `${Math.max(1, Math.ceil(wordCount / 220))} min read`,
   };
 });
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const airlines = [
+  "Qatar Airways",
+  "Emirates",
+  "Turkish Airlines",
+  "Singapore Airlines",
+  "Cathay Pacific",
+  "Lufthansa",
+  "Air France",
+  "British Airways",
+  "United Airlines",
+  "American Airlines",
+  "Japan Airlines",
+  "ANA",
+  "Etihad"
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const extraServices = [
+  {
+    "label": "Private fare logic",
+    "storyLabel": "Traveler finds a fare",
+    "title": "Private Fare Playbook",
+    "activeSummary": "Derek turns a confusing business and first class fare search into a clear decision path.",
+    "body": "Derek explains date windows, airline tradeoffs, routing choices, and fare rules before you spend time searching or committing.",
+    "outcome": "Best for travelers who want the strategy behind the quote.",
+    "checklist": [
+      "Date windows that actually matter",
+      "Airline and routing tradeoffs",
+      "Fare rules worth reading twice"
+    ]
+  },
+  {
+    "label": "Route audit",
+    "storyLabel": "Derek audits the details",
+    "title": "Route & Aircraft Audit",
+    "activeSummary": "Send the option you found and Derek checks whether it is truly worth booking.",
+    "body": "Send Derek an option you found online. He checks the aircraft, cabin quality, connection risk, ticket rules, and better alternatives.",
+    "outcome": "Useful before paying for a business or first class fare that may not match the experience.",
+    "checklist": [
+      "Aircraft and seat quality",
+      "Connection risk and timing",
+      "Cleaner alternatives if the fare is weak"
+    ]
+  },
+  {
+    "label": "Booking confidence",
+    "storyLabel": "You decide with confidence",
+    "title": "Self-Booking Guidance",
+    "activeSummary": "If you prefer to book yourself, Derek gives you the practical guardrails first.",
+    "body": "For clients who prefer to book themselves, Derek gives a clear path so you avoid weak routings, hidden fees, or cabin surprises.",
+    "outcome": "Guidance first. Booking support if you want Derek to take over.",
+    "checklist": [
+      "Steps before final checkout",
+      "Rules and fees to verify",
+      "When to let Derek take over"
+    ]
+  }
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const methodology = [
+  {
+    "title": "Published Fare",
+    "body": "A snapshot of publicly available business and first class fares for comparable dates and routings."
+  },
+  {
+    "title": "Derek's Fare",
+    "body": "The most recent quote sourced through consolidator channels available to Derek clients."
+  },
+  {
+    "title": "Your Savings",
+    "body": "The difference between the public fare and Derek quote, shown as a practical percentage."
+  },
+  {
+    "title": "Flexible Dates",
+    "body": "The date window expands or tightens by route, usually from +/- 1 to +/- 6 days, when it improves value."
+  }
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const reviews = [
+  {
+    "title": "The only way I book long-haul now",
+    "body": "Derek found a business class seat to Tokyo for less than I expected to pay in premium economy. Fast, calm, and completely transparent.",
+    "name": "Michael R.",
+    "date": "2 months ago",
+    "verified": false
+  },
+  {
+    "title": "Booked in three hours",
+    "body": "I had a last-minute London trip and Derek handled the whole thing before dinner. The fare was better than anything I found myself.",
+    "name": "Sarah T.",
+    "date": "1 month ago",
+    "verified": false
+  },
+  {
+    "title": "Personal service that actually feels personal",
+    "body": "Derek remembered my aisle preference, connection limits, and airline priorities. That level of care is rare.",
+    "name": "James K.",
+    "date": "3 weeks ago",
+    "verified": false
+  }
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const routeDeals = [
+  {
+    "from": "New York",
+    "fromCode": "JFK",
+    "to": "London",
+    "toCode": "LHR",
+    "cabin": "Business",
+    "carriers": "BA/AA/UA",
+    "published": "$3,570",
+    "derek": "$2,625",
+    "savings": "Illustrative savings 26%",
+    "flexibleWindow": "+/- 2 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-460672.jpg",
+    "advisorNote": {
+      "title": "Why Derek would audit it",
+      "points": [
+        "Check nonstop vs. one-stop tradeoff",
+        "Compare aircraft and seat layout",
+        "Confirm fare rules before ticketing"
+      ],
+      "cta": "Ask Derek to audit this route"
+    }
+  },
+  {
+    "from": "Chicago",
+    "fromCode": "ORD",
+    "to": "Rome",
+    "toCode": "FCO",
+    "cabin": "Business",
+    "carriers": "UA/LH/ITA",
+    "published": "$5,060",
+    "derek": "$3,530",
+    "savings": "Illustrative savings 30%",
+    "flexibleWindow": "+/- 4 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-2064827.jpg",
+    "advisorNote": {
+      "title": "Where the value usually appears",
+      "points": [
+        "Test nearby date windows",
+        "Compare Lufthansa and ITA routing",
+        "Avoid weak overnight connections"
+      ],
+      "cta": "Have Derek review the options"
+    }
+  },
+  {
+    "from": "San Francisco",
+    "fromCode": "SFO",
+    "to": "Frankfurt",
+    "toCode": "FRA",
+    "cabin": "Business",
+    "carriers": "LH/UA",
+    "published": "$5,550",
+    "derek": "$3,870",
+    "savings": "Illustrative savings 30%",
+    "flexibleWindow": "+/- 1 day",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-5645180.jpg",
+    "imageAlt": "Aircraft wing above clouds, a travel illustration",
+    "advisorNote": {
+      "title": "What Derek checks first",
+      "points": [
+        "Verify the operating aircraft",
+        "Protect the long-haul cabin quality",
+        "Compare rules against public fares"
+      ],
+      "cta": "Ask for a fare audit"
+    }
+  },
+  {
+    "from": "Boston",
+    "fromCode": "BOS",
+    "to": "Dubai",
+    "toCode": "DXB",
+    "cabin": "Business",
+    "carriers": "EK/BA/QR",
+    "published": "$5,041",
+    "derek": "$3,400",
+    "savings": "Illustrative savings 33%",
+    "flexibleWindow": "+/- 5 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-3787839.jpg",
+    "advisorNote": {
+      "title": "How Derek keeps it practical",
+      "points": [
+        "Balance savings against travel time",
+        "Check Emirates and Qatar options",
+        "Review change and refund rules"
+      ],
+      "cta": "Get Derek to compare it"
+    }
+  },
+  {
+    "from": "Los Angeles",
+    "fromCode": "LAX",
+    "to": "Tokyo",
+    "toCode": "HND",
+    "cabin": "Business",
+    "carriers": "JL/AA/NH",
+    "published": "$6,185",
+    "derek": "$4,200",
+    "savings": "Illustrative savings 32%",
+    "flexibleWindow": "+/- 4 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-2506923.jpg",
+    "advisorNote": {
+      "title": "What matters on this route",
+      "points": [
+        "Check Japan Airlines and ANA aircraft",
+        "Avoid unnecessary domestic positioning",
+        "Compare arrival time comfort"
+      ],
+      "cta": "Ask Derek about this fare"
+    }
+  },
+  {
+    "from": "Miami",
+    "fromCode": "MIA",
+    "to": "Singapore",
+    "toCode": "SIN",
+    "cabin": "First Class",
+    "carriers": "SQ/EK",
+    "published": "$12,400",
+    "derek": "$7,200",
+    "savings": "Illustrative savings 42%",
+    "flexibleWindow": "+/- 6 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-777059.jpg",
+    "advisorNote": {
+      "title": "First class needs extra scrutiny",
+      "points": [
+        "Confirm true first class availability",
+        "Check lounge and ground benefits",
+        "Protect the long-haul experience"
+      ],
+      "cta": "Have Derek qualify it"
+    }
+  },
+  {
+    "from": "New York",
+    "fromCode": "JFK",
+    "to": "Johannesburg",
+    "toCode": "JNB",
+    "cabin": "Business",
+    "carriers": "UA/LH/ET",
+    "published": "$6,530",
+    "derek": "$4,100",
+    "savings": "Illustrative savings 37%",
+    "flexibleWindow": "+/- 2 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-33702740.jpg",
+    "advisorNote": {
+      "title": "Where Derek adds judgement",
+      "points": [
+        "Compare connection risk",
+        "Check partner airline consistency",
+        "Watch ticketing deadlines closely"
+      ],
+      "cta": "Ask for route guidance"
+    }
+  },
+  {
+    "from": "Washington",
+    "fromCode": "IAD",
+    "to": "Cairo",
+    "toCode": "CAI",
+    "cabin": "Business",
+    "carriers": "MS/UA/LH",
+    "published": "$4,140",
+    "derek": "$2,737",
+    "savings": "Illustrative savings 34%",
+    "flexibleWindow": "+/- 5 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-29678689.jpg",
+    "advisorNote": {
+      "title": "How to avoid a weak fare",
+      "points": [
+        "Confirm mixed-cabin exposure",
+        "Review EgyptAir and partner options",
+        "Check stop length against savings"
+      ],
+      "cta": "Let Derek audit the fare"
+    }
+  }
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const serviceDeals = [
+  {
+    "from": "New York",
+    "fromCode": "JFK",
+    "to": "London",
+    "toCode": "LHR",
+    "cabin": "Business",
+    "carriers": "BA/AA/UA",
+    "published": "$3,570",
+    "derek": "$2,200",
+    "savings": "Illustrative savings 38%",
+    "flexibleWindow": "+/- 2 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-460672.jpg",
+    "advisorNote": {
+      "title": "Why Derek would audit it",
+      "points": [
+        "Check nonstop vs. one-stop tradeoff",
+        "Compare aircraft and seat layout",
+        "Confirm fare rules before ticketing"
+      ],
+      "cta": "Ask Derek to audit this route"
+    }
+  },
+  {
+    "from": "Chicago",
+    "fromCode": "ORD",
+    "to": "Rome",
+    "toCode": "FCO",
+    "cabin": "Business",
+    "carriers": "UA/LH/ITA",
+    "published": "$5,060",
+    "derek": "$3,100",
+    "savings": "Illustrative savings 39%",
+    "flexibleWindow": "+/- 4 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-2064827.jpg",
+    "advisorNote": {
+      "title": "Where the value usually appears",
+      "points": [
+        "Test nearby date windows",
+        "Compare Lufthansa and ITA routing",
+        "Avoid weak overnight connections"
+      ],
+      "cta": "Have Derek review the options"
+    }
+  },
+  {
+    "from": "Los Angeles",
+    "fromCode": "LAX",
+    "to": "Tokyo",
+    "toCode": "HND",
+    "cabin": "Business",
+    "carriers": "JL/AA/NH",
+    "published": "$6,185",
+    "derek": "$4,000",
+    "savings": "Illustrative savings 35%",
+    "flexibleWindow": "+/- 4 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-2506923.jpg",
+    "advisorNote": {
+      "title": "What matters on this route",
+      "points": [
+        "Check Japan Airlines and ANA aircraft",
+        "Avoid unnecessary domestic positioning",
+        "Compare arrival time comfort"
+      ],
+      "cta": "Ask Derek about this fare"
+    }
+  },
+  {
+    "from": "Miami",
+    "fromCode": "MIA",
+    "to": "Dubai",
+    "toCode": "DXB",
+    "cabin": "First Class",
+    "carriers": "SQ/EK",
+    "published": "$12,400",
+    "derek": "$7,800",
+    "savings": "Illustrative savings 37%",
+    "flexibleWindow": "+/- 6 days",
+    "note": "Illustrative fare comparison. Subject to availability.",
+    "image": "/images/legacy/pexels-3787839.jpg",
+    "advisorNote": {
+      "title": "First class needs extra scrutiny",
+      "points": [
+        "Confirm true first class availability",
+        "Check lounge and ground benefits",
+        "Protect the long-haul experience"
+      ],
+      "cta": "Have Derek qualify it"
+    }
+  }
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const services = [
+  {
+    "title": "Business Class Deals",
+    "badge": "15-60% Savings",
+    "description": "Private access to business class fares for long-haul routes without sacrificing routing quality.",
+    "example": "New York to London - lie-flat business - flexible dates"
+  },
+  {
+    "title": "First Class Access",
+    "badge": "Private Suites",
+    "description": "High-touch sourcing for Emirates, Singapore, Etihad, and other true first class experiences.",
+    "example": "Miami to Dubai - first class - chauffeur and lounge eligible fares"
+  },
+  {
+    "title": "Complex Itineraries",
+    "badge": "Multi-City",
+    "description": "Open-jaw, round-the-world, and mixed cabin trips built by a person who reads the fare rules.",
+    "example": "London to Tokyo to Sydney to New York - four cities, five flights"
+  },
+  {
+    "title": "Last Minute Bookings",
+    "badge": "Any Timeline",
+    "description": "Same-week international travel support when mainstream booking tools show thin availability.",
+    "example": "48-hour departure windows - business or first - any destination"
+  }
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const siteBackdrops = {
+  "homeSavings": {
+    "src": "/images/legacy/pexels-5645180.jpg",
+    "alt": "Aircraft wing above clouds at dusk"
+  },
+  "homeMethodology": {
+    "src": "/images/legacy/pexels-11757933.jpg",
+    "alt": "Modern aircraft cabin with rows of passenger seats"
+  },
+  "homeFinalCta": {
+    "src": "/images/legacy/pexels-23522837.jpg",
+    "alt": "Commercial airplane preparing for departure on an airport runway"
+  },
+  "servicesSteps": {
+    "src": "/images/legacy/pexels-5645180.jpg",
+    "alt": "Aircraft wing above a calm cloud layer"
+  },
+  "servicesSavings": {
+    "src": "/images/legacy/pexels-11757933.jpg",
+    "alt": "Premium aircraft cabin prepared for boarding"
+  },
+  "servicesFinalCta": {
+    "src": "/images/legacy/pexels-23522837.jpg",
+    "alt": "Commercial jet on an airport runway"
+  },
+  "blogHero": {
+    "src": "/images/legacy/pexels-11757933.jpg",
+    "alt": "Premium aircraft cabin interior"
+  },
+  "aboutFinalCta": {
+    "src": "/images/legacy/pexels-23522837.jpg",
+    "alt": "Airplane flying through a sunset sky"
+  },
+  "articleCta": {
+    "src": "/images/legacy/pexels-5645180.jpg",
+    "alt": "Aircraft wing over clouds during a long-haul flight"
+  }
+};
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const timeline = [
+  {
+    "year": "2010",
+    "title": "Aviation foundation",
+    "body": "Derek begins learning the premium travel market and how consolidator fare access works behind the scenes."
+  },
+  {
+    "year": "2014",
+    "title": "Partner network",
+    "body": "Early airline and ticketing relationships turn into a practical network for unpublished premium cabin options."
+  },
+  {
+    "year": "2018",
+    "title": "Personal clients",
+    "body": "Derek starts serving individual travelers directly, building long-term relationships instead of one-off transactions."
+  },
+  {
+    "year": "2022",
+    "title": "Repeat referrals",
+    "body": "A compact client base grows through referrals from travelers who value direct access and calm support."
+  },
+  {
+    "year": "2026",
+    "title": "Personal brand",
+    "body": "The Derek Monti site brings his private advisory model online for a wider international audience."
+  }
+];
+
+// Restored presentation data from c577596; fare examples are illustrative.
+export const values = [
+  {
+    "title": "Trust",
+    "body": "Every quote is honest, transparent, and based on real availability. No hidden surprises."
+  },
+  {
+    "title": "Speed",
+    "body": "Derek respects timing. Urgent requests are handled with the pace premium travel demands."
+  },
+  {
+    "title": "Personalization",
+    "body": "Dates, cabins, stops, airline preference, budget, and comfort all shape the recommendation."
+  }
+];
+
+export const legacySteps = [
+  {
+    "title": "Get in Touch",
+    "body": "Send Derek a WhatsApp message or submit a quote request."
+  },
+  {
+    "title": "Share Your Needs",
+    "body": "Destination, dates, cabin, budget, and preferences are reviewed personally."
+  },
+  {
+    "title": "Check Your Inbox",
+    "body": "Derek sends the best matching itineraries at insider fares."
+  },
+  {
+    "title": "Book and Fly",
+    "body": "Confirm securely, receive your e-ticket, and travel with support behind you."
+  }
+];
+export const legacyWhyDerek = [
+  {
+    "title": "Exclusive Deals",
+    "body": "Derek accesses insider fares through consolidator partners, often 15-60% below published business and first class pricing."
+  },
+  {
+    "title": "Last Minute Bookings",
+    "body": "Need to fly within 48 hours? Derek works the options personally when search engines look exhausted."
+  },
+  {
+    "title": "Complex Itineraries",
+    "body": "Multi-city, open-jaw, mixed cabin, and multi-airline routing built around the way you actually travel."
+  },
+  {
+    "title": "Personal Attention",
+    "body": "You deal with Derek directly. No queue, no generic desk, no handoff after the quote."
+  },
+  {
+    "title": "24/7 Support",
+    "body": "Before departure, during the trip, and when plans change, Derek remains reachable through WhatsApp."
+  },
+  {
+    "title": "Trusted by Clients",
+    "body": "A focused network of repeat travelers returns because the service feels human and the pricing holds up."
+  }
+];

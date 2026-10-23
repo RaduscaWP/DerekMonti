@@ -1,0 +1,276 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/",
+      "passed": true
+    },
+    {
+      "path": "/services",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/services",
+      "passed": true
+    },
+    {
+      "path": "/about",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/about",
+      "passed": true
+    },
+    {
+      "path": "/blog",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/blog",
+      "passed": true
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/privacy",
+      "passed": true
+    },
+    {
+      "path": "/terms",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/terms",
+      "passed": true
+    },
+    {
+      "path": "/business-class-flights",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/business-class-flights",
+      "passed": true
+    },
+    {
+      "path": "/first-class-flights",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/first-class-flights",
+      "passed": true
+    },
+    {
+      "path": "/business-class-flights/europe",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/business-class-flights/europe",
+      "passed": true
+    },
+    {
+      "path": "/business-class-flights/usa",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/business-class-flights/usa",
+      "passed": true
+    },
+    {
+      "path": "/services/last-minute-business-class",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/services/last-minute-business-class",
+      "passed": true
+    },
+    {
+      "path": "/services/complex-itineraries",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/services/complex-itineraries",
+      "passed": true
+    },
+    {
+      "path": "/services/premium-flight-advisor",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/services/premium-flight-advisor",
+      "passed": true
+    },
+    {
+      "path": "/blog/why-travelers-overpay-business-class",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/blog/why-travelers-overpay-business-class",
+      "passed": true
+    },
+    {
+      "path": "/blog/business-class-service-beyond-seat",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/blog/business-class-service-beyond-seat",
+      "passed": true
+    },
+    {
+      "path": "/blog/last-minute-business-class",
+      "status": 200,
+      "language": "en",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/blog/last-minute-business-class",
+      "passed": true
+    },
+    {
+      "path": "/ro",
+      "status": 200,
+      "language": "ro",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ro",
+      "passed": true
+    },
+    {
+      "path": "/ru",
+      "status": 200,
+      "language": "ru",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ru",
+      "passed": true
+    },
+    {
+      "path": "/de",
+      "status": 200,
+      "language": "de",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/de",
+      "passed": true
+    },
+    {
+      "path": "/ro/servicii",
+      "status": 200,
+      "language": "ro",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ro/servicii",
+      "passed": true
+    },
+    {
+      "path": "/ru/uslugi",
+      "status": 200,
+      "language": "ru",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ru/uslugi",
+      "passed": true
+    },
+    {
+      "path": "/de/leistungen",
+      "status": 200,
+      "language": "de",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/de/leistungen",
+      "passed": true
+    },
+    {
+      "path": "/ro/despre-derek",
+      "status": 200,
+      "language": "ro",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ro/despre-derek",
+      "passed": true
+    },
+    {
+      "path": "/ru/o-dereke",
+      "status": 200,
+      "language": "ru",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ru/o-dereke",
+      "passed": true
+    },
+    {
+      "path": "/de/ueber-derek",
+      "status": 200,
+      "language": "de",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/de/ueber-derek",
+      "passed": true
+    },
+    {
+      "path": "/ro/confidentialitate",
+      "status": 200,
+      "language": "ro",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ro/confidentialitate",
+      "passed": true
+    },
+    {
+      "path": "/ru/konfidencialnost",
+      "status": 200,
+      "language": "ru",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ru/konfidencialnost",
+      "passed": true
+    },
+    {
+      "path": "/de/datenschutz",
+      "status": 200,
+      "language": "de",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/de/datenschutz",
+      "passed": true
+    },
+    {
+      "path": "/ro/termeni",
+      "status": 200,
+      "language": "ro",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ro/termeni",
+      "passed": true
+    },
+    {
+      "path": "/ru/usloviya",
+      "status": 200,
+      "language": "ru",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/ru/usloviya",
+      "passed": true
+    },
+    {
+      "path": "/de/nutzungsbedingungen",
+      "status": 200,
+      "language": "de",
+      "h1Count": 1,
+      "canonical": "https://www.flywithderek.com/de/nutzungsbedingungen",
+      "passed": true
+    }
+  ],
+  "extra": [
+    {
+      "path": "/does-not-exist",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "path": "/ru/unknown-page",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "path": "/qa/fixtures/quote-recovery.html",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "path": "/services/",
+      "status": 308,
+      "location": "/services",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

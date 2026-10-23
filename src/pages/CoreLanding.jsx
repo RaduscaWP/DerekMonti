@@ -29,9 +29,9 @@ function Breadcrumbs({ items }) {
   );
 }
 
-function Hero({ page }) {
+function Hero({ page, scene, onChoose }) {
   return (
-    <section className={styles.hero} aria-labelledby={`${page.id}-title`}>
+    <section className={`${styles.hero} ${styles[scene.kind]}`} aria-labelledby={`${page.id}-title`}>
       <div className={`container ${styles.heroInner}`}>
         <Breadcrumbs items={page.breadcrumbs} />
         <div className={styles.heroCopy} data-reveal data-reveal-y="24">
@@ -39,30 +39,15 @@ function Hero({ page }) {
           <h1 id={`${page.id}-title`}>{page.h1}</h1>
           <p className={styles.heroSummary}>{page.heroSummary}</p>
           <div className={styles.heroActions}>
-            <Button to="/#request-form">Request a Personal Review</Button>
+            <Button to="/#request-form" onClick={onChoose}>Request a Personal Review</Button>
             <Link className={styles.quietLink} to="/about">
               About Derek
               <ArrowUpRight aria-hidden="true" size={17} />
             </Link>
           </div>
         </div>
-        <aside className={styles.heroDossier} aria-label="Guide overview" data-reveal data-reveal-y="18">
-          <p className={styles.dossierLabel}>Your itinerary, considered</p>
-          <ul className={styles.heroPoints} aria-label="Review focus">
-          {page.heroPoints.map((point, index) => (
-            <li key={point}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{point}</strong>
-            </li>
-          ))}
-          </ul>
-          <nav className={styles.contents} aria-label="On this page">
-            <p>Inside this guide</p>
-            <a href={`#${page.id}-context`}>The request in context <ArrowUpRight size={16} aria-hidden="true" /></a>
-            <a href={`#${page.id}-review`}>What Derek evaluates <ArrowUpRight size={16} aria-hidden="true" /></a>
-            <a href={`#${page.id}-questions`}>Questions before requesting <ArrowUpRight size={16} aria-hidden="true" /></a>
-          </nav>
-        </aside>
+        <figure className={styles.heroScene} data-reveal data-reveal-y="18"><img className={styles.heroImage} src={scene.image} alt={scene.alt} width={sceneDimensions[scene.kind][0]} height={sceneDimensions[scene.kind][1]} fetchpriority="high" decoding="async" /><figcaption>{scene.caption}</figcaption></figure>
+        <div className={styles.focusStrip} aria-label="Review focus">{scene.labels.map((point, index) => <span key={point}><small>{String(index + 1).padStart(2, '0')}</small>{point}</span>)}</div>
       </div>
     </section>
   );
@@ -87,7 +72,6 @@ function Introduction({ page, scene, onChoose }) {
   return (
     <section id={`${page.id}-context`} className={`${styles.contextScene} ${styles[scene.kind]}`} aria-labelledby={`${page.id}-intro-title`}>
       <div className={`container ${styles.sceneGrid}`}>
-        <figure className={styles.scenePhoto} data-reveal><img src={scene.image} alt={scene.alt} width={sceneDimensions[scene.kind][0]} height={sceneDimensions[scene.kind][1]} loading="lazy" decoding="async" /><figcaption>{scene.caption}</figcaption></figure>
         <div className={styles.sceneCopy} data-reveal><p className="eyebrow">The request in context</p><h2 id={`${page.id}-intro-title`}>{page.introTitle}</h2>{page.intro.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<Link className={styles.sceneAction} to="/#request-form" onClick={onChoose}>Start my {scene.cabin === 'first' ? 'first class ' : ''}trip brief <ArrowRight size={17} aria-hidden="true" /></Link></div>
         {scene.kind === 'complex' && <div className={styles.stopSequence} aria-label="Organize the sequence of your journey"><p>Your stop sequence</p><ol><li>Departure</li><li>First stop</li><li>Next stop</li><li>Final arrival</li></ol><span>Add two to six legs in your trip brief. Set the dates that are fixed and note where the order can change.</span></div>}
         {scene.kind === 'urgent' && <div className={styles.urgentContact}><div><p className="eyebrow">A direct conversation</p><strong>Have your time limits ready.</strong><p>Share the route, exact travel dates, and the latest arrival you can accept.</p></div><div><a href={`tel:${contactConfig.phoneHref}`}>Call {contactConfig.phoneLabel} <ArrowUpRight size={17} aria-hidden="true" /></a><a href={getWhatsappUrl({ serviceIntent: 'time_sensitive', cabin: 'business' })} target="_blank" rel="noopener noreferrer">Message Derek on WhatsApp <ArrowUpRight size={17} aria-hidden="true" /></a></div></div>}
@@ -230,7 +214,7 @@ export default function CoreLanding({ page }) {
 
   return (
     <div className={styles.page} ref={pageRef}>
-      <Hero page={page} />
+      <Hero page={page} scene={scene} onChoose={choosePage} />
       <Introduction page={page} scene={scene} onChoose={choosePage} />
       <Evaluation page={page} scene={scene} />
       <Limitations page={page} />

@@ -1,0 +1,40 @@
+.premium-experience .priority-review--document {
+  .chapter-heading { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 18px 8%; max-width: none; margin-bottom: 40px; .eyebrow { grid-column: 1 / -1; margin-bottom: 0; } h2 { font-size: clamp(38px, 4.2vw, 60px); } > p:last-child:not(.eyebrow) { margin: 0; align-self: end; max-width: 410px; font-size: 16px; } }
+  .priority-layout { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 6%; align-items: start; }
+  .priority-controls { min-width: 0; padding-top: 6px; }
+  .priority-controls fieldset > label { min-height: 84px; font-size: clamp(19px, 1.7vw, 24px); }
+  .priority-preview-note { font-size: 12px; line-height: 1.7; color: #4a5568; margin: 22px 0; max-width: 380px; }
+  .priority-status { font-size: 12px; }
+  .priority-document { min-width: 0; background: #fff; padding: clamp(24px, 3vw, 40px); border-top: 3px solid #8a194f; box-shadow: 0 12px 40px rgba(11, 25, 41, .06); }
+  .priority-document-masthead { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid rgba(11, 25, 41, .15); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #4a5568; }
+  .priority-document-opening { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 20px; align-items: center; padding-block: 24px; }
+  .priority-document-condition { color: #4a5568; font-size: 12px; line-height: 1.65; max-width: 360px; margin-bottom: 12px; }
+  .priority-document h3 { font-size: clamp(26px, 2.45vw, 35px); line-height: 1.15; font-weight: 650; letter-spacing: -.035em; color: #0b1929; }
+  .priority-document-illustration { margin: 0; min-width: 0; img { display: block; width: 100%; height: auto; } figcaption { color: #4a5568; font-size: 9px; line-height: 1.5; margin-top: 5px; text-align: center; } }
+  .priority-document-label { color: #8a194f; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 15px; }
+  .priority-document-tradeoffs { margin: 0; > div { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); gap: 24px; padding-block: 17px; border-top: 1px solid rgba(11, 25, 41, .14); } dt { font-weight: 600; font-size: 14px; line-height: 1.6; } dd { color: #4a5568; font-size: 13px; line-height: 1.7; margin: 0; } }
+  .priority-document-takeaway { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 13px; margin-top: 13px; padding-top: 19px; border-top: 1px solid rgba(11, 25, 41, .14); svg { color: #8a194f; margin-top: 2px; } p { font-size: 13px; line-height: 1.7; color: #0b1929; } }
+  @media (max-width: 1000px) {
+    .priority-layout { gap: 4%; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+    .priority-controls fieldset > label { grid-template-columns: 21px minmax(0, 1fr) 21px; gap: 11px; }
+    .priority-document-opening { grid-template-columns: minmax(0, 1fr) 85px; gap: 14px; }
+    .priority-document-tradeoffs > div { grid-template-columns: 1fr; gap: 7px; }
+  }
+  @media (max-width: 760px) {
+    .chapter-heading { display: block; margin-bottom: 30px; .eyebrow { margin-bottom: 19px; } h2 { font-size: clamp(34px, 7.4vw, 52px); } > p:last-child:not(.eyebrow) { margin-top: 20px; font-size: 15px; } }
+    .priority-layout { grid-template-columns: 1fr; gap: 30px; }
+    .priority-controls { padding: 0; }
+    .priority-controls fieldset > label { min-height: 72px; font-size: 21px; }
+    .priority-preview-note { max-width: 520px; margin-block: 19px; }
+    .priority-status { min-height: 0; }
+    .priority-document-opening { grid-template-columns: minmax(0, 1fr) 90px; }
+    .priority-document-tradeoffs > div { grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); gap: 20px; }
+  }
+  @media (max-width: 480px) {
+    .priority-document { padding: 23px; }
+    .priority-document-opening { grid-template-columns: minmax(0, 1fr) 70px; gap: 12px; }
+    .priority-document h3 { font-size: 26px; }
+    .priority-document-tradeoffs > div { grid-template-columns: 1fr; gap: 7px; }
+    .priority-document dd, .priority-document-takeaway p { font-size: 13px; }
+  }
+}

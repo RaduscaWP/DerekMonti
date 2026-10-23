@@ -147,26 +147,110 @@ export function serializeTrip(trip) {
   return payload;
 }
 
+const submissionIdentities = new WeakMap();
+export const SAFE_RETRY_WINDOW_MS = 23 * 60 * 60 * 1000;
+
+export function createSubmissionIdentity(trip, previous = null, { cryptoImpl = globalThis.crypto, now = Date.now() } = {}) {
+  const payloadKey = JSON.stringify(serializeTrip(trip));
+  if (previous?.payloadKey === payloadKey) return previous;
+  if (typeof cryptoImpl?.randomUUID !== 'function') throw Object.assign(new Error('Automatic requests are unavailable in this browser. Contact Derek directly; your entries are kept.'), { code: 'IDENTITY_UNAVAILABLE' });
+  return { requestId: cryptoImpl.randomUUID(), requestCreatedAt: now, payloadKey };
+}
+
+const DEFINITE_SUBMISSION_FAILURES = new Set([
+  'VALIDATION', 'FORM_TIMING', 'INTAKE_UNAVAILABLE', 'VERIFICATION_UNAVAILABLE',
+  'VERIFICATION_FAILED', 'RATE_LIMITED', 'DELIVERY_REJECTED', 'IDENTITY_UNAVAILABLE',
+  'JSON_REQUIRED', 'ORIGIN_REJECTED', 'INVALID_PAYLOAD',
+]);
+
+export function isTripSubmissionLocked(state) {
+  return state.status === 'submitting' || state.status === 'success' || state.attempt?.unresolved === true;
+}
+
+function immutableTrip(trip) {
+  return Object.freeze({ ...trip, legs: Object.freeze(trip.legs.map((leg) => Object.freeze({ ...leg }))) });
+}
+
+// This store belongs to the page provider, not a mounted form. Its asynchronous
+// result and original identity survive route changes without persisting PII.
+export function createTripSubmissionController({ send = submitTripRequest } = {}) {
+  let state = { status: 'idle', attempt: null, result: null, error: null };
+  let pending = null;
+  const listeners = new Set();
+  const commit = (next) => { state = next; listeners.forEach((listener) => listener()); };
+  return {
+    getSnapshot: () => state,
+    subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
+    clearError() {
+      if (isTripSubmissionLocked(state)) return false;
+      commit({ ...state, status: 'idle', error: null });
+      return true;
+    },
+    reset() {
+      if (state.status === 'submitting' || state.attempt?.unresolved) return false;
+      commit({ status: 'idle', attempt: null, result: null, error: null });
+      return true;
+    },
+    submit(trip, options = {}) {
+      if (state.status === 'submitting') return pending || Promise.reject(Object.assign(new Error('Request in progress'), { code: 'REQUEST_IN_PROGRESS' }));
+      if (state.status === 'success') return Promise.resolve(state.result);
+      let attempt;
+      try {
+        const snapshot = state.attempt?.unresolved ? state.attempt.trip : immutableTrip(trip);
+        const identity = state.attempt?.unresolved ? state.attempt.identity : Object.freeze(createSubmissionIdentity(snapshot, state.attempt?.identity));
+        attempt = { trip: snapshot, identity, unresolved: state.attempt?.unresolved === true };
+      } catch (error) {
+        commit({ ...state, status: 'error', error });
+        return Promise.reject(error);
+      }
+      commit({ status: 'submitting', attempt, result: null, error: null });
+      pending = (async () => {
+        try {
+          const receipt = await send(attempt.trip, { ...options, requestIdentity: attempt.identity });
+          const result = { ...receipt, trip: attempt.trip };
+          commit({ status: 'success', attempt: { ...attempt, unresolved: false }, result, error: null });
+          return result;
+        } catch (error) {
+          // A later rejection cannot prove that an earlier uncertain send failed.
+          const unresolved = attempt.unresolved || !DEFINITE_SUBMISSION_FAILURES.has(error.code);
+          commit({ status: 'error', attempt: { ...attempt, unresolved }, result: null, error });
+          throw error;
+        } finally { pending = null; }
+      })();
+      return pending;
+    },
+  };
+}
+
 export async function submitTripRequest(trip, {
   turnstileToken = '', companyWebsite = '', formStartedAt = 0,
-  fetchImpl = globalThis.fetch, today,
+  fetchImpl = globalThis.fetch, today, requestIdentity, timeoutMs = 35000,
 } = {}) {
   const fieldErrors = validateTrip(trip, today ? { today } : {});
   if (Object.keys(fieldErrors).length) {
     throw Object.assign(new Error('Review the highlighted fields.'), { code: 'VALIDATION', fieldErrors });
   }
-  const payload = { ...serializeTrip(trip), companyWebsite, formStartedAt, turnstileToken };
+  const identity = createSubmissionIdentity(trip, requestIdentity || submissionIdentities.get(trip));
+  submissionIdentities.set(trip, identity);
+  if (Date.now() - identity.requestCreatedAt >= SAFE_RETRY_WINDOW_MS) throw Object.assign(new Error('The safe retry window for the earlier attempt has ended. Your entries are kept. Contact Derek directly about that attempt.'), { code: 'RETRY_WINDOW_EXPIRED' });
+  const payload = { ...serializeTrip(trip), requestId: identity.requestId, requestCreatedAt: identity.requestCreatedAt, companyWebsite, formStartedAt, turnstileToken };
   let response;
+  let data;
+  const controller = new AbortController();
+  let timer;
   try {
-    response = await fetchImpl('/api/quote', {
+    [response, data] = await Promise.race([(async () => {
+      const result = await fetchImpl('/api/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    });
+      signal: controller.signal,
+      });
+      return [result, await result.json().catch(() => null)];
+    })(), new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error('request-timeout')); }, timeoutMs); })]);
   } catch {
-    throw Object.assign(new Error('We could not confirm receipt. Your details are kept. Check your email before trying again, or contact Derek.'), { code: 'NETWORK_UNCONFIRMED' });
-  }
-  const data = await response.json().catch(() => null);
+    throw Object.assign(new Error('We could not confirm receipt. Your details are kept. Retry this same request later, or contact Derek about the earlier attempt.'), { code: 'NETWORK_UNCONFIRMED' });
+  } finally { clearTimeout(timer); }
   if (!response.ok || data?.ok !== true) {
     const serverErrors = data?.fieldErrors && typeof data.fieldErrors === 'object' && !Array.isArray(data.fieldErrors)
       ? Object.fromEntries(Object.entries(data.fieldErrors)
@@ -176,8 +260,10 @@ export async function submitTripRequest(trip, {
     throw Object.assign(new Error(typeof data?.error === 'string' && data.error.trim()
       ? data.error
       : 'We could not confirm receipt. Your details are kept. Check your email before trying again, or contact Derek.'), {
-      code: typeof data?.code === 'string' ? data.code : 'RESPONSE_UNCONFIRMED',
+      code: typeof data?.code === 'string' ? data.code
+        : response.status === 400 && Object.keys(serverErrors).length ? 'VALIDATION' : 'RESPONSE_UNCONFIRMED',
       fieldErrors: serverErrors,
+      retryAfter: Number.isFinite(data?.retryAfter) ? data.retryAfter : null,
     });
   }
   if (typeof data.reference !== 'string' || !data.reference.trim()) {

@@ -22,10 +22,11 @@ export function structuredDataFor(metadata) {
     description: metadata.description,
     url: metadata.canonical || `${SITE_ORIGIN}/`,
     image: metadata.image,
+    inLanguage: metadata.locale || 'en',
     isPartOf: {
       '@type': 'WebSite',
       name: SITE_NAME,
-      url: `${SITE_ORIGIN}/`,
+      url: metadata.locale && metadata.locale !== 'en' ? `${SITE_ORIGIN}/${metadata.locale}` : `${SITE_ORIGIN}/`,
     },
   };
 
@@ -62,6 +63,12 @@ export function renderSeoHead(metadata, { deploymentNoindex = false } = {}) {
   const canonical = metadata.canonical
     ? `\n    <link rel="canonical" href="${escapeHtml(metadata.canonical)}" />`
     : '';
+  const alternates = indexable ? (metadata.alternates || []).map(({ language, href }) => (
+    `\n    <link rel="alternate" hreflang="${escapeHtml(language)}" href="${escapeHtml(href)}" />`
+  )).join('') : '';
+  const alternateLocales = indexable ? (metadata.alternates || [])
+    .filter(({ language }) => language !== metadata.locale && language !== 'x-default')
+    .map(({ language }) => `\n    <meta property="og:locale:alternate" content="${{ en: 'en_US', ro: 'ro_RO', ru: 'ru_RU', de: 'de_DE' }[language]}" />`).join('') : '';
   const structuredData = indexable
     ? `\n    <script id="page-structured-data" type="application/ld+json">${JSON.stringify(
         structuredDataFor(metadata),
@@ -71,9 +78,9 @@ export function renderSeoHead(metadata, { deploymentNoindex = false } = {}) {
   return `<!--seo-head:start-->
     <title>${escapeHtml(metadata.title)}</title>
     <meta name="description" content="${escapeHtml(metadata.description)}" />
-    <meta name="robots" content="${robots}" />${deploymentMarker}${canonical}
+    <meta name="robots" content="${robots}" />${deploymentMarker}${canonical}${alternates}
     <meta property="og:site_name" content="${SITE_NAME}" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content="${escapeHtml(metadata.openGraphLocale || 'en_US')}" />${alternateLocales}
     <meta property="og:type" content="${metadata.type === 'article' ? 'article' : 'website'}" />
     <meta property="og:title" content="${escapeHtml(metadata.title)}" />
     <meta property="og:description" content="${escapeHtml(metadata.description)}" />

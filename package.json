@@ -10,11 +10,12 @@
     "build:ssr": "vite build --ssr src/entry-server.jsx --outDir .vite/ssr",
     "prerender": "node scripts/prerender.mjs",
     "validate:seo": "node scripts/validate-prerender.mjs",
-    "test": "node --test tests/quote-contract.test.mjs tests/seo-deployment.test.mjs tests/homepage-trip.test.mjs",
+    "test": "node --test tests/quote-contract.test.mjs tests/quote-security.test.mjs tests/seo-deployment.test.mjs tests/homepage-trip.test.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "preview:static": "node scripts/serve-prerender.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
     "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/syne": "^5.2.7",
     "@upstash/redis": "^1.38.0",

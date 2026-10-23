@@ -1,0 +1,9 @@
+{
+  "mode": "turnstile-binding",
+  "syntheticProvidersOnly": true,
+  "acceptsSuccessForOtherHostnameAndAction": true,
+  "result": {
+    "ok": true
+  },
+  "realNetworkCalls": 0
+}

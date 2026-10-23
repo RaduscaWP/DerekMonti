@@ -1,0 +1,22 @@
+{
+  "mode": "endpoint",
+  "syntheticProvidersOnly": true,
+  "foreignOriginTextPlainStatus": 200,
+  "verificationCallsWithoutSecret": 0,
+  "repeatCreatesNewReference": true,
+  "repeatedRequestEmailCount": 4,
+  "idempotencyHeadersPresent": false,
+  "statusesForSameIpWithinOneProcess": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    429
+  ],
+  "emailCalls": 16,
+  "realNetworkCalls": 0
+}
