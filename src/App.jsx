@@ -12,13 +12,10 @@ import Terms from './pages/Terms.jsx';
 import NotFound from './pages/NotFound.jsx';
 import CoreLanding from './pages/CoreLanding.jsx';
 import { corePages } from './data/corePages.js';
-import { TripBriefProvider } from './context/TripBriefProvider.jsx';
-import { MotionPreferenceProvider } from './context/MotionPreferenceProvider.jsx';
 import SeoHead from './seo/SeoHead.jsx';
-import RouteErrorBoundary from './components/common/RouteErrorBoundary.jsx';
 
 function RouteFocus() {
-  const { pathname, hash, key } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -48,7 +45,7 @@ function RouteFocus() {
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [pathname, hash, key]);
+  }, [pathname, hash]);
 
   return null;
 }
@@ -59,18 +56,13 @@ function SiteAnalytics() {
   return isLocalPreview ? null : <Analytics />;
 }
 
-function PageBoundary({ children }) {
-  const { pathname } = useLocation();
-  return <RouteErrorBoundary key={pathname}>{children}</RouteErrorBoundary>;
-}
-
 export default function App() {
   return (
-    <TripBriefProvider><MotionPreferenceProvider>
+    <>
       <SeoHead />
       <Layout>
         <RouteFocus />
-        <PageBoundary><Routes>
+        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
           <Route path="/about" element={<About />} />
@@ -82,9 +74,9 @@ export default function App() {
             <Route path={page.path} element={<CoreLanding page={page} />} key={page.path} />
           ))}
           <Route path="*" element={<NotFound />} />
-        </Routes></PageBoundary>
+        </Routes>
       </Layout>
       <SiteAnalytics />
-    </MotionPreferenceProvider></TripBriefProvider>
+    </>
   );
 }

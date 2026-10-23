@@ -23,23 +23,6 @@ export const CONTACT_PREFERENCE_OPTIONS = [
   { value: 'whatsapp', label: 'WhatsApp' },
 ];
 
-export const COMFORT_PREFERENCE_OPTIONS = [
-  { value: 'rested', label: 'Rested' },
-  { value: 'work', label: 'Ready to work' },
-  { value: 'together', label: 'Travelling together' },
-];
-
-export const SERVICE_INTENT_OPTIONS = [
-  { value: 'single_destination', label: 'One clear journey' },
-  { value: 'complex_itinerary', label: 'Several connected stops' },
-  { value: 'time_sensitive', label: 'Departure is close' },
-  { value: 'personal_advisor', label: 'Personal flight advisor' },
-];
-export const CONVERSION_SOURCES = ['homepage', 'services', 'blog'];
-export function getServiceIntentLabel(value) {
-  return optionLabel(SERVICE_INTENT_OPTIONS, value, 'Not specified');
-}
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const PHONE_ALLOWED_RE = /^[+()\d\s.-]+$/;
@@ -49,7 +32,6 @@ const TRIP_TYPE_VALUES = optionValues(TRIP_TYPE_OPTIONS);
 const CABIN_VALUES = optionValues(CABIN_OPTIONS);
 const FLEXIBILITY_VALUES = optionValues(FLEXIBILITY_OPTIONS);
 const CONTACT_PREFERENCE_VALUES = optionValues(CONTACT_PREFERENCE_OPTIONS);
-const COMFORT_PREFERENCE_VALUES = optionValues(COMFORT_PREFERENCE_OPTIONS);
 
 const legacyTripTypes = {
   'Round trip': 'round_trip',
@@ -103,10 +85,6 @@ export function getContactPreferenceLabel(value) {
   return optionLabel(CONTACT_PREFERENCE_OPTIONS, normalizeContactPreference(value), 'Email');
 }
 
-export function getComfortPreferenceLabel(value) {
-  return optionLabel(COMFORT_PREFERENCE_OPTIONS, value, 'Not specified');
-}
-
 export function isValidPhone(value) {
   const trimmed = String(value || '').trim();
   const digits = trimmed.replace(/\D/g, '');
@@ -154,14 +132,6 @@ function validateRouteFields(fields, errors, prefix = '', today = localTodayIso(
 
 export function validateQuoteFields(fields, { today = localTodayIso() } = {}) {
   const errors = {};
-  // These optional enums are checked raw: never trim, truncate or coerce an
-  // untrusted value into a valid selection or attribution value.
-  if (fields?.serviceIntent != null && !SERVICE_INTENT_OPTIONS.some(({ value }) => value === fields.serviceIntent)) {
-    errors.serviceIntent = 'Choose a listed travel situation, or leave it unselected.';
-  }
-  if (fields?.source !== undefined && fields.source !== '' && !CONVERSION_SOURCES.includes(fields.source)) {
-    errors.source = 'Choose a valid request source.';
-  }
   const rawTripType = legacyTripTypes[fields?.tripType] || String(fields?.tripType || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
   const tripType = normalizeTripType(fields?.tripType);
   const travelers = Number(fields?.travelers);
@@ -208,10 +178,6 @@ export function validateQuoteFields(fields, { today = localTodayIso() } = {}) {
   if (!CABIN_VALUES.has(String(fields?.cabin || ''))) errors.cabin = 'Choose a cabin preference.';
   if (!FLEXIBILITY_VALUES.has(String(fields?.flexibility || ''))) {
     errors.flexibility = 'Choose how flexible your dates are.';
-  }
-  // Existing forms can omit this optional field; never silently select a priority.
-  if (fields?.comfortPreference != null && fields.comfortPreference !== '' && !COMFORT_PREFERENCE_VALUES.has(fields.comfortPreference)) {
-    errors.comfortPreference = 'Choose a valid comfort preference.';
   }
   if (fullName.length < 2) errors.fullName = 'Enter your full name.';
   if (!EMAIL_RE.test(email)) errors.email = 'Enter a valid email address.';

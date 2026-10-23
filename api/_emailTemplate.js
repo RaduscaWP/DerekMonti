@@ -1,8 +1,6 @@
 import { resolveLocation } from './_iataLookup.js';
 import {
   getCabinLabel,
-  getComfortPreferenceLabel,
-  getServiceIntentLabel,
   getContactPreferenceLabel,
   getFlexibilityLabel,
   getItineraryLegs,
@@ -103,13 +101,13 @@ function itineraryBlock(fields, legs) {
   `;
 }
 
-function notesBlock(notes, label = 'Notes or priorities') {
+function notesBlock(notes) {
   if (!notes) return '';
   return `
     <tr>
       <td style="background:#FFFFFF;padding:0 24px 24px;">
         <div style="background:#F5F5F7;border-radius:12px;padding:14px;">
-          <div style="font:700 10px Arial,sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:#6D788B;line-height:1.3;">${escape(label)}</div>
+          <div style="font:700 10px Arial,sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:#6D788B;line-height:1.3;">Notes or priorities</div>
           <div style="font:400 13px Arial,sans-serif;color:#253348;line-height:1.6;padding-top:6px;white-space:pre-line;">${escape(notes)}</div>
         </div>
       </td>
@@ -185,8 +183,6 @@ function renderTicketHtml(fields, meta) {
                 </table>
               </td>
             </tr>
-            ${notesBlock(fields.comfortPreference ? getComfortPreferenceLabel(fields.comfortPreference) : '', 'Comfort preference')}
-            ${notesBlock(fields.serviceIntent ? getServiceIntentLabel(fields.serviceIntent) : '', 'Travel situation')}
             ${notesBlock(fields.notes)}
             <tr>
               <td style="background:#07111F;padding:22px 24px 24px;border-radius:0 0 24px 24px;">

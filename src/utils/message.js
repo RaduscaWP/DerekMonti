@@ -1,8 +1,6 @@
 import { contactConfig } from '../data/siteData.js';
 import {
   getCabinLabel,
-  getComfortPreferenceLabel,
-  getServiceIntentLabel,
   getContactPreferenceLabel,
   getFlexibilityLabel,
   getItineraryLegs,
@@ -25,8 +23,6 @@ function hasQuoteDetails(fields) {
       fields?.email ||
       fields?.phone ||
       fields?.notes ||
-      fields?.comfortPreference ||
-      fields?.serviceIntent ||
       fields?.legs?.some((leg) => leg.from || leg.to || leg.departure),
   );
 }
@@ -65,8 +61,6 @@ export function buildQuoteMessage(fields = {}) {
     `Travelers: ${fields.travelers || 1}`,
     `Cabin: ${getCabinLabel(fields.cabin)}`,
     `Date flexibility: ${getFlexibilityLabel(fields.flexibility)}`,
-    fields.comfortPreference ? `Comfort preference: ${getComfortPreferenceLabel(fields.comfortPreference)}` : null,
-    fields.serviceIntent ? `Travel situation: ${getServiceIntentLabel(fields.serviceIntent)}` : null,
     fields.fullName ? `Name: ${fields.fullName}` : null,
     fields.email ? `Email: ${fields.email}` : null,
     fields.phone ? `Phone or WhatsApp: ${fields.phone}` : null,

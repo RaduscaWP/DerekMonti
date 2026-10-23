@@ -1,15 +1,13 @@
-import { useMotionPreference } from '../context/MotionPreferenceProvider.jsx';
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export function usePageMotion(scopeRef) {
-  const { reduced, motionReady } = useMotionPreference();
   useEffect(() => {
     const scope = scopeRef.current;
-    if (!scope || !motionReady) return undefined;
+    if (!scope) return undefined;
 
-    if (reduced) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       scope.querySelectorAll('[data-reveal]').forEach((element) => {
         element.style.removeProperty('opacity');
         element.style.removeProperty('transform');
@@ -17,10 +15,7 @@ export function usePageMotion(scopeRef) {
       return undefined;
     }
 
-    let ctx;
-    try {
-    ctx = gsap.context(() => {}, scope);
-    ctx.add(() => {
+    const ctx = gsap.context(() => {
       gsap.utils.toArray('[data-reveal]').forEach((element) => {
         gsap.from(element, {
           y: Number(element.dataset.revealY || 44),
@@ -34,14 +29,11 @@ export function usePageMotion(scopeRef) {
           },
         });
       });
-    });
-    } catch {
-      try { ctx?.revert(); } catch { /* Motion is optional. */ }
-      scope.querySelectorAll('[data-reveal]').forEach(element => { element.style.removeProperty('opacity'); element.style.removeProperty('transform'); });
-    }
+    }, scope);
 
     return () => {
-      try { ctx?.revert(); ScrollTrigger.refresh(); } catch { /* Navigation stays usable when motion fails. */ }
+      ctx.revert();
+      ScrollTrigger.refresh();
     };
-  }, [scopeRef, reduced, motionReady]);
+  }, [scopeRef]);
 }
