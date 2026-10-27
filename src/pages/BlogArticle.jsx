@@ -7,7 +7,7 @@ import QuickQuote from '../components/common/QuickQuote.jsx';
 import { blogPosts } from '../data/blog.js';
 import { imagery } from '../data/siteData.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
-import { SITE_ORIGIN } from '../seo/routeManifest.js';
+import { SITE_ORIGIN } from '../seo/site.js';
 import NotFound from './NotFound.jsx';
 
 const routeLinks = [

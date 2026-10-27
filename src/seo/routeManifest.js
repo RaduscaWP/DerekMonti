@@ -3,8 +3,9 @@ import { homeFaqs } from '../data/siteData.js';
 import { routePages } from '../data/routePages.js';
 import { corePages } from '../data/corePages.js';
 
-export const SITE_NAME = 'Fly with Derek';
-export const SITE_ORIGIN = 'https://www.flywithderek.com';
+import { SITE_NAME, SITE_ORIGIN } from './site.js';
+
+export { SITE_NAME, SITE_ORIGIN };
 export const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/images/og/default.jpg`;
 export const PORTRAIT_IMAGE = `${SITE_ORIGIN}/images/derek-monti.jpg`;
 // Bump when site-wide content changes; individual routes can carry their own `updated` date.

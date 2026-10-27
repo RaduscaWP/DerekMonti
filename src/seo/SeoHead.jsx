@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 function setMeta(attribute, key, content) {
@@ -79,8 +79,15 @@ function applyHead(pathname, manifest, head) {
 // the main bundle.
 export default function SeoHead() {
   const location = useLocation();
+  const firstRun = useRef(true);
 
   useEffect(() => {
+    // The prerendered document already carries the correct head for the first URL; only
+    // in-app navigation needs the manifest (which brings the page data with it).
+    if (firstRun.current) {
+      firstRun.current = false;
+      if (document.head.querySelector('meta[property="og:title"]')) return undefined;
+    }
     let cancelled = false;
     Promise.all([import('./routeManifest.js'), import('./head.js')]).then(([manifest, head]) => {
       if (!cancelled) applyHead(location.pathname, manifest, head);
