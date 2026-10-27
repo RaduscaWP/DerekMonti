@@ -62,12 +62,12 @@ Hero cu video de cabină (doar pe desktop; pe mobil rămâne posterul), portret,
 | Scroll orizontal | About sub 375 px | niciunul la 320/390/768/1024/1440/1920 |
 | Înălțime home mobil | 13.920 px | 13.412 px (mai mult conținut comercial pe aceeași lungime) |
 | Înălțime blog mobil | — | 4.974 px |
-| Lighthouse desktop home | — | 85–94 (variază între rulări), a11y 97, SEO 100 |
-| Lighthouse mobil home (laborator, throttling simulat) | 71 | 52 (vezi nota) |
+| Lighthouse desktop home | — | 86–94 (variază între rulări), a11y 100, SEO 100 |
+| Lighthouse mobil home (laborator, throttling simulat, server cu gzip) | 71 | 62 (vezi nota) |
 | Lighthouse mobil pagină de rută / landing | — | 66 / 63, a11y 100, SEO 100 |
 | FCP / LCP observate la throttling real (slow 4G, CPU ×4) | — | 2,5 s / 2,5 s |
 
-Nota despre scorul mobil: pagina de home are acum de trei ori mai mult conținut (1.125 elemente DOM, 123 KB CSS), iar simularea Lighthouse penalizează costul de stil și layout pe CPU ×4 (FCP simulat 5,5 s față de 0,6 s observat). Pe serverul local fără compresie scorul este și mai pesimist; pe Vercel (brotli) și în PageSpeed Insights trebuie remăsurat după deploy. Pașii următori pentru ≥ 90 sunt la secțiunea 5.
+Nota despre scorul mobil: pagina de home are acum de trei ori mai mult conținut (1.125 elemente DOM, 123 KB CSS), iar simularea Lighthouse penalizează costul de stil și layout pe CPU ×4 (FCP simulat 4,9 s față de 0,7 s observat). Pe Vercel (brotli, HTTP/2) și în PageSpeed Insights trebuie remăsurat după deploy. Pașii următori pentru ≥ 90 sunt la secțiunea 5.
 
 ## 4. Ce rămâne în sarcina proprietarului (nu se poate face din cod)
 
