@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ArrowRight, Menu, X } from 'lucide-react';
+import { ArrowRight, Menu, MessageCircle, Phone, X } from 'lucide-react';
+import { contactConfig } from '../../data/siteData.js';
+import { getWhatsappUrl } from '../../utils/message.js';
 
 const navItems = [
   { label: 'Business Class', to: '/business-class-flights' },
   { label: 'First Class', to: '/first-class-flights' },
   { label: 'Services', to: '/services' },
-  { label: 'Guides', to: '/blog' },
+  { label: 'Blog', to: '/blog' },
   { label: 'About', to: '/about' },
 ];
 
@@ -17,6 +19,7 @@ export default function Navbar() {
   const restoreFocusRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const whatsapp = getWhatsappUrl({ requestTitle: 'Business & First Class flight quote' });
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 28);
@@ -87,8 +90,8 @@ export default function Navbar() {
   return (
     <header className={`navbar ${solid ? 'navbar--solid' : ''}`}>
       <div className="container navbar__inner">
-        <Link className="navbar__brand" to="/" aria-label="Fly with Derek home">
-          <span>Fly with</span>
+        <Link className="navbar__brand" to="/">
+          <span>Fly with</span>{' '}
           <strong>Derek</strong>
         </Link>
 
@@ -100,22 +103,32 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <a className="navbar__cta" href="/#request-form">
-          Request a quote
-          <ArrowRight aria-hidden="true" size={17} />
-        </a>
-
-        <button
-          ref={toggleRef}
-          className="navbar__toggle"
-          type="button"
-          aria-expanded={isOpen}
-          aria-controls="mobile-navigation"
-          aria-label="Open navigation menu"
-          onClick={openMenu}
-        >
-          <Menu aria-hidden="true" size={24} />
-        </button>
+        <div className="navbar__actions">
+          <a className="navbar__phone" href={`tel:${contactConfig.phoneHref}`}>
+            <span>
+              <small>Call 24/7</small>
+              {contactConfig.phoneLabel}
+            </span>
+          </a>
+          <a className="navbar__call" href={`tel:${contactConfig.phoneHref}`} aria-label={`Call Derek ${contactConfig.phoneLabel}`}>
+            <Phone aria-hidden="true" size={18} />
+          </a>
+          <a className="navbar__cta" href="/#request-form">
+            Get a quote
+            <ArrowRight aria-hidden="true" size={17} />
+          </a>
+          <button
+            ref={toggleRef}
+            className="navbar__toggle"
+            type="button"
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
+            aria-label="Open navigation menu"
+            onClick={openMenu}
+          >
+            <Menu aria-hidden="true" size={24} />
+          </button>
+        </div>
       </div>
 
       {isOpen && (
@@ -129,29 +142,34 @@ export default function Navbar() {
         >
           <div className="mobile-menu__top">
             <Link className="navbar__brand" to="/" onClick={() => closeForNavigation('/')}>
-              <span>Fly with</span>
+              <span>Fly with</span>{' '}
               <strong>Derek</strong>
             </Link>
             <button type="button" onClick={() => closeMenu()} aria-label="Close navigation menu">
               <X aria-hidden="true" size={25} />
             </button>
           </div>
+          <div className="mobile-menu__contact">
+            <a className="is-primary" href="/#request-form" onClick={() => closeForNavigation('/#request-form')}>
+              Get a quote
+              <ArrowRight aria-hidden="true" size={18} />
+            </a>
+            <a href={`tel:${contactConfig.phoneHref}`}>
+              <Phone aria-hidden="true" size={17} />
+              Call Derek
+            </a>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer">
+              <MessageCircle aria-hidden="true" size={17} />
+              WhatsApp
+            </a>
+          </div>
           <nav aria-label="Mobile navigation">
-            {navItems.map((item, index) => (
+            {navItems.map((item) => (
               <NavLink key={item.to} to={item.to} onClick={() => closeForNavigation(item.to)}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
                 {item.label}
               </NavLink>
             ))}
           </nav>
-          <a
-            className="mobile-menu__cta"
-            href="/#request-form"
-            onClick={() => closeForNavigation('/#request-form')}
-          >
-            Request a personal review
-            <ArrowRight aria-hidden="true" size={18} />
-          </a>
         </div>
       )}
     </header>

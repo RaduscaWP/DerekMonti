@@ -96,6 +96,38 @@ for (const route of routeManifest) {
   }
   if (headings[0]) recordUnique('h1', headings[0], route.pathname);
 
+  if (titles[0] && titles[0].length > 70) {
+    errors.push(`${route.pathname} title is ${titles[0].length} characters; keep titles at or under 70.`);
+  }
+  if (descriptions[0] && descriptions[0].length > 160) {
+    errors.push(`${route.pathname} description is ${descriptions[0].length} characters; keep descriptions at or under 160.`);
+  }
+  for (const block of matches(html, /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      const parsed = JSON.parse(block[1]);
+      const nodes = parsed['@graph'] || [parsed];
+      for (const node of nodes) {
+        if (!node['@type']) errors.push(`${route.pathname} has a structured data node without @type.`);
+      }
+    } catch {
+      errors.push(`${route.pathname} contains structured data that is not valid JSON.`);
+    }
+  }
+  const internalLinks = new Set(
+    matches(html, /href="(\/[^"#?]*)"/gi)
+      .map((match) => match[1])
+      .filter((href) => !href.startsWith('/assets') && !href.startsWith('/images') && !href.startsWith('/videos')),
+  );
+  if (route.indexable && !noindexDeployment && internalLinks.size < 5) {
+    errors.push(`${route.pathname} links to only ${internalLinks.size} internal pages; indexable pages need at least 5.`);
+  }
+  const h2s = matches(html, /<h2\b[^>]*>([\s\S]*?)<\/h2>/gi).map((match) => normalizeText(match[1]));
+  for (const heading of [...headings, ...h2s]) {
+    if (/not a booking|does not create a reservation|no guarantee/i.test(heading)) {
+      errors.push(`${route.pathname} has a disclaimer in a heading: "${heading}".`);
+    }
+  }
+
   if (/\bhref\s*=\s*["']#["']/i.test(html)) {
     errors.push(`${route.pathname} contains an empty hash link (href="#").`);
   }
@@ -129,7 +161,7 @@ const sitemapUrls = matches(sitemap, /<loc>([^<]+)<\/loc>/gi)
   .map((match) => decodeEntities(match[1]))
   .sort();
 const expectedSitemapUrls = routeManifest
-  .filter((route) => route.indexable && !noindexDeployment)
+  .filter((route) => route.indexable && route.sitemap !== false && !noindexDeployment)
   .map((route) => route.canonical)
   .sort();
 

@@ -1,3 +1,5 @@
+import { corePagesCopy } from './corePagesCopy.js';
+
 const SITE_ORIGIN = 'https://www.flywithderek.com';
 
 const absoluteUrl = (path) => `${SITE_ORIGIN}${path}`;
@@ -30,7 +32,9 @@ function createServiceSchema({ name, description, path, serviceType }) {
   };
 }
 
-function definePage(page) {
+function definePage(source) {
+  // Conversion copy lives in corePagesCopy.js; the page definition keeps routing, SEO and schema.
+  const page = { ...source, ...(corePagesCopy[source.id] || {}) };
   const canonical = absoluteUrl(page.path);
 
   return {
@@ -71,20 +75,20 @@ export const corePages = [
     approvedForIndexing: true,
     id: 'business-class-flights',
     path: '/business-class-flights',
-    title: 'Business Class Flight Guidance | Fly with Derek',
+    title: 'Cheap Business Class Flights & Tickets | Fly with Derek',
     description:
-      'Request a personal review of business class flight options, including cabin fit, routing, timing, flexibility, and fare conditions.',
-    schemaName: 'Business Class Flight Guidance',
-    serviceType: 'Business class flight itinerary review',
+      'Discounted business class tickets on major airlines, typically 15–60% below published fares. Derek quotes personally within hours. WhatsApp 24/7.',
+    schemaName: 'Discounted Business Class Flights',
+    serviceType: 'Business class ticket sourcing',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Business Class Flights', path: '/business-class-flights' },
     ],
-    eyebrow: 'Business Class Guidance',
-    h1: 'Business class planning with the whole trip in view',
+    eyebrow: 'Business Class Flights',
+    h1: 'Cheap business class flights, sourced personally',
     heroSummary:
-      'Share the journey you are considering and Derek will review the cabin, routing, timing, flexibility, and ticket conditions together.',
-    heroPoints: ['Cabin and aircraft context', 'Route and connection tradeoffs', 'Ticket-condition review'],
+      'I find business class tickets through consolidator fares that airline websites never show. Send me your route and dates; I reply with real options, usually the same day.',
+    heroPoints: ['Lie-flat seats on major airlines', 'Published fare vs my fare, side by side', 'Ticket rules explained before you book'],
     introTitle: 'A useful option is more than a cabin label',
     intro: [
       'Business class products and ticket conditions can differ across an itinerary. A personal review keeps the decision focused on the parts that affect the complete journey, not one feature in isolation.',
@@ -146,7 +150,7 @@ export const corePages = [
       {
         question: 'Is Fly with Derek an airline?',
         answer:
-          'No. Fly with Derek is an independent advisory service. Airline names and products, when discussed for a request, belong to their respective owners.',
+          'No. I am a personal flight advisor, and your tickets are issued through Travel Business Class, an ARC-accredited agency. You get agency protection with one person handling your trip.',
       },
     ],
     related: [
@@ -177,20 +181,20 @@ export const corePages = [
     approvedForIndexing: true,
     id: 'first-class-flights',
     path: '/first-class-flights',
-    title: 'First Class Flight Planning | Fly with Derek',
+    title: 'First Class Flight Deals | Discounted Tickets by Derek',
     description:
-      'Request an independent review of international first class options, product scope, itinerary fit, and ticket conditions.',
-    schemaName: 'First Class Flight Planning',
-    serviceType: 'First class flight itinerary review',
+      'First class tickets on Emirates, Qatar, Lufthansa, British Airways and more at insider prices. Personal quotes from Derek Monti within hours.',
+    schemaName: 'First Class Flight Deals',
+    serviceType: 'First class ticket sourcing',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'First Class Flights', path: '/first-class-flights' },
     ],
-    eyebrow: 'First Class Planning',
-    h1: 'First class, considered in the context of the journey',
+    eyebrow: 'First Class Flights',
+    h1: 'First class flight deals most travelers never see',
     heroSummary:
-      'First class is not offered on every route or aircraft. Derek reviews the product that is actually presented for the trip and how it fits the wider itinerary.',
-    heroPoints: ['Product scope', 'Journey continuity', 'Conditions and caveats'],
+      'Private suites and lie-flat first class cabins at consolidator prices. Tell me where you are flying; I check what is actually available on your dates and what it costs.',
+    heroPoints: ['Private suites and lie-flat cabins', 'Real availability on your dates', 'Business vs first, priced both ways'],
     introTitle: 'The label alone does not define the experience',
     intro: [
       'International first class has a narrower and more variable footprint than business class. The relevant question is not simply whether a first class label appears, but what the specific itinerary includes and whether it supports the traveler\'s priorities.',
@@ -252,7 +256,7 @@ export const corePages = [
       {
         question: 'Does Fly with Derek have an airline affiliation?',
         answer:
-          'No airline affiliation is represented on this page. Fly with Derek is an independent advisory service and airline trademarks belong to their owners.',
+          'I am not affiliated with any airline. I buy through consolidator contracts and issue tickets through Travel Business Class, an ARC-accredited agency, which is how the fares come in below published prices.',
       },
     ],
     related: [
@@ -283,21 +287,21 @@ export const corePages = [
     approvedForIndexing: true,
     id: 'business-class-europe',
     path: '/business-class-flights/europe',
-    title: 'Business Class Flights from the US to Europe | Fly with Derek',
+    title: 'Business Class Flights to Europe from the US – Insider Fares',
     description:
-      'Plan a US-to-Europe business class request around cabin fit, departure and arrival timing, connection quality, airports, and flexibility.',
-    schemaName: 'US to Europe Business Class Planning',
-    serviceType: 'US to Europe business class itinerary review',
+      'Business class flights from the US to London, Paris, Rome, Frankfurt and more, typically 15–60% below published fares. Personal quotes from Derek Monti.',
+    schemaName: 'US to Europe Business Class Flights',
+    serviceType: 'US to Europe business class ticket sourcing',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Business Class Flights', path: '/business-class-flights' },
       { name: 'US to Europe', path: '/business-class-flights/europe' },
     ],
     eyebrow: 'US to Europe',
-    h1: 'Business class planning from the United States to Europe',
+    h1: 'Business class flights from the US to Europe, for less',
     heroSummary:
-      'Build the request around the arrival you need, the journey you can tolerate, and the cabin priorities that matter after crossing the Atlantic.',
-    heroPoints: ['Departure and arrival fit', 'Gateway and connection logic', 'Cabin continuity'],
+      'Overnight lie-flat flights from New York, Miami, Chicago or the West Coast to Europe. I compare the nonstops, the one-stops and the consolidator fares, then send you the two or three worth booking.',
+    heroPoints: ['Nonstop and one-stop options', 'Overnight lie-flat departures', 'Published fare vs my fare'],
     introTitle: 'Plan backward from the purpose of the trip',
     intro: [
       'A transatlantic request is easier to evaluate when the desired arrival, onward plans, and acceptable connection pattern are clear. That context helps distinguish a workable itinerary from one that merely reaches the destination.',
@@ -359,7 +363,7 @@ export const corePages = [
       {
         question: 'Does this page represent a European or US airline?',
         answer:
-          'No. Fly with Derek is an independent advisory service and does not represent an airline.',
+          'No. I work for you, not for an airline. I compare the carriers on your route and issue the ticket through Travel Business Class, an ARC-accredited agency.',
       },
     ],
     related: [
@@ -390,21 +394,21 @@ export const corePages = [
     approvedForIndexing: true,
     id: 'business-class-usa',
     path: '/business-class-flights/usa',
-    title: 'Business Class Flights from Europe to the USA | Fly with Derek',
+    title: 'Business Class Flights Europe to USA – Insider Fares',
     description:
-      'Plan a Europe-to-USA business class request around departure options, arrival airports, connections, cabin continuity, and trip priorities.',
-    schemaName: 'Europe to USA Business Class Planning',
-    serviceType: 'Europe to USA business class itinerary review',
+      'Business class tickets from London, Paris, Frankfurt, Bucharest and other European cities to the USA at consolidator prices. Quotes within hours.',
+    schemaName: 'Europe to USA Business Class Flights',
+    serviceType: 'Europe to USA business class ticket sourcing',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Business Class Flights', path: '/business-class-flights' },
       { name: 'Europe to USA', path: '/business-class-flights/usa' },
     ],
     eyebrow: 'Europe to USA',
-    h1: 'Business class planning from Europe to the United States',
+    h1: 'Business class flights from Europe to the United States, for less',
     heroSummary:
-      'Frame the request around the US arrival that works, the European departure options available to you, and the connection pattern you are prepared to accept.',
-    heroPoints: ['Arrival-airport fit', 'European departure options', 'Onward-journey context'],
+      'Daytime westbound flights with a lie-flat seat and a sensible arrival time. I price the published fare next to my fare so you see exactly what you save.',
+    heroPoints: ['Daytime westbound flights', 'Departures from your nearest hub', 'Published fare vs my fare'],
     introTitle: 'The best-shaped itinerary finishes the journey well',
     intro: [
       'For Europe-to-USA travel, the arrival airport and any onward plans can be as important as the transatlantic cabin. A useful request explains the final destination, not only the first US airport on the itinerary.',
@@ -497,20 +501,20 @@ export const corePages = [
     approvedForIndexing: true,
     id: 'last-minute-business-class',
     path: '/services/last-minute-business-class',
-    title: 'Last-Minute Business Class Request Support | Fly with Derek',
+    title: 'Last Minute Business Class Flights – Booked in Hours',
     description:
-      'Submit a time-sensitive business class request with the route, dates, traveler details, cabin priorities, and realistic flexibility made clear.',
-    schemaName: 'Last-Minute Business Class Request Support',
-    serviceType: 'Time-sensitive business class itinerary review',
+      'Flying in the next 48 hours? Derek finds last minute business and first class seats when airline sites show nothing. WhatsApp +1 (786) 706-4828 now.',
+    schemaName: 'Last Minute Business Class Flights',
+    serviceType: 'Last-minute business class ticket sourcing',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Last-Minute Business Class', path: '/services/last-minute-business-class' },
     ],
-    eyebrow: 'Time-Sensitive Requests',
-    h1: 'A clearer way to submit an urgent business class request',
+    eyebrow: 'Last-Minute Flights',
+    h1: 'Last minute business class flights, booked in hours',
     heroSummary:
-      'When departure is close, a complete brief matters. Share the non-negotiables, the genuine flexibility, and a reliable contact method from the start.',
-    heroPoints: ['Complete trip brief', 'Firm versus flexible details', 'No availability promise'],
+      'Need to fly tomorrow or this week? Message me the route, the date and how many travelers. I work my consolidator network and reply the same day with seats I can ticket.',
+    heroPoints: ['Same-day search', 'Seats airline sites do not show', 'WhatsApp reply within hours'],
     introTitle: 'Urgency should make the request clearer, not louder',
     intro: [
       'A time-sensitive request is easier to assess when the required route, travel date, traveler count, and decision constraints are complete. Missing details can make an already narrow decision harder to review.',
@@ -603,20 +607,20 @@ export const corePages = [
     approvedForIndexing: true,
     id: 'complex-itineraries',
     path: '/services/complex-itineraries',
-    title: 'Complex and Multi-City Flight Itinerary Review | Fly with Derek',
+    title: 'Multi-City & Round-the-World Business Class Tickets',
     description:
-      'Organize a multi-city, open-jaw, or mixed-cabin request around segment order, fixed dates, cabin continuity, connections, and ticket conditions.',
-    schemaName: 'Complex Flight Itinerary Review',
-    serviceType: 'Multi-city and complex flight itinerary review',
+      'Multi-city, open-jaw and round-the-world business class itineraries built personally by Derek, with mixed cabins and several airlines priced together.',
+    schemaName: 'Multi-City Business Class Itineraries',
+    serviceType: 'Multi-city and round-the-world ticket sourcing',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Complex Itineraries', path: '/services/complex-itineraries' },
     ],
     eyebrow: 'Complex Itineraries',
-    h1: 'Make every segment serve the complete journey',
+    h1: 'Multi-city and round-the-world business class, built personally',
     heroSummary:
-      'Bring multi-city, open-jaw, mixed-cabin, and connection-heavy requests into one clear itinerary brief before comparing individual flights.',
-    heroPoints: ['Segment-by-segment clarity', 'Cabin continuity', 'Fixed dates and dependencies'],
+      'London to Tokyo to Sydney to New York, or an open-jaw that ends in a different city: I build the routing, mix cabins where it makes sense and price the whole trip as one plan.',
+    heroPoints: ['Up to six legs in one plan', 'Mixed cabins where it makes sense', 'One price for the whole trip'],
     introTitle: 'Complex trips need one source of truth',
     intro: [
       'When a journey has several stops, reviewing each flight separately can hide conflicts between dates, airports, cabins, or ticket conditions. A structured request makes the order and dependencies visible.',
@@ -709,20 +713,20 @@ export const corePages = [
     approvedForIndexing: true,
     id: 'premium-flight-advisor',
     path: '/services/premium-flight-advisor',
-    title: 'Personal Premium Flight Advisor | Fly with Derek',
+    title: 'Personal Business Class Advisor – Derek Monti',
     description:
-      'Work through a premium flight request with a personal itinerary review focused on cabin, routing, timing, flexibility, and ticket conditions.',
-    schemaName: 'Personal Premium Flight Advisor',
-    serviceType: 'Premium flight itinerary advisory',
+      'A personal advisor, not a call center: Derek Monti reviews your business or first class trip, finds consolidator fares and handles the booking end to end.',
+    schemaName: 'Personal Business Class Advisor',
+    serviceType: 'Personal business and first class flight advisory',
     breadcrumbs: [
       { name: 'Home', path: '/' },
       { name: 'Premium Flight Advisor', path: '/services/premium-flight-advisor' },
     ],
     eyebrow: 'Personal Flight Advisor',
-    h1: 'A human review for a premium flight decision',
+    h1: 'One advisor for your business and first class flights',
     heroSummary:
-      'Derek brings the route, cabin, timing, flexibility, and ticket conditions into one conversation so the traveler can assess the journey as a whole.',
-    heroPoints: ['One clear trip brief', 'Itinerary-level comparison', 'Tradeoffs explained in context'],
+      'You deal with me directly, from the first message to the e-ticket. Share the route, dates and what matters most; I come back with real fares and the conditions that matter.',
+    heroPoints: ['One point of contact', 'Consolidator fares on 50+ airlines', 'Booking handled end to end'],
     introTitle: 'Advice starts with the traveler, not a search result',
     intro: [
       'A premium flight request often includes priorities that are difficult to express in a short search: rest, privacy, arrival timing, connection tolerance, airport preference, or flexibility if plans change.',
@@ -779,7 +783,7 @@ export const corePages = [
       {
         question: 'Does Derek represent an airline?',
         answer:
-          'No. Fly with Derek is an independent advisory service. Airline products and trademarks belong to their respective owners.',
+          'No. I represent you. Fares come from consolidator contracts across many airlines, and tickets are issued through Travel Business Class, an ARC-accredited agency.',
       },
       {
         question: 'What happens after I submit the request?',
@@ -807,6 +811,124 @@ export const corePages = [
         path: '/about',
         label: 'About Derek',
         description: 'Read more about the personal advisory approach.',
+      },
+    ],
+  }),
+
+  definePage({
+    approvedForIndexing: true,
+    id: 'business-class-miami',
+    path: '/business-class-flights-miami',
+    updated: '2026-10-27',
+    title: 'Business Class Travel Agent in Miami – Insider Fares from MIA',
+    description:
+      'Miami-based business and first class flight advisor. Consolidator fares from MIA and FLL, typically 15–60% below published. WhatsApp +1 (786) 706-4828.',
+    schemaName: 'Business Class Travel Agent in Miami',
+    serviceType: 'Business class flight booking from Miami',
+    breadcrumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Business Class Flights', path: '/business-class-flights' },
+      { name: 'Miami', path: '/business-class-flights-miami' },
+    ],
+    eyebrow: 'Miami · MIA & FLL',
+    h1: 'Your business class travel agent in Miami',
+    heroSummary:
+      'I live in Miami and price flights out of MIA and Fort Lauderdale every day: London, Madrid, Paris, Rome, Bucharest and beyond, in business and first class at consolidator fares the airline sites never show.',
+    heroPoints: ['Nonstop MIA to London, Madrid, Paris, Rome and more', 'Published fare vs my fare, side by side', 'Same-day quotes, 24/7 on WhatsApp'],
+    introTitle: 'Miami is one of the best-served US airports for premium cabins to Europe and Latin America',
+    intro: [
+      'From Miami International you can fly nonstop in a lie-flat seat to London, Madrid, Paris, Rome, Frankfurt, Zurich, Lisbon and Istanbul, and to almost every capital in Latin America. That much competition is good news for my clients: when four airlines sell the same overnight flight, at least one of them is quietly discounting it through consolidators.',
+      'I am based here, so I know which evening departures sell out first, when American and British Airways release their cheapest business fares to Heathrow, and when a one-stop through Lisbon or Madrid is worth the extra hour. Fort Lauderdale is often part of the answer too.',
+      'Send me the trip on WhatsApp and I reply the same day with real fares, the published price next to mine and the seat you actually get on each leg.',
+    ],
+    audienceTitle: 'Who I help from Miami',
+    audience: [
+      {
+        title: 'South Florida families flying to Europe',
+        body: 'Summer and Christmas trips to London, Madrid, Rome or Paris, priced per seat so a family of four sees the real saving before booking.',
+      },
+      {
+        title: 'Executives on short notice',
+        body: 'Same-week business class to Europe, the Gulf or Latin America when the airline website shows only full fares or nothing at all.',
+      },
+      {
+        title: 'Visitors flying home',
+        body: 'Romanian, Spanish, Italian and Latin American clients who fly the same route every year and want one person who remembers how they like to travel.',
+      },
+    ],
+    evaluationTitle: 'What I check before I quote a Miami departure',
+    evaluationIntro: 'Four questions decide whether a fare out of MIA is a good one, and I answer them before you see a price.',
+    evaluation: [
+      {
+        title: 'Nonstop or one-stop',
+        body: 'A nonstop from MIA is usually worth a few hundred dollars more; a one-stop through Madrid or Lisbon can save a thousand. I show both.',
+      },
+      {
+        title: 'The seat on each leg',
+        body: 'Miami to Europe is all widebody, lie-flat business; I tell you which airlines fly suites with doors and which still run older cabins.',
+      },
+      {
+        title: 'Departure time',
+        body: 'Most European flights leave Miami between 5 pm and 11 pm. The latest departures often carry the best consolidator fares.',
+      },
+      {
+        title: 'Fare rules',
+        body: 'Consolidator fares have their own change and refund rules; I spell them out before you book, not after.',
+      },
+    ],
+    process: [
+      { title: 'Message me the trip', body: 'WhatsApp or the form: route, dates, travelers and cabin. Flexible dates help me find the better fare.' },
+      { title: 'I search the fares', body: 'Published fares and my consolidator contracts, nonstop and one-stop, out of MIA and FLL.' },
+      { title: 'You get real options', body: 'Usually within hours: price, seat, schedule and the rules for each option, with the published fare next to mine.' },
+      { title: 'I issue the ticket', body: 'Through Travel Business Class, an ARC-accredited agency, with your airline record locator sent the same day.' },
+    ],
+    faqs: [
+      {
+        question: 'Which airlines fly business class nonstop from Miami to Europe?',
+        answer:
+          'British Airways, American and Virgin Atlantic to London; Iberia and American to Madrid; Air France to Paris; ITA Airways to Rome; Lufthansa to Frankfurt; Swiss to Zurich; TAP to Lisbon; Turkish Airlines to Istanbul. All of them fly lie-flat business class and I price every one of them.',
+      },
+      {
+        question: 'How much is business class from Miami to London?',
+        answer:
+          'Published round-trip fares run roughly $4,000 to $7,000 depending on the season. As an example, a recent quote I sent came to $2,850 against $4,400 published. Fares change daily and I confirm the price before ticketing.',
+      },
+      {
+        question: 'Do you also book from Fort Lauderdale?',
+        answer:
+          'Yes. FLL has fewer premium-cabin nonstops, but a one-stop from there is sometimes the cheapest business class fare in South Florida, and I check it alongside Miami on every request.',
+      },
+      {
+        question: 'Can I call you instead of using the form?',
+        answer:
+          'Yes. Call or WhatsApp +1 (786) 706-4828 any time; most of my clients send the trip on WhatsApp because it is the fastest way to get options back.',
+      },
+      {
+        question: 'Do you only work with Miami clients?',
+        answer:
+          'No. I book business and first class worldwide for clients across the US and Europe. Miami is simply where I am based and the airport I know best.',
+      },
+    ],
+    related: [
+      {
+        path: '/business-class-flights/miami-to-london',
+        label: 'Miami to London',
+        description: 'Nonstop business class on British Airways, American and Virgin Atlantic.',
+      },
+      {
+        path: '/business-class-flights/miami-to-madrid',
+        label: 'Miami to Madrid',
+        description: 'Iberia and American nonstops, plus the one-stops that cut the fare.',
+      },
+      {
+        path: '/business-class-flights/miami-to-rome',
+        label: 'Miami to Rome',
+        description: 'Seasonal nonstops and year-round one-stops in business class.',
+      },
+      {
+        path: '/business-class-flights/europe',
+        label: 'Business class to Europe',
+        description: 'Every US gateway, priced below the published fare.',
       },
     ],
   }),

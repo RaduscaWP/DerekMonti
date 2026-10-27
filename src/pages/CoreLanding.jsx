@@ -1,11 +1,19 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Check, CircleDot, Compass } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, MessageCircle, Phone } from 'lucide-react';
 import Button from '../components/common/Button.jsx';
 import FaqAccordion from '../components/common/FaqAccordion.jsx';
+import FinalCta from '../components/common/FinalCta.jsx';
+import QuickQuote from '../components/common/QuickQuote.jsx';
 import SectionHeader from '../components/common/SectionHeader.jsx';
+import Spotlight from '../components/landing/Spotlight.jsx';
+import { contactConfig } from '../data/siteData.js';
+import { spotlights } from '../data/spotlights.js';
 import { usePageMotion } from '../hooks/usePageMotion.js';
+import { getWhatsappUrl } from '../utils/message.js';
 import styles from './CoreLanding.module.scss';
+
+const cabinByPage = { 'first-class-flights': 'first' };
 
 function Breadcrumbs({ items }) {
   return (
@@ -25,14 +33,9 @@ function Breadcrumbs({ items }) {
   );
 }
 
-function Hero({ page }) {
+function Hero({ page, whatsapp }) {
   return (
     <section className={styles.hero} aria-labelledby={`${page.id}-title`}>
-      <div className={styles.heroAtmosphere} aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
       <div className={`container ${styles.heroInner}`}>
         <Breadcrumbs items={page.breadcrumbs} />
         <div className={styles.heroCopy} data-reveal data-reveal-y="24">
@@ -40,17 +43,26 @@ function Hero({ page }) {
           <h1 id={`${page.id}-title`}>{page.h1}</h1>
           <p className={styles.heroSummary}>{page.heroSummary}</p>
           <div className={styles.heroActions}>
-            <Button href="/#request-form">Request a Personal Review</Button>
-            <Link className={styles.quietLink} to="/about">
-              About Derek
-              <ArrowUpRight aria-hidden="true" size={17} />
-            </Link>
+            <Button href="#quote">Get a quote</Button>
+            <a className={styles.heroContact} href={whatsapp} target="_blank" rel="noopener noreferrer">
+              <MessageCircle aria-hidden="true" size={17} />
+              WhatsApp Derek
+            </a>
+            <a className={styles.heroContact} href={`tel:${contactConfig.phoneHref}`}>
+              <Phone aria-hidden="true" size={17} />
+              {contactConfig.phoneLabel}
+            </a>
           </div>
         </div>
-        <ul className={styles.heroPoints} aria-label="Review focus" data-reveal data-reveal-y="18">
-          {page.heroPoints.map((point, index) => (
+        <div className={styles.heroQuote} id="quote" data-reveal data-reveal-y="18">
+          <p className={styles.heroQuoteTitle}>Price my trip</p>
+          <QuickQuote variant="inline" cabin={cabinByPage[page.id] || null} label="Get my quote" />
+          <p className={styles.heroQuoteNote}>Free quote, no obligation. I reply within hours, usually the same day.</p>
+        </div>
+        <ul className={styles.heroPoints} aria-label="What you get" data-reveal data-reveal-y="18">
+          {page.heroPoints.map((point) => (
             <li key={point}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
+              <Check aria-hidden="true" size={18} />
               <strong>{point}</strong>
             </li>
           ))}
@@ -65,18 +77,18 @@ function Introduction({ page }) {
     <section className={styles.introduction} aria-labelledby={`${page.id}-intro-title`}>
       <div className={`container ${styles.introGrid}`}>
         <div className={styles.introCopy} data-reveal>
-          <p className="eyebrow">The request in context</p>
+          <p className="eyebrow">How I work this route</p>
           <h2 id={`${page.id}-intro-title`}>{page.introTitle}</h2>
           {page.intro.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
+            <p key={paragraph.slice(0, 40)}>{paragraph}</p>
           ))}
         </div>
         <div className={styles.audience} data-reveal>
           <h3>{page.audienceTitle}</h3>
           <ol>
-            {page.audience.map((item, index) => (
+            {page.audience.map((item) => (
               <li key={item.title}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
+                <Check aria-hidden="true" size={18} />
                 <div>
                   <strong>{item.title}</strong>
                   <p>{item.body}</p>
@@ -92,19 +104,16 @@ function Introduction({ page }) {
 
 function Evaluation({ page }) {
   return (
-    <section className={styles.evaluation} aria-label={page.evaluationTitle}>
+    <section className={styles.evaluation} aria-labelledby={`${page.id}-evaluation-title`}>
       <div className="container">
-        <SectionHeader
-          eyebrow="Itinerary Review"
-          title={page.evaluationTitle}
-          text={page.evaluationIntro}
-          align="left"
-          light
-        />
+        <SectionHeader eyebrow="Before you book" title={page.evaluationTitle} text={page.evaluationIntro} align="left" light />
+        <h2 className="sr-only" id={`${page.id}-evaluation-title`}>
+          {page.evaluationTitle}
+        </h2>
         <div className={styles.evaluationGrid}>
-          {page.evaluation.map((item, index) => (
+          {page.evaluation.map((item) => (
             <article key={item.title} data-reveal>
-              <span>{String(index + 1).padStart(2, '0')}</span>
+              <Check aria-hidden="true" size={20} />
               <h3>{item.title}</h3>
               <p>{item.body}</p>
             </article>
@@ -115,44 +124,15 @@ function Evaluation({ page }) {
   );
 }
 
-function Limitations({ page }) {
-  return (
-    <section className={styles.limitations} aria-labelledby={`${page.id}-limitations-title`}>
-      <div className={`container ${styles.limitationsInner}`} data-reveal>
-        <div className={styles.limitationsHeading}>
-          <CircleDot aria-hidden="true" size={22} />
-          <div>
-            <p className="eyebrow">Clear expectations</p>
-            <h2 id={`${page.id}-limitations-title`}>{page.limitationsTitle}</h2>
-          </div>
-        </div>
-        <ul>
-          {page.limitations.map((item) => (
-            <li key={item}>
-              <Check aria-hidden="true" size={17} />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
 function Process({ page }) {
   return (
     <section className={styles.process} aria-label="How it works">
       <div className="container">
-        <SectionHeader
-          eyebrow="How It Works"
-          title="Three steps from request to decision"
-          text="The process stays focused on the trip information and the tradeoffs that can be confirmed."
-          align="left"
-        />
+        <SectionHeader eyebrow="How it works" title="From your message to a confirmed ticket" text="Send the trip, get real fares, book when you are ready." align="left" />
         <ol className={styles.processList}>
           {page.process.map((step, index) => (
             <li key={step.title} data-reveal>
-              <span>{String(index + 1).padStart(2, '0')}</span>
+              <span>Step {index + 1}</span>
               <h3>{step.title}</h3>
               <p>{step.body}</p>
             </li>
@@ -168,11 +148,10 @@ function RelatedPages({ page }) {
     <section className={styles.related} aria-labelledby={`${page.id}-related-title`}>
       <div className={`container ${styles.relatedInner}`}>
         <div className={styles.relatedIntro} data-reveal>
-          <Compass aria-hidden="true" size={26} />
-          <p className="eyebrow">Continue planning</p>
-          <h2 id={`${page.id}-related-title`}>Explore the next relevant guide</h2>
+          <p className="eyebrow">Keep planning</p>
+          <h2 id={`${page.id}-related-title`}>Other ways I can help with this trip</h2>
         </div>
-        <nav className={styles.relatedLinks} aria-label="Related planning pages" data-reveal>
+        <nav className={styles.relatedLinks} aria-label="Related pages" data-reveal>
           {page.related.map((item) => (
             <Link to={item.path} key={item.path}>
               <span>
@@ -193,32 +172,15 @@ function FrequentlyAskedQuestions({ page }) {
     <section className={`faq-section ${styles.faq}`} aria-labelledby={`${page.id}-faq-title`}>
       <div className={`container faq-section__inner ${styles.faqInner}`}>
         <div data-reveal>
-          <p className="eyebrow">Questions before requesting</p>
-          <h2 id={`${page.id}-faq-title`}>Frequently asked questions</h2>
-          <p className={styles.faqIntro}>
-            These answers explain the review process. Specific flights, products, and conditions still require
-            confirmation for the individual request.
-          </p>
+          <p className="eyebrow">FAQ</p>
+          <h2 id={`${page.id}-faq-title`}>Questions travelers ask me</h2>
+          <p className={styles.faqIntro}>Straight answers before you request a quote.</p>
+          <a className={styles.faqAction} href="#quote">
+            Get a quote
+            <ArrowRight aria-hidden="true" size={17} />
+          </a>
         </div>
         <FaqAccordion items={page.faqs} />
-      </div>
-    </section>
-  );
-}
-
-function FinalCallToAction() {
-  return (
-    <section className={styles.finalCta} aria-labelledby="core-landing-cta-title">
-      <div className={`container ${styles.finalCtaInner}`} data-reveal>
-        <div>
-          <p className="eyebrow">Start with the trip</p>
-          <h2 id="core-landing-cta-title">Share the journey you want Derek to review</h2>
-          <p>
-            Provide the route, dates, traveler count, cabin preference, and the tradeoffs that matter most. Submitting
-            the request does not create a reservation.
-          </p>
-        </div>
-        <Button href="/#request-form">Request a Personal Review</Button>
       </div>
     </section>
   );
@@ -231,17 +193,23 @@ export default function CoreLanding({ page }) {
 
   const pageRef = useRef(null);
   usePageMotion(pageRef);
+  const whatsapp = getWhatsappUrl({ requestTitle: `${page.schemaName} quote` });
+  const spotlight = spotlights[page.id];
 
   return (
     <div className={styles.page} ref={pageRef}>
-      <Hero page={page} />
+      <Hero page={page} whatsapp={whatsapp} />
       <Introduction page={page} />
+      {spotlight && <Spotlight spotlight={spotlight} pageId={page.id} />}
       <Evaluation page={page} />
-      <Limitations page={page} />
       <Process page={page} />
       <RelatedPages page={page} />
       <FrequentlyAskedQuestions page={page} />
-      <FinalCallToAction />
+      <FinalCta
+        title="Tell me where you want to fly"
+        text="Route, dates, travelers and cabin. I reply with real fares, usually the same day, and the published price next to mine."
+        quoteHref="#quote"
+      />
     </div>
   );
 }

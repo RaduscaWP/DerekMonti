@@ -1,0 +1,558 @@
+@use '../variables' as *;
+
+// QuickQuote — compact pre-qualifier that hands off to the full request form.
+// Mobile first: stacked fields. >=720px two columns, >=940px three, >=1200px one row.
+
+$qq-border: rgba(11, 25, 41, 0.16);
+$qq-divider: rgba(11, 25, 41, 0.1);
+$qq-placeholder: rgba(11, 25, 41, 0.62);
+$qq-ivory: #f7f3eb;
+
+.quick-quote {
+  display: grid;
+  width: 100%;
+  gap: 0.85rem;
+  color: $color-text-primary;
+  font-family: $font-body;
+  text-align: left;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+.quick-quote--inline {
+  padding: 1.25rem;
+  border: 1px solid rgba(11, 25, 41, 0.08);
+  border-radius: 16px;
+  background: $qq-ivory;
+}
+
+// ---------------------------------------------------------------------------
+// Trip type segmented control
+// ---------------------------------------------------------------------------
+
+.quick-quote__trip {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.quick-quote__legend {
+  display: block;
+  margin-bottom: 0.5rem;
+  padding: 0;
+  color: $color-text-secondary;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.quick-quote__segment {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(11, 25, 41, 0.1);
+}
+
+.quick-quote--inline .quick-quote__segment {
+  border: 1px solid $qq-border;
+  box-shadow: none;
+}
+
+.quick-quote__option {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    white-space: nowrap;
+  }
+
+  span {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    color: $color-text-secondary;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    transition: color 0.2s $ease-smooth, background-color 0.2s $ease-smooth;
+  }
+
+  span:hover {
+    color: $color-text-primary;
+  }
+
+  input:checked + span {
+    color: #fff;
+    background: $color-accent;
+  }
+
+  input:focus-visible + span {
+    outline: 3px solid $color-text-primary;
+    outline-offset: 2px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Field bar
+// ---------------------------------------------------------------------------
+
+.quick-quote__bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.quick-quote--hero .quick-quote__bar {
+  padding: 1rem;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.quick-quote__field {
+  min-width: 0;
+}
+
+.quick-quote__label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: $color-text-secondary;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+// Hero: icon + placeholder carry the meaning; labels stay in the DOM for AT.
+.quick-quote--hero .quick-quote__label,
+.quick-quote--hero .quick-quote__legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+.quick-quote__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  border: 1px solid $qq-border;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 0.2s $ease-smooth, box-shadow 0.2s $ease-smooth;
+
+  &:focus-within {
+    border-color: $color-accent;
+    box-shadow: 0 0 0 3px rgba(138, 25, 79, 0.16);
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-height: 46px;
+    margin: 0;
+    padding: 0.6rem 0.9rem 0.6rem 2.6rem;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: $color-text-primary;
+    font-family: $font-body;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.3;
+    appearance: none;
+    -webkit-appearance: none;
+    text-overflow: ellipsis;
+
+    &:focus-visible {
+      // The wrapper paints the focus ring (border + glow) so the field edge stays clean.
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $qq-placeholder;
+      opacity: 1;
+    }
+  }
+
+  input[type='date'] {
+    min-width: 0;
+    color-scheme: light;
+    text-align: left;
+
+    &::-webkit-date-and-time-value {
+      min-height: 1.3em;
+      text-align: left;
+    }
+
+    &::-webkit-calendar-picker-indicator {
+      margin-left: 0.25rem;
+      padding: 0.25rem;
+      opacity: 0.65;
+      cursor: pointer;
+    }
+
+    &::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+  }
+
+  select {
+    padding-right: 2.2rem;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  select option {
+    color: $color-text-primary;
+    background: #fff;
+  }
+}
+
+.quick-quote__field--from .quick-quote__control:has(input[aria-invalid='true']),
+.quick-quote__field--to .quick-quote__control:has(input[aria-invalid='true']) {
+  border-color: $color-accent;
+}
+
+.quick-quote__icon {
+  position: absolute;
+  left: 0.9rem;
+  flex: none;
+  color: $color-accent;
+  pointer-events: none;
+}
+
+.quick-quote__chevron {
+  position: absolute;
+  right: 0.75rem;
+  flex: none;
+  color: $color-text-secondary;
+  pointer-events: none;
+}
+
+.quick-quote__action {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.quick-quote__submit {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.quick-quote__error {
+  margin: 0;
+  color: $color-accent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.quick-quote--hero .quick-quote__error {
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  background: #fff;
+}
+
+// ---------------------------------------------------------------------------
+// >= 720px: two columns
+// ---------------------------------------------------------------------------
+
+@media (min-width: 720px) {
+  .quick-quote__bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-quote__action {
+    grid-column: 1 / -1;
+  }
+
+  .quick-quote__submit {
+    width: auto;
+    min-width: 220px;
+    margin-left: auto;
+  }
+
+  .quick-quote--one-way .quick-quote__field--cabin {
+    grid-column: 1 / -1;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// >= 940px: three columns
+// ---------------------------------------------------------------------------
+
+@media (min-width: 940px) {
+  .quick-quote__bar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .quick-quote--one-way .quick-quote__field--cabin {
+    grid-column: auto;
+  }
+
+  .quick-quote--one-way .quick-quote__action {
+    grid-column: 3 / 4;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// >= 1200px: single row
+// ---------------------------------------------------------------------------
+
+@media (min-width: 1200px) {
+  .quick-quote__bar {
+    grid-template-columns:
+      minmax(0, 1.25fr) minmax(0, 1.25fr) minmax(146px, 0.85fr) minmax(146px, 0.85fr) minmax(150px, 0.75fr)
+      minmax(150px, 0.95fr) auto;
+    align-items: stretch;
+  }
+
+  .quick-quote--one-way .quick-quote__bar {
+    grid-template-columns:
+      minmax(0, 1.25fr) minmax(0, 1.25fr) minmax(146px, 0.85fr) minmax(150px, 0.75fr) minmax(150px, 0.95fr)
+      auto;
+  }
+
+  .quick-quote__action,
+  .quick-quote--one-way .quick-quote__action {
+    grid-column: auto;
+  }
+
+  .quick-quote__submit {
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .quick-quote__field {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .quick-quote__control {
+    flex: 1 1 auto;
+  }
+
+  .quick-quote__control input,
+  .quick-quote__control select {
+    padding-left: 2.35rem;
+  }
+
+  .quick-quote__control select {
+    padding-right: 1.9rem;
+  }
+
+  .quick-quote__icon {
+    left: 0.75rem;
+  }
+
+  .quick-quote__chevron {
+    right: 0.55rem;
+  }
+
+  // Hero: the bar becomes a pill, fields share it and are separated by hairlines.
+  .quick-quote--hero .quick-quote__bar {
+    gap: 0;
+    padding: 0.45rem 0.45rem 0.45rem 0.5rem;
+    border-radius: 999px;
+  }
+
+  .quick-quote--hero .quick-quote__field + .quick-quote__field {
+    border-left: 1px solid $qq-divider;
+  }
+
+  .quick-quote--hero .quick-quote__control {
+    min-height: 52px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+
+    &:focus-within {
+      box-shadow: inset 0 0 0 2px $color-accent;
+    }
+
+    input,
+    select {
+      min-height: 52px;
+    }
+  }
+
+  .quick-quote--hero .quick-quote__field--from .quick-quote__control:has(input[aria-invalid='true']),
+  .quick-quote--hero .quick-quote__field--to .quick-quote__control:has(input[aria-invalid='true']) {
+    box-shadow: inset 0 0 0 2px $color-accent;
+  }
+
+  .quick-quote--hero .quick-quote__action {
+    padding-left: 0.5rem;
+  }
+
+  .quick-quote--hero .quick-quote__submit {
+    min-height: 52px;
+  }
+
+  // Inline: one row as well, but fields keep their own borders inside the ivory card.
+  .quick-quote--inline .quick-quote__bar {
+    gap: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quick-quote__control,
+  .quick-quote__option span {
+    transition: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Inline variant lives inside cards and rails of unknown width: lay it out by
+// container width, never by viewport width (the rules above are for the hero).
+// ---------------------------------------------------------------------------
+
+.quick-quote--inline {
+  container-type: inline-size;
+}
+
+.quick-quote--inline .quick-quote__bar,
+.quick-quote--one-way.quick-quote--inline .quick-quote__bar {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.65rem;
+}
+
+.quick-quote--inline .quick-quote__field {
+  display: block;
+}
+
+.quick-quote--inline .quick-quote__field--cabin,
+.quick-quote--one-way.quick-quote--inline .quick-quote__field--cabin {
+  grid-column: auto;
+}
+
+.quick-quote--inline .quick-quote__action,
+.quick-quote--one-way.quick-quote--inline .quick-quote__action {
+  grid-column: 1 / -1;
+  padding-left: 0;
+}
+
+.quick-quote--inline .quick-quote__submit {
+  width: 100%;
+  min-width: 0;
+  margin-left: 0;
+}
+
+@container (min-width: 460px) {
+  .quick-quote--inline .quick-quote__bar,
+  .quick-quote--one-way.quick-quote--inline .quick-quote__bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-quote--one-way.quick-quote--inline .quick-quote__field--cabin {
+    grid-column: 1 / -1;
+  }
+}
+
+@container (min-width: 760px) {
+  .quick-quote--inline .quick-quote__bar,
+  .quick-quote--one-way.quick-quote--inline .quick-quote__bar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .quick-quote--one-way.quick-quote--inline .quick-quote__field--cabin {
+    grid-column: auto;
+  }
+}
+
+// Keep the field above its decorative icon so nothing obscures the tap target.
+.quick-quote__control input,
+.quick-quote__control select {
+  position: relative;
+  z-index: 1;
+}
+
+.quick-quote__icon,
+.quick-quote__chevron {
+  z-index: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Hero variant inside the two-column hero: the content column is ~720px wide at
+// desktop, too narrow for the seven-cell pill, so the bar becomes a card with
+// From/To on the first row, dates/travelers/cabin on the second and the button last.
+// ---------------------------------------------------------------------------
+
+.quick-quote--hero {
+  container-type: inline-size;
+}
+
+@media (min-width: 1200px) {
+  @container (max-width: 1000px) {
+    .quick-quote--hero .quick-quote__bar,
+    .quick-quote--one-way.quick-quote--hero .quick-quote__bar {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.6rem;
+      padding: 0.75rem;
+      border-radius: 24px;
+    }
+
+    .quick-quote--hero .quick-quote__field--from,
+    .quick-quote--hero .quick-quote__field--to {
+      grid-column: span 2;
+    }
+
+    .quick-quote--hero .quick-quote__field + .quick-quote__field {
+      border-left: 0;
+    }
+
+    .quick-quote--hero .quick-quote__control {
+      min-height: 48px;
+      border: 1px solid $qq-border;
+      border-radius: 12px;
+      background: #fff;
+
+      input,
+      select {
+        min-height: 46px;
+      }
+    }
+
+    .quick-quote--hero .quick-quote__action,
+    .quick-quote--one-way.quick-quote--hero .quick-quote__action {
+      grid-column: 1 / -1;
+      padding-left: 0;
+    }
+
+    .quick-quote--hero .quick-quote__submit {
+      min-height: 48px;
+    }
+  }
+}

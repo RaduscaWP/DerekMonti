@@ -1,0 +1,316 @@
+@use '../variables' as *;
+
+/* ---------------------------------------------------------------------------
+   About page
+   Blocks: .about-hero .about-portrait .about-story .about-checks .about-values
+           .about-agency
+   --------------------------------------------------------------------------- */
+
+.about-hero {
+  overflow: hidden;
+  padding: calc(var(--header-total) + clamp(2.5rem, 5vw, 4.5rem)) 0 clamp(3rem, 6vw, 5rem);
+  color: #fff;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(138, 25, 79, 0.3), transparent 32%),
+    $gradient-dark;
+}
+
+.about-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.about-hero h1 {
+  margin: 0.9rem 0 0;
+  color: #fff;
+  font-size: clamp(2.3rem, 4.6vw, 4.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.about-hero__lead {
+  max-width: 60ch;
+  margin: 1.25rem 0 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.7;
+}
+
+.about-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.about-hero__contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.about-hero__contact:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.about-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: clamp(1.25rem, 3vw, 3rem);
+  justify-content: start;
+  margin: 2.25rem 0 0;
+  padding: 1.5rem 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.about-hero .stat-counter__value {
+  color: #fff;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+}
+
+.about-hero .stat-counter__label {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.about-portrait {
+  position: relative;
+  max-width: 460px;
+  margin: 0 0 0 auto;
+  overflow: hidden;
+  aspect-ratio: 0.84;
+  border-radius: 220px 220px 24px 24px;
+  background: #172333;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+}
+
+.about-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 28%;
+}
+
+.about-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 68%, rgba(8, 16, 26, 0.78));
+}
+
+.about-portrait figcaption {
+  position: absolute;
+  z-index: 1;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  display: grid;
+}
+
+.about-portrait figcaption strong {
+  font-family: $font-display;
+  font-size: 1.2rem;
+}
+
+.about-portrait figcaption span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8125rem;
+}
+
+/* Story ------------------------------------------------------------------ */
+.about-story {
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  background: #fff;
+}
+
+.about-story__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.about-story h2 {
+  margin: 0.6rem 0 1.25rem;
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.about-story__copy p {
+  margin: 0 0 1.1rem;
+  color: $color-text-secondary;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.about-checks {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: 24px;
+  background: var(--bg-ivory);
+}
+
+.about-checks h3 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.about-checks ol {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-checks li {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.about-checks svg {
+  margin-top: 0.15rem;
+  color: $color-accent;
+}
+
+.about-checks strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.about-checks p {
+  margin: 0.2rem 0 0;
+  color: $color-text-secondary;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* Values ----------------------------------------------------------------- */
+.about-values {
+  position: relative;
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  color: #fff;
+  background: $color-bg-dark url('/images/routes/cabin.webp') center / cover no-repeat;
+  isolation: isolate;
+}
+
+.about-values::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: rgba(8, 16, 26, 0.86);
+}
+
+.about-values__header h2 {
+  margin: 0.6rem 0 0;
+  color: #fff;
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  letter-spacing: -0.03em;
+}
+
+.about-values__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.about-values__card {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: 24px;
+  color: $color-text-primary;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.about-values__card svg {
+  color: $color-accent;
+}
+
+.about-values__card h3 {
+  margin: 0.9rem 0 0.5rem;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.about-values__card p {
+  margin: 0;
+  color: $color-text-secondary;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Agency ----------------------------------------------------------------- */
+.about-agency {
+  padding: clamp(3rem, 6vw, 5rem) 0;
+  background: #fff;
+}
+
+.about-agency__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.about-agency h2 {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.about-agency__copy p {
+  margin: 0 0 1rem;
+  color: $color-text-secondary;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+.about-agency__copy p:last-child {
+  margin-bottom: 0;
+}
+
+.about-agency__copy a {
+  color: $color-accent;
+  font-weight: 600;
+}
+
+/* Responsive ------------------------------------------------------------- */
+@media (max-width: 940px) {
+  .about-hero__inner,
+  .about-story__inner,
+  .about-agency__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .about-portrait {
+    max-width: 380px;
+    margin: 0;
+  }
+
+  .about-values__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero__stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}

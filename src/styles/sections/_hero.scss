@@ -1,0 +1,343 @@
+@use '../variables' as *;
+
+/* ---------------------------------------------------------------------------
+   Home hero
+   Block: .hero
+   Elements: __media __video __overlay __inner __content __eyebrow __title
+             __title-line __copy __actions __quick __proof __fineprint
+             __portrait __portrait-frame __portrait-caption
+   --------------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  align-content: center;
+  box-sizing: border-box;
+  min-height: min(100svh, 920px);
+  overflow: hidden;
+  padding: calc(var(--header-total, 112px) + clamp(1.5rem, 3vw, 2.5rem)) 0 clamp(2.5rem, 5vw, 4rem);
+  color: #fff;
+  background: $color-bg-darker;
+  isolation: isolate;
+
+  /* Media layer -------------------------------------------------------- */
+  &__media {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    overflow: hidden;
+    background: $color-bg-darker url('/images/hero/cabin-poster.webp') center / cover no-repeat;
+    pointer-events: none;
+  }
+
+  &__video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  // Navy wash. The copy sits on the left, where the overlay is near-opaque,
+  // so white text keeps well above 4.5:1 regardless of the frame underneath.
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(8, 16, 26, 0.94) 0%, rgba(8, 16, 26, 0.86) 45%, rgba(8, 16, 26, 0.62) 100%),
+      linear-gradient(180deg, rgba(8, 16, 26, 0.55) 0%, rgba(8, 16, 26, 0.1) 35%, rgba(8, 16, 26, 0.75) 100%);
+  }
+
+  /* Layout ------------------------------------------------------------- */
+  &__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.72fr);
+    column-gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: center;
+  }
+
+  &__content {
+    max-width: 720px;
+  }
+
+  /* Type --------------------------------------------------------------- */
+  &__eyebrow {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-family: $font-body;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    margin: 1rem 0 0;
+    color: #fff;
+    font-family: $font-display;
+    font-size: clamp(2.4rem, 4.8vw, 4.4rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+  }
+
+  &__title-line {
+    display: block;
+    padding-bottom: 0.05em;
+
+    &:last-child {
+      color: rgba(255, 255, 255, 0.88);
+    }
+  }
+
+  &__copy {
+    max-width: 600px;
+    margin: 1.4rem 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-family: $font-body;
+    font-size: clamp(1rem, 1.1vw, 1.125rem);
+    line-height: 1.6;
+  }
+
+  /* Actions ------------------------------------------------------------ */
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    margin-top: 1.75rem;
+
+    .btn--outline {
+      gap: 0.6rem;
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn--outline:hover {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  /* Quick quote strip (component supplied by QuickQuote.jsx) ----------- */
+  &__quick {
+    margin-top: 1.75rem;
+  }
+
+  /* Proof row ---------------------------------------------------------- */
+  &__proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 0;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding-right: clamp(1rem, 2.5vw, 1.75rem);
+      margin-right: clamp(1rem, 2.5vw, 1.75rem);
+      border-right: 1px solid rgba(255, 255, 255, 0.22);
+
+      &:last-child {
+        padding-right: 0;
+        margin-right: 0;
+        border-right: 0;
+      }
+    }
+
+    strong {
+      color: #fff;
+      font-family: $font-display;
+      font-size: clamp(1.35rem, 1.6vw, 1.75rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1;
+    }
+
+    span {
+      color: rgba(255, 255, 255, 0.72);
+      font-family: $font-body;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+  }
+
+  &__fineprint {
+    margin: 1rem 0 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-family: $font-body;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  /* Portrait ----------------------------------------------------------- */
+  &__portrait {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    margin: 0;
+    justify-self: end;
+  }
+
+  &__portrait-frame {
+    overflow: hidden;
+    aspect-ratio: 1122 / 1402;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 220px 220px 24px 24px;
+    background: $color-bg-dark;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+  }
+
+  &__portrait-caption {
+    position: absolute;
+    bottom: 1.1rem;
+    left: 1.1rem;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    max-width: calc(100% - 2.2rem);
+    padding: 0.7rem 1rem;
+    border-radius: 16px;
+    color: $color-text-primary;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(11, 25, 41, 0.1);
+
+    strong {
+      font-family: $font-display;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    span {
+      color: $color-text-secondary;
+      font-family: $font-body;
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
+  }
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (max-width: 1120px) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.75fr);
+  }
+}
+
+@media (max-width: 940px) {
+  .hero {
+    min-height: 0;
+    padding-top: calc(var(--header-total, 112px) + 1.5rem);
+  }
+
+  .hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2.5rem;
+  }
+
+  .hero__content {
+    max-width: 640px;
+  }
+
+  .hero__overlay {
+    background:
+      linear-gradient(180deg, rgba(8, 16, 26, 0.9) 0%, rgba(8, 16, 26, 0.8) 60%, rgba(8, 16, 26, 0.88) 100%);
+  }
+
+  .hero__portrait {
+    max-width: 360px;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero {
+    padding-top: calc(var(--header-total, 112px) + 1rem);
+    padding-bottom: 2.5rem;
+  }
+
+  .hero__title {
+    margin-top: 0.85rem;
+    font-size: clamp(2.1rem, 8vw, 2.8rem);
+  }
+
+  .hero__copy {
+    margin-top: 1.1rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 1.4rem;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .hero__quick {
+    margin-top: 1.4rem;
+  }
+
+  .hero__proof {
+    margin-top: 1.4rem;
+
+    li {
+      padding-right: 1rem;
+      margin-right: 1rem;
+    }
+
+    strong {
+      font-size: 1.35rem;
+    }
+  }
+
+  .hero__inner {
+    row-gap: 2rem;
+  }
+
+  .hero__portrait {
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__proof li {
+    padding-right: 0.8rem;
+    margin-right: 0.8rem;
+  }
+
+  .hero__proof span {
+    font-size: 0.75rem;
+  }
+
+  .hero__portrait-caption {
+    bottom: 0.85rem;
+    left: 0.85rem;
+    padding: 0.6rem 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__video {
+    // The poster stays visible; playback is never started by the component.
+    visibility: hidden;
+  }
+}

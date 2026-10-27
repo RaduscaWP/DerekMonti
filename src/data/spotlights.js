@@ -1,0 +1,125 @@
+// One page-specific module per landing page (Phase 3). Fares marked as examples come from
+// CLAUDE.md and must stay labelled as examples until Derek supplies real bookings.
+import { routeDeals } from './siteData.js';
+
+const dealByCodes = (codes) => routeDeals.find((deal) => `${deal.fromCode}-${deal.toCode}` === codes);
+
+export const spotlights = {
+  'business-class-flights': {
+    type: 'fares',
+    eyebrow: 'Example fares',
+    title: 'What my clients pay next to the published fare',
+    intro: 'Five recent examples. Fares change daily; your dates, cabin and airline rules decide the final price.',
+    rows: ['JFK-LHR', 'ORD-FCO', 'SFO-FRA', 'BOS-DXB', 'LAX-HND'].map(dealByCodes).filter(Boolean).map((deal) => ({
+      route: `${deal.from} → ${deal.to}`,
+      codes: `${deal.fromCode} → ${deal.toCode}`,
+      cabin: deal.cabin === 'First Class' ? 'First Class' : 'Business',
+      carriers: deal.carriers,
+      published: deal.published,
+      derek: deal.derek,
+    })),
+    note: 'Example fares from recent quotes, round trip per person. The published fare is the airline website price for similar dates.',
+  },
+  'first-class-flights': {
+    type: 'fares',
+    eyebrow: 'Example fares',
+    title: 'First class, priced the way my clients see it',
+    intro: 'Examples from recent quotes. First class availability is narrower than business, so I confirm the exact cabin and aircraft before you decide.',
+    rows: [
+      { route: 'Miami → Singapore', codes: 'MIA → SIN', cabin: 'First Class', carriers: 'SQ / EK', published: '$12,400', derek: '$7,200' },
+      { route: 'Chicago → Dubai', codes: 'ORD → DXB', cabin: 'First Class', carriers: 'EK', published: '$8,400', derek: '$5,100' },
+      { route: 'New York → Frankfurt', codes: 'JFK → FRA', cabin: 'First Class', carriers: 'LH', published: '$9,800', derek: '$6,300' },
+    ],
+    note: 'Example fares from recent quotes, round trip per person. The published fare is the airline website price for similar dates.',
+  },
+  'business-class-europe': {
+    type: 'routes',
+    eyebrow: 'Popular routes',
+    title: 'The transatlantic routes I price most often',
+    intro: 'Most eastbound departures leave the US between 5 pm and 11 pm and land in Europe the next morning. Block times are approximate.',
+    columns: ['Route', 'Nonstop airlines', 'Flight time', 'Cabin'],
+    rows: [
+      ['New York (JFK) → London (LHR)', 'British Airways, American, Virgin Atlantic, Delta, United, JetBlue', '≈ 7 h', 'Lie-flat business on every nonstop'],
+      ['New York (JFK) → Paris (CDG)', 'Air France, Delta, American, United', '≈ 7 h 20', 'Lie-flat business'],
+      ['Miami (MIA) → London (LHR)', 'British Airways, American, Virgin Atlantic', '≈ 8 h 45', 'Lie-flat business; first on selected BA flights'],
+      ['Miami (MIA) → Madrid (MAD)', 'Iberia, American', '≈ 8 h 30', 'Lie-flat business'],
+      ['Boston (BOS) → Frankfurt (FRA)', 'Lufthansa', '≈ 7 h 30', 'Lie-flat business; first on selected flights'],
+      ['Chicago (ORD) → Rome (FCO)', 'United, ITA Airways', '≈ 9 h 30', 'Lie-flat business'],
+      ['Los Angeles (LAX) → London (LHR)', 'British Airways, Virgin Atlantic, American, United, Delta', '≈ 10 h 30', 'Lie-flat business; first on selected BA flights'],
+    ],
+    note: 'One-stop itineraries through Lisbon, Dublin, Reykjavík or a European hub are often the cheapest business class fares; I compare them with the nonstops on your dates.',
+  },
+  'business-class-usa': {
+    type: 'routes',
+    eyebrow: 'Popular routes',
+    title: 'Europe to the United States, priced both ways',
+    intro: 'Westbound flights leave Europe in the morning and land in the US the same afternoon, so a lie-flat seat and a calm arrival matter more than on the overnight return.',
+    columns: ['Route', 'Nonstop airlines', 'Flight time', 'Cabin'],
+    rows: [
+      ['London (LHR) → New York (JFK)', 'British Airways, Virgin Atlantic, American, Delta, United, JetBlue', '≈ 8 h', 'Lie-flat business on every nonstop'],
+      ['London (LHR) → Miami (MIA)', 'British Airways, Virgin Atlantic, American', '≈ 9 h 45', 'Lie-flat business'],
+      ['Paris (CDG) → New York (JFK)', 'Air France, Delta, American, United', '≈ 8 h 30', 'Lie-flat business'],
+      ['Frankfurt (FRA) → Miami (MIA)', 'Lufthansa', '≈ 10 h 30', 'Lie-flat business'],
+      ['Madrid (MAD) → Miami (MIA)', 'Iberia, American', '≈ 9 h 45', 'Lie-flat business'],
+      ['Bucharest (OTP) → New York', 'One stop via Frankfurt, Munich, Istanbul, Paris or Amsterdam', '≈ 13–15 h in total', 'Lie-flat business on the long leg'],
+      ['Istanbul (IST) → Miami (MIA)', 'Turkish Airlines', '≈ 13 h', 'Lie-flat business'],
+    ],
+    note: 'Open-jaw tickets (into New York, home from Miami) are often cheaper than two one-ways. Tell me both cities and I price it as one trip.',
+  },
+  'last-minute-business-class': {
+    type: 'timeline',
+    eyebrow: 'The next 24 hours',
+    title: 'What happens after you message me',
+    intro: 'Last-minute business class is possible more often than airline websites suggest, because consolidator seats are released differently from the public fare.',
+    rows: [
+      ['Hour 0', 'You send the route, the date, the number of travelers and the latest arrival you can accept, on WhatsApp or through the form.'],
+      ['Within 2 hours', 'I check consolidator inventory and the published fares on every airline that serves the route, including one-stop options.'],
+      ['Same day', 'You receive the two or three itineraries worth booking, with the published fare next to mine and the ticket rules spelled out.'],
+      ['Once you confirm', 'I issue the e-ticket through Travel Business Class and send it to your inbox, usually within the hour.'],
+    ],
+    note: 'Flying tonight? Call +1 (786) 706-4828. Same-day departures depend on seat availability, which I confirm before you pay anything.',
+  },
+  'complex-itineraries': {
+    type: 'itinerary',
+    eyebrow: 'Example itinerary',
+    title: 'Four cities, five flights, one ticket plan',
+    intro: 'An example of the kind of trip I build: this routing mixes business and first class across two alliances and is priced as a single plan.',
+    rows: [
+      ['London → Tokyo', 'Business class, nonstop overnight'],
+      ['Tokyo → Sydney', 'Business class, daytime flight'],
+      ['Sydney → Singapore', 'Business class'],
+      ['Singapore → New York', 'First class on the longest leg'],
+      ['New York → London', 'Business class, overnight home'],
+    ],
+    note: 'Up to six legs in one request. I set the order, choose where a cabin upgrade is worth it and keep the ticket rules consistent across airlines.',
+  },
+  'premium-flight-advisor': {
+    type: 'comparison',
+    eyebrow: 'Why an advisor',
+    title: 'Airline website, booking site or me',
+    intro: 'The same seat can cost three different prices depending on where you buy it. This is what changes when a person handles the booking.',
+    columns: ['', 'Airline website', 'Booking site', 'Derek'],
+    rows: [
+      ['Fare access', 'Published fares only', 'Published fares, sometimes bundled', 'Consolidator fares typically 15–60% below published'],
+      ['Who you talk to', 'Call center', 'Chat bot, call center', 'Me, on WhatsApp'],
+      ['Multi-city and open-jaw', 'Limited tools', 'Limited tools', 'Built by hand, priced as one plan'],
+      ['Changes and problems', 'Hold queue', 'Ticket to the airline', 'One message to me, before and during the trip'],
+      ['Ticket issued by', 'The airline', 'The booking site', 'Travel Business Class, an ARC-accredited agency'],
+    ],
+  },
+  'business-class-miami': {
+    type: 'routes',
+    eyebrow: 'Miami departures',
+    title: 'The Europe routes I price from Miami every week',
+    intro: 'Overnight flights leave Miami between 5 pm and 11 pm and land in Europe the next morning. Block times are approximate; fares are examples from recent quotes, round trip per person.',
+    columns: ['Route', 'Nonstop airlines', 'Flight time', 'Example business fare'],
+    rows: [
+      ['Miami (MIA) → London (LHR)', 'British Airways, American, Virgin Atlantic', '≈ 8 h 45', '$4,400 published · $2,850 my fare'],
+      ['Miami (MIA) → Madrid (MAD)', 'Iberia, American', '≈ 8 h 30', '$4,300 published · $2,800 my fare'],
+      ['Miami (MIA) → Paris (CDG)', 'Air France', '≈ 9 h', '$4,600 published · $3,050 my fare'],
+      ['Miami (MIA) → Rome (FCO)', 'ITA Airways; American (seasonal)', '≈ 10 h', '$5,200 published · $3,400 my fare'],
+      ['Miami (MIA) → Bucharest (OTP)', 'No nonstop: one stop via Frankfurt, Munich, Istanbul or Paris', '≈ 13–15 h', '$4,900 published · $3,100 my fare'],
+    ],
+    note: 'Fares change daily; I confirm every price before ticketing. Fort Lauderdale (FLL) one-stops are checked on every Miami request.',
+  },
+};

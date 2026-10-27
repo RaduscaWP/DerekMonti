@@ -1,0 +1,159 @@
+@use '../variables' as *;
+
+// Airline wordmark marquee — "Airlines my clients fly with".
+// Scoped under .airline-marquee; light (ivory) by default, navy with --dark.
+
+.airline-marquee {
+  --am-bg: #f7f3eb;
+  --am-text: rgba(11, 25, 41, 0.8);
+  --am-label: #{$color-accent};
+  --am-rule: rgba(11, 25, 41, 0.14);
+  --am-dot: #{$color-accent};
+  --am-gap: clamp(1.25rem, 2.6vw, 2.25rem);
+
+  position: relative;
+  background: var(--am-bg);
+  color: var(--am-text);
+  padding: clamp(1.5rem, 3.2vw, 2.4rem) 0;
+  overflow: hidden;
+
+  &--dark {
+    --am-bg: #{$color-bg-dark};
+    --am-text: rgba(255, 255, 255, 0.8);
+    --am-label: rgba(255, 255, 255, 0.72);
+    --am-rule: rgba(255, 255, 255, 0.16);
+  }
+
+  &__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: 0.9rem 0;
+  }
+
+  &__label {
+    margin: 0;
+    color: var(--am-label);
+    font-family: $font-body;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &__viewport {
+    min-width: 0;
+    overflow: hidden;
+    outline-offset: 6px;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 7%,
+      #000 93%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 7%,
+      #000 93%,
+      transparent 100%
+    );
+  }
+
+  &__track {
+    display: flex;
+    width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    animation: airline-marquee-scroll 30s linear infinite;
+    will-change: transform;
+  }
+
+  &__viewport:hover &__track,
+  &__viewport:focus-visible &__track,
+  &__viewport:focus-within &__track {
+    animation-play-state: paused;
+  }
+
+  &__item {
+    display: flex;
+    flex: none;
+    align-items: center;
+    font-family: $font-display;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    // Crimson separator dot after every wordmark (decorative).
+    &::after {
+      content: '';
+      flex: none;
+      width: 5px;
+      height: 5px;
+      margin: 0 var(--am-gap);
+      border-radius: 50%;
+      background: var(--am-dot);
+    }
+  }
+
+  @media (min-width: 940px) {
+    &__inner {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0 2.25rem;
+    }
+
+    &__label {
+      padding-right: 2.25rem;
+      border-right: 1px solid var(--am-rule);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    &__item {
+      font-size: 1.15rem;
+    }
+  }
+}
+
+@keyframes airline-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+// Static, wrapped row for users who prefer reduced motion:
+// no animation, no edge fade, duplicate copy removed.
+@media (prefers-reduced-motion: reduce) {
+  .airline-marquee {
+    &__viewport {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    &__track {
+      flex-wrap: wrap;
+      width: auto;
+      row-gap: 0.6rem;
+      animation: none;
+      will-change: auto;
+    }
+
+    &__item--dup {
+      display: none;
+    }
+
+    &__item--last::after {
+      display: none;
+    }
+  }
+}

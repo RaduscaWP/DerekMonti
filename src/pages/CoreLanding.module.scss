@@ -8,85 +8,67 @@
 
 .hero {
   position: relative;
-  min-height: min(900px, 100svh);
   overflow: hidden;
-  padding: calc(var(--header-total) + clamp(2.75rem, 7vw, 6rem)) 0 clamp(3.5rem, 7vw, 6rem);
+  padding: calc(var(--header-total) + clamp(1.75rem, 4vw, 3rem)) 0 clamp(2.5rem, 5vw, 4rem);
   color: $color-text-light;
   background:
-    radial-gradient(circle at 84% 28%, rgba(138, 25, 79, 0.2), transparent 28%),
-    radial-gradient(circle at 20% 108%, rgba(255, 255, 255, 0.08), transparent 34%),
+    radial-gradient(circle at 84% 20%, rgba(138, 25, 79, 0.28), transparent 30%),
     $gradient-dark;
-}
-
-.heroAtmosphere {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-  }
-
-  &::before {
-    top: 5%;
-    right: -17vw;
-    width: min(64vw, 850px);
-    aspect-ratio: 1;
-  }
-
-  &::after {
-    top: 16%;
-    right: -9vw;
-    width: min(42vw, 580px);
-    aspect-ratio: 1;
-  }
-
-  span {
-    position: absolute;
-    top: 41%;
-    right: clamp(2rem, 13vw, 13rem);
-    width: clamp(5px, 0.5vw, 8px);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: $color-accent;
-    box-shadow: 0 0 0 9px rgba(138, 25, 79, 0.12);
-  }
-
-  span:nth-child(2) {
-    top: 28%;
-    right: clamp(8rem, 25vw, 28rem);
-    width: 4px;
-    background: rgba(255, 255, 255, 0.72);
-    box-shadow: none;
-  }
-
-  span:nth-child(3) {
-    top: auto;
-    right: 8%;
-    bottom: 17%;
-    width: 3px;
-    background: rgba(255, 255, 255, 0.48);
-    box-shadow: none;
-  }
 }
 
 .heroInner {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 820px) 1fr;
-  align-content: space-between;
-  min-height: clamp(520px, 63svh, 650px);
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.heroQuote {
+  align-self: center;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border-radius: 24px;
+  color: $color-text-primary;
+  background: $color-bg-white;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+  scroll-margin-top: calc(var(--header-total) + 1rem);
+}
+
+.heroQuoteTitle {
+  margin-bottom: 0.9rem;
+  font-family: $font-display;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.heroQuoteNote {
+  margin-top: 0.9rem;
+  color: $color-text-secondary;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.heroContact {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.45rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  &:hover {
+    color: white;
+    text-decoration: underline;
+  }
 }
 
 .breadcrumbs {
   grid-column: 1 / -1;
   align-self: start;
-  margin-bottom: clamp(2.5rem, 7vh, 5.5rem);
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
 
   ol {
     display: flex;
@@ -102,8 +84,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
-    color: rgba(255, 255, 255, 0.58);
-    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.66);
+    font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -125,16 +107,17 @@
 }
 
 .heroCopy {
-  align-self: end;
-  max-width: 820px;
+  align-self: center;
+  max-width: 640px;
 
   h1 {
-    max-width: 800px;
+    max-width: 640px;
     color: white;
-    font-size: clamp(3rem, 7vw, 6.65rem);
-    font-weight: 650;
-    letter-spacing: -0.045em;
-    line-height: 0.94;
+    font-size: clamp(2.3rem, 4.4vw, 4.1rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+    text-wrap: balance;
   }
 }
 
@@ -184,7 +167,7 @@
   grid-column: 1 / -1;
   align-self: end;
   gap: 0;
-  margin: clamp(3rem, 8vh, 6rem) 0 0;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
   padding: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.14);
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
@@ -193,10 +176,14 @@
   li {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 1rem;
+    gap: 0.8rem;
     align-items: center;
-    min-height: 86px;
-    padding: 1.15rem clamp(1rem, 2.5vw, 2rem);
+    min-height: 64px;
+    padding: 0.9rem clamp(1rem, 2.5vw, 2rem);
+  }
+
+  svg {
+    color: $color-accent;
   }
 
   li + li {
@@ -436,7 +423,7 @@
     border-radius: 50%;
     color: $color-accent;
     font-family: $font-display;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 700;
   }
 
@@ -701,5 +688,26 @@
   .quietLink:hover svg,
   .relatedLinks a:hover svg {
     transform: none;
+  }
+}
+
+.breadcrumbs a {
+  display: inline-block;
+  padding: 0.75rem 0.15rem;
+  margin: -0.75rem -0.15rem;
+}
+
+@media (max-width: 720px) {
+  .evaluationGrid article {
+    padding: 1.25rem;
+  }
+
+  .processList li {
+    padding: 1.1rem 0;
+  }
+
+  .heroPoints li {
+    min-height: 52px;
+    padding: 0.7rem 1rem;
   }
 }

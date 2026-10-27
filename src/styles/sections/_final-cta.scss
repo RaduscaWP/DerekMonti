@@ -1,0 +1,217 @@
+@use '../variables' as *;
+
+// Final CTA: crimson gradient closing band (CLAUDE.md 5.7).
+// Rendered by src/components/common/FinalCta.jsx on Services, About, Blog and
+// BlogArticle. Everything is scoped under .final-cta--band because global.scss
+// still carries an older .final-cta block (navy, radial glow) and, since @use
+// lines sit at the top of that file, this partial is emitted BEFORE those
+// rules. Every selector below therefore carries at least one more class than
+// the rule it replaces, so it wins regardless of source order.
+//
+// Layout: single column, full-width buttons below 720px; actions in a row from
+// 720px; two columns (copy left, actions right, centred) from 940px.
+
+$band-rule: rgba(255, 255, 255, 0.14);
+$band-ivory: #f7f3eb;
+
+.final-cta.final-cta--band {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(4rem, 8vw, 7rem);
+  color: #fff;
+  background: $gradient-crimson;
+  border-top: 1px solid $band-rule;
+}
+
+.final-cta--band .final-cta__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 3rem);
+  align-items: center;
+}
+
+// ---- Copy ---------------------------------------------------------------
+
+.final-cta--band .final-cta__copy {
+  min-width: 0;
+}
+
+.final-cta--band .final-cta__copy .final-cta__eyebrow {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.final-cta--band .final-cta__title {
+  max-width: 14ch;
+  margin: 0.85rem 0 0;
+  color: #fff;
+  font-family: $font-display;
+  font-size: clamp(2rem, 3.4vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.final-cta--band .final-cta__copy .final-cta__text {
+  max-width: 560px;
+  margin: 1.1rem 0 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: $font-body;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+// ---- Actions ------------------------------------------------------------
+
+.final-cta--band .final-cta__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  justify-items: stretch;
+  min-width: 0;
+}
+
+.final-cta--band .final-cta__actions .btn {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+// Button wraps its children in a <span>; keep the icon and label on one line
+// with a consistent gap for the WhatsApp button.
+.final-cta--band .final-cta__actions .btn > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  white-space: nowrap;
+}
+
+// Primary: white pill, crimson text. Overrides .btn--primary / :hover.
+.final-cta--band .btn--white {
+  border-color: #fff;
+  color: $color-accent;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(8, 16, 26, 0.22);
+}
+
+.final-cta--band .btn--white:hover,
+.final-cta--band .btn--white:focus-visible {
+  border-color: $band-ivory;
+  color: $color-accent-hover;
+  background: $band-ivory;
+}
+
+.final-cta--band .btn--white svg {
+  color: $color-accent;
+}
+
+// Secondary: white outline on the gradient.
+.final-cta--band .final-cta__whatsapp {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+  background: transparent;
+}
+
+.final-cta--band .final-cta__whatsapp:hover,
+.final-cta--band .final-cta__whatsapp:focus-visible {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+// Tertiary: phone link. 1rem white, 44px tap target, underline only on hover.
+.final-cta--band .final-cta__actions .final-cta__phone {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.25rem;
+  color: #fff;
+  font-family: $font-body;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  transition: opacity 0.22s $ease-smooth;
+}
+
+.final-cta--band .final-cta__actions .final-cta__phone > span {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  padding-bottom: 0.1rem;
+  transition: border-color 0.22s $ease-smooth;
+}
+
+.final-cta--band .final-cta__actions .final-cta__phone:hover > span,
+.final-cta--band .final-cta__actions .final-cta__phone:focus-visible > span {
+  border-bottom-color: #fff;
+}
+
+.final-cta--band .final-cta__actions .final-cta__phone svg {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+// ---- 720px and up: actions become a wrapping row under the copy -----------
+
+@media (min-width: 720px) {
+  .final-cta--band .final-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem 1rem;
+  }
+
+  .final-cta--band .final-cta__actions .btn {
+    width: auto;
+  }
+
+  .final-cta--band .final-cta__actions .final-cta__phone {
+    padding-inline: 0.5rem;
+  }
+}
+
+// ---- 940px and up: two columns, actions stacked on the right ---------------
+
+@media (min-width: 940px) {
+  .final-cta--band .final-cta__inner {
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, auto);
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: center;
+  }
+
+  .final-cta--band .final-cta__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    gap: 0.75rem;
+    justify-self: end;
+    min-width: 280px;
+  }
+
+  .final-cta--band .final-cta__actions .btn {
+    width: 100%;
+  }
+
+  .final-cta--band .final-cta__actions .final-cta__phone {
+    margin-top: 0.15rem;
+    justify-self: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .final-cta--band .final-cta__inner {
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, auto);
+  }
+
+  .final-cta--band .final-cta__actions {
+    min-width: 320px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .final-cta--band .final-cta__actions .final-cta__phone,
+  .final-cta--band .final-cta__actions .final-cta__phone > span {
+    transition: none;
+  }
+}

@@ -1,0 +1,241 @@
+@use '../variables' as *;
+
+// ---------------------------------------------------------------------------
+// Why book with Derek  (.why)  +  stat counter (.stat-counter, shared component)
+// ---------------------------------------------------------------------------
+
+.why {
+  padding-block: clamp(4rem, 8vw, 7rem);
+  background: var(--bg-white, #fff);
+  color: var(--text-primary, #0b1929);
+}
+
+.why__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 4rem);
+}
+
+// --- Intro column -----------------------------------------------------------
+
+.why__intro {
+  max-width: 34rem;
+}
+
+.why__title {
+  margin-top: 0.85rem;
+  font-size: clamp(2rem, 3.4vw, 3.25rem);
+  font-weight: 750;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.why__lead {
+  max-width: 30rem;
+  margin-top: 1.25rem;
+  color: var(--text-secondary, #4a5568);
+  font-size: 1.04rem;
+  line-height: 1.65;
+}
+
+.why__person {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.why__avatar {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 4px rgba(11, 25, 41, 0.12);
+}
+
+.why__person-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.why__person-name {
+  font-family: $font-display;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.why__person-role {
+  color: var(--text-secondary, #4a5568);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.why__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2rem 0 0;
+  padding: 1.5rem 0 0;
+  border-top: 1px solid var(--border, rgba(11, 25, 41, 0.15));
+  list-style: none;
+}
+
+.why__stat {
+  min-width: 0;
+}
+
+// --- Stat counter (component, reusable outside .why) -----------------------
+
+.stat-counter {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stat-counter__value {
+  display: block;
+  color: var(--text-primary, #0b1929);
+  font-family: $font-display;
+  font-size: clamp(1.7rem, 2.4vw, 2.25rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.stat-counter__label {
+  color: var(--text-secondary, #4a5568);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+// --- Reasons list -----------------------------------------------------------
+
+.why__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border, rgba(11, 25, 41, 0.15));
+  list-style: none;
+}
+
+.why__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--border, rgba(11, 25, 41, 0.15));
+}
+
+.why__icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  color: $color-accent;
+}
+
+.why__item-title {
+  font-family: $font-display;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.why__item-body {
+  max-width: 32rem;
+  color: var(--text-secondary, #4a5568);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+// --- >= 720px: two reason columns, hairline between them ------------------
+
+@media (min-width: 720px) {
+  .why__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 0;
+  }
+
+  .why__item {
+    padding: 2rem 0;
+    border-top: 1px solid var(--border, rgba(11, 25, 41, 0.15));
+    border-bottom: 0;
+  }
+
+  .why__item:nth-child(odd) {
+    padding-right: 2rem;
+    border-right: 1px solid var(--border, rgba(11, 25, 41, 0.15));
+  }
+
+  .why__item:nth-child(even) {
+    padding-left: 2rem;
+  }
+
+  .why__item:nth-child(-n + 2) {
+    padding-top: 0.5rem;
+    border-top: 0;
+  }
+
+  .why__item:nth-last-child(-n + 2) {
+    padding-bottom: 0.5rem;
+  }
+}
+
+// --- >= 940px: intro sticks on the left, reasons on the right -------------
+
+@media (min-width: 940px) {
+  .why__inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+    gap: clamp(3rem, 6vw, 6rem);
+  }
+
+  .why__intro {
+    position: sticky;
+    top: var(--sticky-offset, 7.5rem);
+  }
+
+  .why__item {
+    padding: 2.25rem 0;
+  }
+
+  .why__item:nth-child(odd) {
+    padding-right: 2.5rem;
+  }
+
+  .why__item:nth-child(even) {
+    padding-left: 2.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .why__inner {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+  }
+
+  .why__intro {
+    max-width: 36rem;
+  }
+
+  .why__item-body {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .why__intro {
+    position: static;
+  }
+}

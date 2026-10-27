@@ -1,0 +1,506 @@
+@use '../variables' as *;
+
+// ---------------------------------------------------------------------------
+// Smart savings section (dark navy) + ticket-style route cards + carousel
+// Scope: .savings, .route-carousel, .route-card
+// ---------------------------------------------------------------------------
+
+.savings {
+  --route-card-bg: #{$color-bg-dark};
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(4rem, 8vw, 7rem);
+  color: #fff;
+  background: $color-bg-dark;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: auto -20% -40% -20%;
+    height: 60%;
+    pointer-events: none;
+    background: radial-gradient(60% 60% at 50% 100%, rgba(138, 25, 79, 0.18), transparent 70%);
+  }
+
+  .container {
+    position: relative;
+  }
+}
+
+.savings__header {
+  max-width: 720px;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+
+  h2 {
+    margin: 0.75rem 0 0;
+    color: #fff;
+    font-family: $font-display;
+    font-size: clamp(2rem, 3.4vw, 3.25rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+}
+
+.savings__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 2px;
+    background: $color-accent;
+  }
+}
+
+.savings__intro {
+  max-width: 600px;
+  margin: 1.1rem 0 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.savings__carousel {
+  position: relative;
+}
+
+.savings__note {
+  max-width: 720px;
+  margin: 1rem 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.savings__method {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  padding-top: clamp(1.75rem, 3vw, 2.5rem);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.savings__method-title {
+  margin: 0 0 1.4rem;
+  color: #fff;
+  font-family: $font-display;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.savings__method-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem 2rem;
+  margin: 0;
+
+  @media (min-width: 720px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+.savings__method-item {
+  padding-left: 1rem;
+  border-left: 2px solid rgba(138, 25, 79, 0.9);
+
+  dt {
+    margin: 0;
+    color: #fff;
+    font-family: $font-display;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  dd {
+    margin: 0.4rem 0 0;
+    color: rgba(255, 255, 255, 0.74);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Carousel
+// ---------------------------------------------------------------------------
+
+.route-carousel {
+  position: relative;
+}
+
+.route-carousel__controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+
+.route-carousel__button {
+  display: inline-grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: $color-accent;
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    transform 0.22s ease,
+    opacity 0.22s ease;
+
+  &:hover {
+    background: $color-accent-hover;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.96);
+  }
+
+  &[aria-disabled='true'] {
+    opacity: 0.38;
+    cursor: default;
+    transform: none;
+  }
+}
+
+.route-carousel__track {
+  display: grid;
+  grid-auto-columns: 88vw;
+  grid-auto-flow: column;
+  gap: 1.25rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 0.35rem 0.25rem 1.25rem;
+  margin: -0.35rem -0.25rem 0;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0.25rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 6px;
+    border-radius: 8px;
+  }
+
+  @media (min-width: 720px) {
+    grid-auto-columns: minmax(340px, 380px);
+  }
+
+  @media (min-width: 940px) {
+    mask-image: linear-gradient(90deg, #000 0%, #000 93%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 93%, transparent 100%);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Ticket card
+// ---------------------------------------------------------------------------
+
+.route-card {
+  --route-card-bg: #{$color-bg-dark};
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  color: $color-text-primary;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(11, 25, 41, 0.1), 0 18px 46px rgba(0, 0, 0, 0.28);
+  scroll-snap-align: start;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.5s $ease-smooth,
+    box-shadow 0.35s $ease-smooth;
+  will-change: transform;
+
+  &[data-tilting='true'] {
+    transition:
+      transform 0.12s linear,
+      box-shadow 0.35s $ease-smooth;
+  }
+
+  &:hover {
+    box-shadow: 0 16px 48px rgba(11, 25, 41, 0.2), 0 28px 64px rgba(0, 0, 0, 0.36);
+  }
+}
+
+.route-card__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: $color-bg-darker;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s $ease-smooth;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(8, 16, 26, 0.08) 0%, rgba(8, 16, 26, 0) 45%, rgba(8, 16, 26, 0.34) 100%);
+  }
+}
+
+.route-card:hover .route-card__media img {
+  transform: scale(1.04);
+}
+
+.route-card__stamp {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  color: #fff;
+  background: $color-accent;
+  box-shadow: 0 10px 24px rgba(8, 16, 26, 0.3);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+
+.route-card__body {
+  padding: 1.1rem 1.2rem 1rem;
+}
+
+.route-card__route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.route-card__endpoint {
+  min-width: 0;
+
+  small,
+  strong,
+  span {
+    display: block;
+  }
+
+  small {
+    color: $color-text-secondary;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  strong {
+    margin-top: 0.35rem;
+    color: $color-text-primary;
+    font-family: $font-display;
+    font-size: clamp(1.6rem, 2.6vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+  }
+
+  span {
+    margin-top: 0.3rem;
+    color: $color-text-secondary;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+}
+
+.route-card__endpoint--to {
+  text-align: right;
+}
+
+.route-card__arrow {
+  display: grid;
+  place-items: center;
+  color: $color-accent;
+}
+
+.route-card__meta {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(11, 25, 41, 0.1);
+
+  div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.3;
+  }
+
+  dt {
+    color: $color-text-secondary;
+  }
+
+  dd {
+    color: $color-text-primary;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+  }
+}
+
+// Perforated stub -----------------------------------------------------------
+
+.route-card__stub {
+  position: relative;
+  margin-top: auto;
+  padding: 1.05rem 1.2rem 1.1rem;
+  background: #f7f3eb;
+
+  // dashed perforation line
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 14px;
+    right: 14px;
+    height: 0;
+    border-top: 2px dashed rgba(11, 25, 41, 0.18);
+  }
+}
+
+.route-card__notch {
+  position: absolute;
+  top: -12px;
+  z-index: 3;
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--route-card-bg);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.route-card__notch--left {
+  left: -12px;
+}
+
+.route-card__notch--right {
+  right: -12px;
+}
+
+.route-card__fares {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.route-card__fare {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  dt {
+    margin: 0;
+    color: $color-text-secondary;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    font-family: $font-display;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  s {
+    color: rgba(74, 85, 104, 0.8);
+    text-decoration-thickness: 2px;
+  }
+}
+
+.route-card__fare--derek {
+  margin-inline: -0.5rem;
+  padding: 0.7rem 0.5rem;
+  border: 1px solid rgba(138, 25, 79, 0.18);
+  border-radius: 10px;
+  background: $color-accent-light;
+
+  dt {
+    color: $color-accent;
+  }
+
+  dd {
+    color: $color-accent;
+    font-size: 1.5rem;
+  }
+}
+
+.route-card__fine {
+  margin: 0.8rem 0 0;
+  color: $color-text-secondary;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+// Motion preferences --------------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  .route-card,
+  .route-card[data-tilting='true'],
+  .route-card__media img,
+  .route-carousel__button {
+    transition: none;
+  }
+
+  .route-card:hover .route-card__media img {
+    transform: none;
+  }
+
+  .route-carousel__track {
+    scroll-behavior: auto;
+  }
+}

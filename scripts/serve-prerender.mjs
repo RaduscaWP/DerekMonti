@@ -1,4 +1,5 @@
 import { createReadStream } from 'node:fs';
+import { createGzip } from 'node:zlib';
 import { access, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import path from 'node:path';
@@ -67,12 +68,23 @@ async function resolveRequest(pathname) {
   return null;
 }
 
+const compressible = new Set(['.css', '.html', '.js', '.json', '.map', '.svg', '.txt', '.xml', '.webmanifest']);
+
 function sendFile(request, response, filePath, statusCode = 200) {
+  const extension = path.extname(filePath).toLowerCase();
   response.statusCode = statusCode;
-  response.setHeader('Content-Type', contentTypes.get(path.extname(filePath).toLowerCase()) || 'application/octet-stream');
+  response.setHeader('Content-Type', contentTypes.get(extension) || 'application/octet-stream');
   response.setHeader('X-Content-Type-Options', 'nosniff');
   if (request.method === 'HEAD') {
     response.end();
+    return;
+  }
+  // Mirror production (Vercel compresses text responses) so local Lighthouse runs are comparable.
+  const acceptsGzip = /gzip/.test(String(request.headers['accept-encoding'] || ''));
+  if (acceptsGzip && compressible.has(extension)) {
+    response.setHeader('Content-Encoding', 'gzip');
+    response.setHeader('Vary', 'Accept-Encoding');
+    createReadStream(filePath).pipe(createGzip()).pipe(response);
     return;
   }
   createReadStream(filePath).pipe(response);

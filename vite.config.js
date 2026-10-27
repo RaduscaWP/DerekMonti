@@ -47,4 +47,8 @@ function vercelApiDev() {
 
 export default defineConfig({
   plugins: [react(), vercelApiDev()],
+  build: {
+    // One stylesheet for every route chunk: the prerender inlines it into each page.
+    cssCodeSplit: false,
+  },
 });

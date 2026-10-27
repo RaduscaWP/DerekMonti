@@ -1,0 +1,13 @@
+{
+  "name": "Fly with Derek",
+  "short_name": "Fly with Derek",
+  "description": "Business and First Class tickets at insider prices, sourced personally by Derek Monti.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0B1929",
+  "theme_color": "#0B1929",
+  "icons": [
+    { "src": "/favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/favicon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

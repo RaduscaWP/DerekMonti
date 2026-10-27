@@ -3,25 +3,48 @@ export const contactConfig = {
   phoneHref: '+17867064828',
   email: 'Derek@travelbusinessclass.com',
   whatsappNumber: '17867064828',
+  location: 'Miami, Florida',
+  availability: '24/7 on WhatsApp',
+  // Ticketing partner confirmed by the owner on 2026-10-23. Verify the accreditation
+  // links on the agency's own profiles before showing badges.
+  agency: {
+    name: 'Travel Business Class',
+    url: 'https://travelbusinessclass.com',
+    accreditation: 'ARC-accredited agency',
+  },
+};
+
+// TODO(owner-data): figures from CLAUDE.md, approved for publication on 2026-10-23
+// until Derek supplies real numbers (savings examples, client count, response time).
+export const stats = {
+  savings: '15–60%',
+  savingsLabel: 'below published fares',
+  clients: '20+',
+  clientsLabel: 'private clients',
+  support: '24/7',
+  supportLabel: 'on WhatsApp',
 };
 
 export const imagery = {
   derekPortrait: '/images/derek-monti.jpg',
-  derekAvatar: '/images/DMphoto.jpg',
+  derekAvatar: '/images/derek-monti-160.webp',
+  heroPoster: '/images/hero/cabin-poster.webp',
+  heroVideo: '/videos/hero-flight.mp4',
+  cabin: '/images/routes/cabin.webp',
 };
 
 export const capabilities = [
   {
-    label: 'Business and First Class',
-    detail: 'Premium-cabin requests reviewed around the trip you actually need to take.',
+    label: 'Business & First Class tickets',
+    detail: 'Insider fares typically 15–60% below the published price, on 50+ airlines.',
   },
   {
-    label: 'Transatlantic and International',
-    detail: 'Support for US–Europe journeys and broader international itineraries.',
+    label: 'Transatlantic and worldwide',
+    detail: 'US–Europe, the Middle East, Asia and multi-city trips, priced as one plan.',
   },
   {
-    label: 'Human Itinerary Review',
-    detail: 'A person compares the schedule, cabin, routing, flexibility, and rules together.',
+    label: 'One advisor, start to finish',
+    detail: 'You deal with Derek directly on WhatsApp, from the first quote to the e-ticket.',
   },
 ];
 
@@ -58,37 +81,56 @@ export const evaluationItems = [
   },
 ];
 
+// TODO(owner-data): figures approved for publication on 2026-10-23 until Derek supplies real ones.
 export const whyDerek = [
   {
-    title: 'One point of contact',
-    body: 'Your request stays in one conversation, so priorities do not get lost between a search result and a handoff.',
+    icon: 'tag',
+    title: 'Insider fares',
+    body: 'Consolidator contracts give me business and first class fares the airlines never publish online, typically 15–60% below the public price.',
   },
   {
-    title: 'Whole-trip review',
-    body: 'A premium seat is evaluated together with the schedule, connection, airport, and fare conditions around it.',
+    icon: 'clock',
+    title: 'Last-minute seats',
+    body: 'Need to fly within 48 hours? I find seats and prices when search engines show nothing, on any airline, to any destination.',
   },
   {
-    title: 'Clear tradeoffs',
-    body: 'Options are easier to compare when the strengths, limitations, and practical differences are stated plainly.',
+    icon: 'route',
+    title: 'Complex itineraries',
+    body: 'Multi-city, open-jaw, round-the-world and mixed-cabin trips on several airlines, built personally and priced as one plan.',
   },
   {
-    title: 'Room for complex requests',
-    body: 'Multi-city, open-jaw, mixed-cabin, and time-sensitive trips can be described in your own words for review.',
+    icon: 'user',
+    title: 'You talk to me',
+    body: 'No call center and no handoff. I take the request, do the search, send the options and issue the ticket myself.',
+  },
+  {
+    icon: 'headset',
+    title: 'Support 24/7',
+    body: 'Before, during and after the trip I am one WhatsApp message away, including when plans change mid-journey.',
+  },
+  {
+    icon: 'badge',
+    title: 'Trusted by 20+ clients',
+    body: 'A private circle of travelers who book every long-haul trip with me and refer their friends and colleagues.',
   },
 ];
 
 export const steps = [
   {
-    title: 'Share your trip',
-    body: 'Send the route, dates, cabin preference, traveler count, flexibility, and the priorities that matter most.',
+    title: 'Get in touch',
+    body: 'Message me on WhatsApp or send the quick quote form with your route and dates.',
   },
   {
-    title: 'Derek reviews it',
-    body: 'The request is considered as a complete itinerary rather than a single price or isolated flight segment.',
+    title: 'Tell me what matters',
+    body: 'Cabin, airlines, budget, seat preferences, fixed arrival times. I handle every detail personally.',
   },
   {
-    title: 'Compare and decide',
-    body: 'Review the relevant options and tradeoffs, then choose whether any of them fits your plans.',
+    title: 'Get real fares',
+    body: 'Within hours you receive the best two or three itineraries, with the published fare next to mine.',
+  },
+  {
+    title: 'Book and fly',
+    body: 'Confirm securely, receive your e-ticket, and travel with me one message away.',
   },
 ];
 
@@ -133,220 +175,124 @@ export const discoveryLinks = [
 
 export const homeFaqs = [
   {
-    question: 'What happens after I submit a quote request?',
+    question: 'How can I find cheap business class tickets?',
     answer:
-      'Your trip details are delivered for personal review. Derek can then use the contact method you provide to clarify priorities and discuss relevant options. Submitting a request is not a booking or a guarantee of availability.',
+      'The cheapest business class tickets are rarely on airline websites. I buy through consolidator contracts that give access to unpublished fares, typically 15–60% below the published price, and I show you the public fare next to mine so you can see the difference.',
   },
   {
-    question: 'Which details make a request easier to review?',
+    question: 'How much can I save with Derek compared with booking directly?',
     answer:
-      'Origin, destination, dates, traveler count, cabin preference, and date flexibility are the essentials. Add any fixed meeting time, connection limit, airport preference, or mobility need in the notes.',
+      'Typically 15–60% off the published business or first class fare. On a New York to London business class ticket that can mean paying around $2,600 instead of $3,570. Every quote lists the published fare next to mine.',
   },
   {
-    question: 'Can I ask about a multi-city or open-jaw trip?',
+    question: 'What airlines does Derek work with?',
     answer:
-      'Yes. Select multi-city in the form and add the trip legs you already know. Use the notes field for cities or dates that are still flexible.',
+      'Qatar Airways, Emirates, Turkish Airlines, Singapore Airlines, Cathay Pacific, Lufthansa, Air France, British Airways, United, American, Japan Airlines, ANA and Etihad, among others. Tickets are issued through Travel Business Class, an ARC-accredited agency.',
   },
   {
-    question: 'Are the options shown on this site live fares?',
+    question: 'How quickly will I receive my quote?',
     answer:
-      'No. This site does not display live inventory or guaranteed pricing. A request starts a review based on the dates and priorities you provide.',
+      'Usually within a few hours during the day, and the same day for most requests. Last-minute trips get priority: message me on WhatsApp and I start searching immediately.',
   },
   {
-    question: 'Can I use points or miles?',
+    question: 'What is included in business class on international flights?',
     answer:
-      'Mention points or miles in the notes if they are relevant to your decision. Do not send account credentials or sensitive loyalty-account information through the form.',
+      'A lie-flat seat on long-haul aircraft, priority check-in and boarding, lounge access, a full meal service and a larger baggage allowance. Products differ by airline and aircraft, so I tell you exactly which seat and cabin you get on every leg.',
   },
   {
-    question: 'What if my dates or airports can move?',
+    question: 'Is first class worth the extra cost over business class?',
     answer:
-      'Choose the flexibility option that best describes your trip and explain any hard limits. Flexibility is considered only as one part of the overall journey.',
+      'On airlines like Emirates, Singapore or Lufthansa, first class adds a private suite, better dining and a quieter cabin. With consolidator fares the gap between business and first is often smaller than published prices suggest, so I price both and you decide.',
+  },
+  {
+    question: 'Does sending a request commit me to anything?',
+    answer:
+      'No. A quote is free and non-binding. You see the itinerary, the fare and the ticket conditions, including change and refund rules, before you decide to book.',
   },
 ];
 
 export const servicesFaqs = [
   {
-    question: 'Is this a live booking engine?',
+    question: 'How do you get business class fares below the airline price?',
     answer:
-      'No. Fly with Derek is a quote-request and advisory experience. The form collects the details needed for a human itinerary review.',
+      'Through consolidator contracts: wholesale fares that airlines release to accredited agencies but do not publish online. I compare them with the public fare and send you the best two or three options.',
   },
   {
-    question: 'Can I submit a request before every detail is final?',
+    question: 'Can you book a flight for tomorrow or this week?',
     answer:
-      'Yes. Provide the fixed parts of the trip and use the notes field to explain what is undecided. Options cannot be guaranteed until a real itinerary is reviewed and confirmed.',
+      'Yes. Last-minute requests get priority. Send the route, the date and the number of travelers on WhatsApp and I reply the same day with seats I can ticket.',
   },
   {
-    question: 'What kinds of complex trips can I describe?',
+    question: 'Do you handle multi-city, open-jaw or round-the-world trips?',
     answer:
-      'The form supports round-trip, one-way, and multi-city requests. Open-jaw and mixed-cabin priorities can be added in the notes.',
+      'Yes. Choose multi-city in the form and add each flight. I combine airlines and cabins where it makes sense and price the whole trip as one plan.',
   },
   {
-    question: 'How are options compared?',
+    question: 'Who issues the ticket, and is my payment protected?',
     answer:
-      'The review considers schedule, cabin, route logic, flexibility, fare rules, and the complete trip fit rather than focusing on one headline number.',
+      'Tickets are issued through Travel Business Class, an ARC-accredited agency, so you get a standard airline e-ticket and agency protection while I handle the booking personally.',
   },
   {
-    question: 'Does submitting the form commit me to book?',
+    question: 'What happens after I send a request?',
     answer:
-      'No. A request starts a conversation. You can review the available tradeoffs before deciding whether to proceed.',
+      'I check the fares on your dates, send you the options with the published price next to mine, and answer your questions. You decide whether to book; nothing is charged until you confirm.',
   },
 ];
 
-const articleDrafts = [
-  {
-    approvedForIndexing: true,
-    slug: 'why-travelers-overpay-business-class',
-    title: 'A Better Way to Compare Business Class Options',
-    category: 'Planning Guides',
-    excerpt:
-      'A premium itinerary is more than a price. Compare schedule, cabin consistency, route logic, and fare rules before deciding what is actually better value.',
-    sections: [
-      {
-        heading: 'Start with the trip, not the search result',
-        paragraphs: [
-          'A fare can look attractive in isolation and still be a poor fit for the journey. A very early departure may require an extra hotel night. A long connection can erase the comfort gained in the cabin. A mixed-cabin segment can place the least comfortable seat on the longest part of the trip.',
-          'Write down the non-negotiables before comparing options: where you must be, when you need to arrive, how much connection time you can tolerate, and which parts of the journey matter most. That short brief creates a better basis for comparison than opening more search tabs.',
-        ],
-      },
-      {
-        heading: 'Compare the same itinerary dimensions',
-        paragraphs: [
-          'Use the same checklist for every option. Look at total travel time, departure and arrival timing, airport changes, number and length of connections, cabin on each segment, baggage conditions, and the rules for changes or cancellation.',
-          'This keeps a lower headline price from hiding a meaningful compromise. It also makes it easier to see when a higher-priced option solves a real problem, such as protecting an important arrival time or removing an exhausting connection.',
-        ],
-        bullets: [
-          'Schedule: does the timing work before and after the flight?',
-          'Cabin: is the expected premium cabin present on every important segment?',
-          'Routing: is the connection proportionate to the journey?',
-          'Rules: what changes if your plans move?',
-          'Trip fit: which option best reflects your stated priorities?',
-        ],
-      },
-      {
-        heading: 'Treat flexibility as a tool, not a requirement',
-        paragraphs: [
-          'Flexible dates or nearby airports can expand the comparison, but they should not become an automatic sacrifice. A different airport may add ground-transport time. A shifted date may create another hotel night or reduce time at the destination.',
-          'State the boundaries clearly. If one day either side is workable, say so. If a specific meeting makes the arrival fixed, mark it as fixed. Useful flexibility is the kind that improves the complete trip rather than simply producing a different number.',
-        ],
-      },
-      {
-        heading: 'Make the decision legible',
-        paragraphs: [
-          'A useful recommendation should be explainable in a few sentences: what the option does well, where it compromises, and what conditions matter before ticketing. If two options remain, identify the decision between them—for example, a cleaner nonstop itinerary versus a more flexible ticket with a connection.',
-          'Fly with Derek uses this whole-trip framework when reviewing a request. The purpose is not to promise a particular price; it is to help make the available tradeoffs easier to understand.',
-        ],
-      },
-    ],
-  },
-  {
-    approvedForIndexing: true,
-    slug: 'business-class-service-beyond-seat',
-    title: 'Business Class Is More Than the Seat',
-    category: 'Cabin Decisions',
-    excerpt:
-      'The seat matters, but so do the schedule, airport experience, connections, and fare conditions that shape the rest of the journey.',
-    sections: [
-      {
-        heading: 'The premium experience begins before boarding',
-        paragraphs: [
-          'A comfortable seat cannot fix an itinerary that starts at the wrong airport, creates a rushed connection, or arrives after an important commitment. Ground time, departure timing, and the sequence of the trip are part of the premium experience even though they do not appear in a seat photograph.',
-          'When comparing options, map the journey from door to door. Include the time needed to reach the departure airport, the realistic connection experience, and the onward journey after arrival.',
-        ],
-      },
-      {
-        heading: 'Cabin consistency deserves attention',
-        paragraphs: [
-          'A multi-segment ticket may not provide the same cabin experience on every flight. The longest segment, an overnight segment, or a segment where you need to work may matter more than a short feeder flight.',
-          'Check each segment individually and decide where comfort is essential. A mixed-cabin itinerary is not automatically wrong, but it should be understood before the decision is made.',
-        ],
-        bullets: [
-          'Identify the longest and overnight segments.',
-          'Confirm the cabin shown for every segment.',
-          'Consider whether a connection interrupts sleep or productive time.',
-          'Keep aircraft and seat expectations separate from guarantees.',
-        ],
-      },
-      {
-        heading: 'Fare conditions are part of the product',
-        paragraphs: [
-          'Two similar-looking itineraries can carry different change, cancellation, or ticketing conditions. Those differences may matter more when the trip is far in the future, tied to an event, or likely to change.',
-          'Read the applicable rules before confirming anything. A useful comparison should make the important restrictions visible instead of treating them as an afterthought.',
-        ],
-      },
-      {
-        heading: 'Ask what the itinerary is solving',
-        paragraphs: [
-          'The best option for a night flight may prioritize rest. The best option for a short business trip may prioritize arrival time and schedule reliability. A leisure trip may leave more room for a connection if it meaningfully improves another priority.',
-          'A personal review begins with that purpose. Once the objective is clear, the cabin, schedule, routing, and fare rules can be evaluated as one decision.',
-        ],
-      },
-    ],
-  },
-  {
-    approvedForIndexing: true,
-    slug: 'last-minute-business-class',
-    title: 'How to Prepare a Time-Sensitive Premium Flight Request',
-    category: 'Planning Guides',
-    excerpt:
-      'When travel is close, a clear brief matters. Separate fixed constraints from preferences so realistic options can be reviewed without false urgency or guarantees.',
-    sections: [
-      {
-        heading: 'Lead with the fixed constraints',
-        paragraphs: [
-          'For a time-sensitive request, begin with the facts that cannot move: the earliest possible departure, latest acceptable arrival, traveler count, passport-name readiness, and any airport or meeting constraint.',
-          'Then separate preferences from requirements. A preferred airline, nonstop routing, or specific departure window may be important, but labeling it correctly makes the review more useful.',
-        ],
-      },
-      {
-        heading: 'Use a short request checklist',
-        paragraphs: [
-          'A complete first message reduces avoidable follow-up. It does not guarantee inventory or a response time, but it gives the reviewer enough context to understand the trip.',
-        ],
-        bullets: [
-          'Origin and acceptable nearby airports.',
-          'Destination and latest acceptable arrival.',
-          'One-way, round-trip, or multi-city structure.',
-          'Traveler count and cabin preference.',
-          'Date and airport flexibility.',
-          'Any fixed event, connection, mobility, or baggage constraint.',
-        ],
-      },
-      {
-        heading: 'Expect tradeoffs to become sharper',
-        paragraphs: [
-          'When departure is close, the available choice may be between schedule, routing, cabin consistency, flexibility, and ticket conditions. The most useful review explains those differences rather than presenting every option as equivalent.',
-          'Decide in advance which compromise is acceptable. For example, you may accept one connection but not an airport change, or a broader departure window but not a late arrival.',
-        ],
-      },
-      {
-        heading: 'Keep sensitive information out of the form',
-        paragraphs: [
-          'A quote request does not need passport scans, payment details, loyalty-account passwords, or other credentials. Share only the trip and contact information requested. If additional information is needed later, confirm the appropriate secure process first.',
-          'Fly with Derek’s request form is designed to collect the trip brief needed for an initial human review. Availability, price, and ticketing conditions can only be discussed in the context of real options.',
-        ],
-      },
-    ],
-  },
+export const airlines = [
+  'Qatar Airways',
+  'Emirates',
+  'Turkish Airlines',
+  'Singapore Airlines',
+  'Cathay Pacific',
+  'Lufthansa',
+  'Air France',
+  'British Airways',
+  'United Airlines',
+  'American Airlines',
+  'Japan Airlines',
+  'ANA',
+  'Etihad',
 ];
 
-function countArticleWords(article) {
-  const sectionWords = article.sections.flatMap((section) => [
-    section.heading,
-    ...(section.paragraphs || []),
-    ...(section.bullets || []),
-  ]);
-  return [article.title, article.excerpt, ...sectionWords]
-    .join(' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean).length;
-}
-
-export const blogPosts = articleDrafts.map((article) => {
-  const wordCount = countArticleWords(article);
-  return {
-    ...article,
-    wordCount,
-    readTime: `${Math.max(1, Math.ceil(wordCount / 220))} min read`,
-  };
+// TODO(owner-data): example fares from CLAUDE.md 4.3, labelled as examples on the cards.
+// Replace with Derek's real recent bookings (route, cabin, carriers, published vs paid, month).
+const routeImage = (name, alt) => ({
+  image: `/images/routes/${name}.webp`,
+  imageSmall: `/images/routes/${name}-600.webp`,
+  imageAlt: alt,
 });
+
+export const routeDeals = [
+  { from: 'New York', fromCode: 'JFK', to: 'London', toCode: 'LHR', cabin: 'Business', carriers: 'BA / AA / UA', published: '$3,570', derek: '$2,625', savings: 'Save up to 60%', window: '±3 days', ...routeImage('london', 'Westminster and the Thames at dusk') },
+  { from: 'Chicago', fromCode: 'ORD', to: 'Rome', toCode: 'FCO', cabin: 'Business', carriers: 'UA / LH / ITA', published: '$5,060', derek: '$3,530', savings: 'Save up to 50%', window: '±3 days', ...routeImage('rome', 'The Colosseum in Rome') },
+  { from: 'San Francisco', fromCode: 'SFO', to: 'Frankfurt', toCode: 'FRA', cabin: 'Business', carriers: 'LH / UA', published: '$5,550', derek: '$3,870', savings: 'Save up to 40%', window: '±3 days', ...routeImage('frankfurt', 'Frankfurt skyline') },
+  { from: 'Boston', fromCode: 'BOS', to: 'Dubai', toCode: 'DXB', cabin: 'Business', carriers: 'EK / BA / QR', published: '$5,041', derek: '$3,400', savings: 'Save up to 45%', window: '±3 days', ...routeImage('dubai', 'Dubai skyline at night') },
+  { from: 'Los Angeles', fromCode: 'LAX', to: 'Tokyo', toCode: 'HND', cabin: 'Business', carriers: 'JL / AA / NH', published: '$6,185', derek: '$4,200', savings: 'Save up to 40%', window: '±3 days', ...routeImage('tokyo', 'Tokyo streets at night') },
+  { from: 'Miami', fromCode: 'MIA', to: 'Singapore', toCode: 'SIN', cabin: 'First Class', carriers: 'SQ / EK', published: '$12,400', derek: '$7,200', savings: 'Save up to 42%', window: '±3 days', ...routeImage('singapore', 'Singapore waterfront') },
+  { from: 'New York', fromCode: 'JFK', to: 'Johannesburg', toCode: 'JNB', cabin: 'Business', carriers: 'UA / LH / ET', published: '$6,530', derek: '$4,100', savings: 'Save up to 37%', window: '±3 days', ...routeImage('johannesburg', 'Johannesburg skyline') },
+  { from: 'Washington', fromCode: 'IAD', to: 'Cairo', toCode: 'CAI', cabin: 'Business', carriers: 'MS / UA / LH', published: '$4,140', derek: '$2,737', savings: 'Save up to 40%', window: '±3 days', ...routeImage('cairo', 'The pyramids of Giza') },
+];
+
+export const routeDealsNote =
+  'Example fares from recent quotes. Fares change daily; your dates, cabin and airline rules determine the final price.';
+
+export const methodology = [
+  { title: 'Published fare', body: 'The public business or first class fare for similar dates, as shown on the airline website.' },
+  { title: "Derek's fare", body: 'The most recent consolidator quote available to my clients for the same route and cabin.' },
+  { title: 'Your saving', body: 'The difference between the two, shown as a percentage of the published fare.' },
+  { title: 'Flexible dates', body: 'Fares use a ±3 day window because a day either side often changes the price; exact dates decide the final quote.' },
+];
+
+// Trust marks belong to the ticketing agency, Travel Business Class, and must be attributed to it.
+// verified: true only after checking the agency's live profile (checked 2026-10-23: Google 4.9 and ARC on
+// travelbusinessclass.com, BBB profile link live; Trustpilot blocked automated checks - confirm manually).
+export const trustMarks = [
+  { id: 'google', label: 'Google Reviews', value: '4.9 / 5', note: 'via Travel Business Class', href: 'https://travelbusinessclass.com', verified: true },
+  { id: 'trustpilot', label: 'Trustpilot', value: 'Excellent', note: 'via Travel Business Class', href: 'https://www.trustpilot.com/review/travelbusinessclass.com', verified: false },
+  { id: 'bbb', label: 'BBB rating', value: 'A+', note: 'Travel Business Class', href: 'https://www.bbb.org/us/fl/sunny-isles-beach/profile/travel-agency/travelbusinessclasscom-llc-0633-92036603', verified: true },
+  { id: 'arc', label: 'ARC accredited', value: 'Ticketing agency', note: 'Travel Business Class', href: 'https://travelbusinessclass.com', verified: true },
+];
+
+// Real client reviews only (first name + initial, route, source). Rendered only when non-empty.
+export const reviews = [];

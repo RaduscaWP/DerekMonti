@@ -1,0 +1,461 @@
+@use '../variables' as *;
+
+/*
+  Two-step quote form: stepper, trip summary, contact-preference pills, notes disclosure
+  and the refined success state. Base .quote-form / .quote-field rules live in global.scss;
+  everything here is scoped under .quote-form so it only overrides what the two-step
+  layout needs.
+*/
+.quote-form {
+  /* Type floor: nothing below 0.75rem, labels 0.875rem, help/error 0.8125rem. */
+  .quote-form__tabs legend,
+  .quote-form__remove-leg,
+  .quote-form__add-leg,
+  .quote-form__privacy-note {
+    font-size: 0.75rem;
+  }
+
+  .quote-field__label {
+    font-size: 0.875rem;
+  }
+
+  .quote-field__help,
+  .quote-field__error {
+    font-size: 0.8125rem;
+  }
+
+  .quote-form__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Stepper */
+  .quote-form__stepper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    margin: 0 0 1.4rem;
+    padding: 0 0 1rem;
+    border-bottom: 1px solid var(--border);
+    list-style: none;
+  }
+
+  .quote-form__stepper-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .quote-form__stepper-item[aria-current='step'] {
+    color: var(--text-primary);
+  }
+
+  .quote-form__stepper-index {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    place-items: center;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-secondary);
+    font-family: $font-display;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .quote-form__stepper-item[aria-current='step'] .quote-form__stepper-index {
+    border-color: var(--accent);
+    color: #fff;
+    background: var(--accent);
+  }
+
+  .quote-form__stepper-item--done .quote-form__stepper-index {
+    border-color: var(--text-primary);
+    color: #fff;
+    background: var(--text-primary);
+  }
+
+  /* Step panel */
+  .quote-form__step-title {
+    margin: 0 0 1.1rem;
+    font-family: $font-display;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .quote-form__step-title:focus {
+    outline: 0;
+  }
+
+  .quote-form__step-title:focus-visible {
+    outline: 3px solid var(--text-primary);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  .quote-form__leg h4 {
+    align-self: center;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  /* Step-1 summary chip shown on step 2 */
+  .quote-form__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin: 0 0 1.25rem;
+    padding: 0.55rem 0.6rem 0.55rem 1rem;
+    border: 1px solid rgba(138, 25, 79, 0.18);
+    border-radius: 16px;
+    background: rgba(138, 25, 79, 0.06);
+  }
+
+  .quote-form__summary-list {
+    display: flex;
+    flex: 1 1 240px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.2rem 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .quote-form__summary-list li {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .quote-form__summary-list li:first-child {
+    font-family: $font-display;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .quote-form__summary-list li + li::before {
+    content: '\00B7';
+    margin: 0 0.5rem;
+    color: var(--accent);
+    font-weight: 800;
+  }
+
+  .quote-form__summary-edit {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 0.9rem;
+    border: 1px solid rgba(138, 25, 79, 0.35);
+    border-radius: 999px;
+    color: var(--accent);
+    background: #fff;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .quote-form__summary-edit:hover {
+    border-color: var(--accent);
+    color: #fff;
+    background: var(--accent);
+  }
+
+  /* Contact-preference pills (radio group) */
+  .quote-form__pills {
+    grid-column: 1 / -1;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .quote-form__pills > legend {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.45rem;
+    padding: 0;
+  }
+
+  .quote-form__pills-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .quote-form__pills-row label {
+    position: relative;
+    display: inline-flex;
+    flex: 1 1 auto;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .quote-form__pills-row label:hover {
+    border-color: rgba(138, 25, 79, 0.5);
+    color: var(--text-primary);
+  }
+
+  .quote-form__pills-row label.active {
+    border-color: var(--accent);
+    color: #fff;
+    background: var(--accent);
+  }
+
+  .quote-form__pills-row input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .quote-form__pills-row label:has(input:focus-visible) {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px var(--text-primary);
+  }
+
+  .quote-form__pills[aria-invalid='true'] .quote-form__pills-row label {
+    border-color: #a61b2b;
+  }
+
+  /* Notes disclosure */
+  .quote-form__disclosure {
+    grid-column: 1 / -1;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .quote-form__disclosure-summary {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.5rem 0.9rem;
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 700;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .quote-form__disclosure-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .quote-form__disclosure-summary::marker {
+    content: '';
+  }
+
+  .quote-form__disclosure-summary svg {
+    flex: 0 0 auto;
+  }
+
+  .quote-form__disclosure[open] .quote-form__disclosure-summary svg {
+    transform: rotate(180deg);
+  }
+
+  .quote-form__disclosure-summary:focus-visible {
+    outline: 3px solid var(--text-primary);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+
+  .quote-form__disclosure-body {
+    padding: 0 0.9rem 0.9rem;
+  }
+
+  /* Privacy checkbox: 24px control on a 44px row */
+  .quote-form__privacy {
+    grid-template-columns: 24px 1fr;
+    align-items: center;
+    min-height: 44px;
+    gap: 0.75rem;
+  }
+
+  .quote-form__privacy input {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .quote-form__privacy label {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    cursor: pointer;
+  }
+
+  /* Actions: Continue / Send + WhatsApp text link */
+  .quote-form__actions {
+    display: grid;
+    grid-column: 1 / -1;
+    gap: 0.6rem;
+    justify-items: center;
+    margin-top: 0.25rem;
+  }
+
+  .quote-form__actions .quote-form__submit {
+    width: 100%;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    transition: background 0.22s ease, transform 0.22s ease;
+  }
+
+  .quote-form__actions .quote-form__submit:not(:disabled):hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+  }
+
+  .quote-form__actions .quote-form__submit:not(:disabled):active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .quote-form__actions-note {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    text-align: center;
+  }
+
+  .quote-form__whatsapp-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 0.5rem;
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .quote-form__whatsapp-link:hover {
+    color: var(--accent-hover);
+  }
+
+  .quote-form__privacy-note {
+    margin-top: 1.1rem;
+  }
+
+  /* Success state additions */
+  .quote-success__identity-copy span,
+  .quote-success__meta span {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+  }
+
+  .quote-success__meta strong {
+    font-family: $font-display;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  .quote-success__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.4rem;
+  }
+
+  .quote-success__phone {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .quote-success__phone strong {
+    color: var(--text-primary);
+    font-family: $font-display;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .quote-success__reset {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .quote-form .quote-form__disclosure-summary svg {
+    transition: transform 0.3s $ease-smooth;
+  }
+}
+
+@media (max-width: 720px) {
+  .quote-form .quote-form__summary {
+    padding: 0.6rem 0.6rem 0.6rem 0.9rem;
+  }
+
+  .quote-form .quote-form__summary-edit {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .quote-form .quote-form__leg h4 {
+    margin-top: 0.5rem;
+  }
+
+  .quote-form .quote-success__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .quote-form .quote-form__stepper {
+    gap: 0.6rem 1rem;
+  }
+
+  .quote-form .quote-form__stepper-item {
+    font-size: 0.8125rem;
+  }
+
+  .quote-form .quote-form__pills-row label {
+    flex: 1 1 calc(50% - 0.45rem);
+  }
+}

@@ -1,0 +1,294 @@
+@use '../variables' as *;
+
+// Footer: three tiers.
+//   1. navy #0B1929 - brand column + Navigate / Flights / Airlines I book / Contact Derek
+//   2. agency disclosure line (hairline rules above and below)
+//   3. #08101A bottom bar - copyright, Privacy, Terms
+// Layout: single column on mobile with the contact block first; two columns
+// from 720px (brand spans the row); brand row + four columns from 940px;
+// five columns in one row (brand 1.4fr) from 1200px.
+// All rules are scoped under .footer and replace the old .footer* block in global.scss.
+
+$footer-text: rgba(255, 255, 255, 0.78);
+$footer-muted: rgba(255, 255, 255, 0.72);
+$footer-rule: rgba(255, 255, 255, 0.1);
+
+.footer {
+  color: #fff;
+  background: $color-bg-dark;
+
+  // ----- Tier 1 ---------------------------------------------------------
+  &__top {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 3vw, 3rem);
+    padding-block: clamp(4rem, 8vw, 7rem);
+  }
+
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &__logo {
+    display: inline-block;
+    color: #fff;
+    font-family: $font-display;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: color 0.2s $ease-smooth;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    strong {
+      color: #fff;
+      font-weight: 800;
+    }
+  }
+
+  &__logo-lead {
+    font-weight: 500;
+  }
+
+  &__tagline {
+    max-width: 36ch;
+    margin: 1.1rem 0 0;
+    color: $footer-muted;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  &__cta {
+    margin-top: 1.6rem;
+  }
+
+  // Column headings are <p>, not landmarks: visually a label, nothing more.
+  &__heading {
+    margin: 0 0 0.35rem;
+    color: #fff;
+    font-family: $font-body;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  &__column,
+  &__contact {
+    min-width: 0;
+  }
+
+  &__contact {
+    font-style: normal;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      width: 100%;
+    }
+  }
+
+  // Plain-text rows (airlines) do not need 44px tap rows.
+  &__list--plain li {
+    min-height: 2.1rem;
+    align-items: center;
+    color: $footer-text;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  &__link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: $footer-text;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    text-decoration: none;
+    transition: color 0.2s $ease-smooth;
+
+    &:hover {
+      color: #fff;
+      text-decoration: underline;
+      text-decoration-color: $color-accent;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.3em;
+    }
+  }
+
+  &__link--icon {
+    gap: 0.55rem;
+
+    svg {
+      flex: 0 0 auto;
+      color: $footer-muted;
+      transition: color 0.2s $ease-smooth;
+    }
+
+    &:hover svg {
+      color: #fff;
+    }
+
+    span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__where {
+    margin: 0.6rem 0 0;
+    color: $footer-muted;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  // ----- Tier 2 ---------------------------------------------------------
+  &__disclosure {
+    padding-block: 1.2rem;
+    border-top: 1px solid $footer-rule;
+    border-bottom: 1px solid $footer-rule;
+
+    p {
+      max-width: 920px;
+      margin: 0;
+      color: $footer-muted;
+      font-size: 0.8125rem;
+      line-height: 1.6;
+    }
+
+    a {
+      color: $footer-text;
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      transition: color 0.2s $ease-smooth;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+
+  // ----- Tier 3 ---------------------------------------------------------
+  &__bottom {
+    padding-block: 0.75rem;
+    background: $color-bg-darker;
+  }
+
+  &__bottom-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem 1.5rem;
+    color: $footer-muted;
+    font-size: 0.8125rem;
+  }
+
+  &__copyright {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    margin: 0;
+  }
+
+  &__legal {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    a {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      color: $footer-text;
+      text-decoration: none;
+      transition: color 0.2s $ease-smooth;
+
+      &:hover {
+        color: #fff;
+        text-decoration: underline;
+        text-decoration-color: $color-accent;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 0.3em;
+      }
+    }
+  }
+
+  // ----- Mobile: contact block first -----------------------------------
+  @media (max-width: 719px) {
+    &__contact {
+      order: -1;
+      padding-bottom: clamp(2rem, 5vw, 3.5rem);
+      border-bottom: 1px solid $footer-rule;
+    }
+  }
+
+  // ----- Tablet: two columns, brand spans the row ----------------------
+  @media (min-width: 720px) {
+    &__top {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  // ----- Small desktop: brand row + four columns -----------------------
+  @media (min-width: 940px) {
+    &__top {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    &__bottom-inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  // ----- Desktop: five columns in one row ------------------------------
+  @media (min-width: 1200px) {
+    &__top {
+      grid-template-columns: 1.4fr 0.85fr 1fr 1fr 1.15fr;
+      column-gap: clamp(2rem, 4vw, 4rem);
+    }
+
+    &__brand {
+      grid-column: auto;
+    }
+
+    &__tagline {
+      max-width: 30ch;
+    }
+  }
+}
+
+@media (max-width: 719px) {
+  .footer .footer__top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem 1rem;
+    padding-block: 2.75rem 2rem;
+  }
+
+  .footer .footer__brand,
+  .footer .footer__contact {
+    grid-column: 1 / -1;
+  }
+}

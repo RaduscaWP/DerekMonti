@@ -1,3 +1,4 @@
+import { readFileSync, readdirSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -19,6 +20,23 @@ const noindexDeployment = shouldNoindexDeployment();
 const { render } = await import(`${pathToFileURL(serverEntryPath).href}?build=${Date.now()}`);
 const template = await readFile(templatePath, 'utf8');
 
+// Inline the single stylesheet so the first paint does not wait for a render-blocking request.
+const stylesheetTag = template.match(/<link rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/);
+const inlinedTemplate = stylesheetTag
+  ? template.replace(stylesheetTag[0], () => `<style>${readFileSync(path.join(distDirectory, stylesheetTag[1]), 'utf8')}</style>`)
+  : template;
+
+// Preload the display and body fonts used above the fold (self-hosted, hashed by Vite).
+const assetFiles = readdirSync(path.join(distDirectory, 'assets'));
+const fontPreloads = ['syne-latin-800-normal', 'dm-sans-latin-400-normal']
+  .map((prefix) => assetFiles.find((file) => file.startsWith(prefix) && file.endsWith('.woff2')))
+  .filter(Boolean)
+  .map((file) => `<link rel="preload" href="/assets/${file}" as="font" type="font/woff2" crossorigin>`)
+  .join('\n    ');
+const templateWithFonts = fontPreloads
+  ? inlinedTemplate.replace('<style>', () => `${fontPreloads}\n    <style>`)
+  : inlinedTemplate;
+
 function assembleDocument(appHtml, metadata) {
   if (!template.includes('<!--app-html-->')) {
     throw new Error('The client template is missing the <!--app-html--> prerender marker.');
@@ -27,7 +45,7 @@ function assembleDocument(appHtml, metadata) {
     throw new Error('The client template is missing the SEO head markers.');
   }
 
-  return template
+  return templateWithFonts
     .replace(
       /<!--seo-head:start-->[\s\S]*?<!--seo-head:end-->/,
       renderSeoHead(metadata, { deploymentNoindex: noindexDeployment }),
@@ -42,7 +60,7 @@ async function writeRenderedPage(outputPath, appHtml, metadata) {
 }
 
 for (const route of routeManifest) {
-  const rendered = render(route.pathname);
+  const rendered = await render(route.pathname);
   if (rendered.metadata.pathname !== route.pathname) {
     throw new Error(`SSR route metadata mismatch for ${route.pathname}.`);
   }
@@ -50,12 +68,15 @@ for (const route of routeManifest) {
   await writeRenderedPage(routeOutputPath(route.pathname), rendered.html, emittedMetadata);
 }
 
-const notFound = render('/__not-found__');
+const notFound = await render('/__not-found__');
 await writeRenderedPage('404.html', notFound.html, notFoundMetadata);
 
 const sitemapEntries = routeManifest
-  .filter((route) => route.indexable && !noindexDeployment)
-  .map((route) => `  <url>\n    <loc>${route.canonical}</loc>\n  </url>`)
+  .filter((route) => route.indexable && route.sitemap !== false && !noindexDeployment)
+  .map((route) => {
+    const priority = Number.isFinite(route.priority) ? `\n    <priority>${route.priority.toFixed(1)}</priority>` : '';
+    return `  <url>\n    <loc>${route.canonical}</loc>\n    <lastmod>${route.lastmod}</lastmod>${priority}\n  </url>`;
+  })
   .join('\n');
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

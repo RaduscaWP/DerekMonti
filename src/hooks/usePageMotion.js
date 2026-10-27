@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { isInViewport, loadGsap, prefersReducedMotion } from '../utils/motion.js';
 
 export function usePageMotion(scopeRef) {
   useEffect(() => {
     const scope = scopeRef.current;
     if (!scope) return undefined;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (prefersReducedMotion()) {
       scope.querySelectorAll('[data-reveal]').forEach((element) => {
         element.style.removeProperty('opacity');
         element.style.removeProperty('transform');
@@ -15,25 +14,37 @@ export function usePageMotion(scopeRef) {
       return undefined;
     }
 
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray('[data-reveal]').forEach((element) => {
-        gsap.from(element, {
-          y: Number(element.dataset.revealY || 44),
-          opacity: 0,
-          duration: Number(element.dataset.revealDuration || 0.75),
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: element,
-            start: 'top 84%',
-            once: true,
-          },
+    let cancelled = false;
+    let cleanup = null;
+
+    loadGsap().then(({ gsap, ScrollTrigger }) => {
+      if (cancelled) return;
+      const ctx = gsap.context(() => {
+        gsap.utils.toArray('[data-reveal]').forEach((element) => {
+          // Content already on screen stays put; only what scrolls in later is revealed.
+          if (isInViewport(element)) return;
+          gsap.from(element, {
+            y: Number(element.dataset.revealY || 44),
+            opacity: 0,
+            duration: Number(element.dataset.revealDuration || 0.75),
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: element,
+              start: 'top 84%',
+              once: true,
+            },
+          });
         });
-      });
-    }, scope);
+      }, scope);
+      cleanup = () => {
+        ctx.revert();
+        ScrollTrigger.refresh();
+      };
+    });
 
     return () => {
-      ctx.revert();
-      ScrollTrigger.refresh();
+      cancelled = true;
+      if (cleanup) cleanup();
     };
   }, [scopeRef]);
 }

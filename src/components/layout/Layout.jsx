@@ -1,6 +1,7 @@
 import AnnouncementBar from './AnnouncementBar.jsx';
 import Footer from './Footer.jsx';
 import Navbar from './Navbar.jsx';
+import StickyMobileCta from './StickyMobileCta.jsx';
 
 export default function Layout({ children }) {
   return (
@@ -12,6 +13,7 @@ export default function Layout({ children }) {
       <Navbar />
       <main id="main-content">{children}</main>
       <Footer />
+      <StickyMobileCta />
     </>
   );
 }

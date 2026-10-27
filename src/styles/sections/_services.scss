@@ -1,0 +1,400 @@
+@use '../variables' as *;
+
+/* ---------------------------------------------------------------------------
+   Services page
+   Blocks: .services-hero .services-cards .service-card .services-corridors
+           .services-proof
+   --------------------------------------------------------------------------- */
+
+.services-hero {
+  position: relative;
+  padding: calc(var(--header-total) + clamp(2rem, 4vw, 3.5rem)) 0 clamp(2.5rem, 5vw, 4rem);
+  color: #fff;
+  background: $color-bg-darker url('/images/routes/cabin.webp') center / cover no-repeat;
+  isolation: isolate;
+}
+
+.services-hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(8, 16, 26, 0.95) 0%, rgba(8, 16, 26, 0.88) 50%, rgba(8, 16, 26, 0.72) 100%);
+}
+
+.services-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.services-hero h1 {
+  margin: 0.9rem 0 0;
+  color: #fff;
+  font-size: clamp(2.3rem, 4.4vw, 4.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.services-hero__lead {
+  max-width: 56ch;
+  margin: 1.25rem 0 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.7;
+}
+
+.services-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.services-hero__contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.services-hero__contact:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.services-hero__quote {
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border-radius: 24px;
+  color: $color-text-primary;
+  background: #fff;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+  scroll-margin-top: calc(var(--header-total) + 1rem);
+}
+
+.services-hero__quote-title {
+  margin: 0 0 0.9rem;
+  font-family: $font-display;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.services-hero__quote-note {
+  margin: 0.9rem 0 0;
+  color: $color-text-secondary;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* Service cards ---------------------------------------------------------- */
+.services-cards {
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(2rem, 4vw, 3rem);
+  background: #fff;
+}
+
+.services-cards__header {
+  max-width: 640px;
+}
+
+.services-cards__header h2 {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1.9rem, 3.4vw, 2.75rem);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.services-cards__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.service-card {
+  perspective: 1400px;
+}
+
+.service-card__inner {
+  position: relative;
+  display: grid;
+  min-height: 360px;
+  transform-style: preserve-3d;
+  transition: transform 0.7s $ease-smooth;
+}
+
+.service-card__face {
+  display: flex;
+  flex-direction: column;
+  grid-area: 1 / 1;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: 24px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.service-card__front {
+  color: #fff;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(138, 25, 79, 0.38), transparent 42%),
+    $gradient-dark;
+}
+
+.service-card__back {
+  border: 1px solid var(--border);
+  color: $color-text-primary;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(11, 25, 41, 0.14);
+  transform: rotateY(180deg);
+}
+
+.service-card__icon {
+  display: inline-flex;
+  width: 52px;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  color: #fff;
+  background: $color-accent;
+}
+
+.service-card__badge {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 1.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  font: 700 0.75rem/1 $font-body;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.service-card__front h3 {
+  margin: 0.9rem 0 0.5rem;
+  color: #fff;
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.service-card__front p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.service-card__toggle {
+  display: none;
+  align-self: flex-start;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 1rem 0 0;
+  border: 0;
+  color: #fff;
+  background: none;
+  font: 700 0.875rem/1 $font-body;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.service-card__back h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.service-card__back > p {
+  margin: 0 0 1rem;
+  color: $color-text-secondary;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.service-card__example {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0 0 1.25rem;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: var(--bg-ivory);
+  font-size: 0.9rem;
+}
+
+.service-card__example span {
+  color: $color-text-secondary;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.service-card__example strong {
+  font-size: 1rem;
+}
+
+.service-card__example p {
+  margin: 0;
+  color: $color-text-primary;
+}
+
+.service-card__example del {
+  color: $color-text-secondary;
+}
+
+.service-card__example em {
+  color: $color-accent;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.service-card__example small {
+  color: $color-text-secondary;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.service-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: auto;
+}
+
+.service-card__page {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  color: $color-accent;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.service-card__page:hover {
+  text-decoration: underline;
+}
+
+@media (hover: hover) {
+  .service-card:hover .service-card__inner {
+    transform: rotateY(180deg);
+  }
+}
+
+.service-card:focus-within .service-card__inner,
+.service-card.is-flipped .service-card__inner {
+  transform: rotateY(180deg);
+}
+
+@media (hover: none) {
+  .service-card__toggle {
+    display: inline-block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card__inner {
+    transition: none;
+  }
+}
+
+/* Corridors -------------------------------------------------------------- */
+.services-corridors {
+  padding: 0 0 clamp(4rem, 8vw, 7rem);
+  background: #fff;
+}
+
+.services-corridors__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.services-corridors__grid a {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: $color-text-primary;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.3s $ease-smooth;
+}
+
+.services-corridors__grid a:hover {
+  border-color: $color-accent;
+  transform: translateY(-2px);
+}
+
+.services-corridors__grid small {
+  color: $color-accent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.services-corridors__grid strong {
+  font-family: $font-display;
+  font-size: 1.05rem;
+}
+
+.services-corridors__grid span {
+  color: $color-text-secondary;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Proof ------------------------------------------------------------------ */
+.services-proof {
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  color: #fff;
+  background: $gradient-dark;
+}
+
+.services-proof__header {
+  max-width: 640px;
+  margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.services-proof__header h2 {
+  margin: 0.5rem 0 0.75rem;
+  color: #fff;
+  font-size: clamp(1.9rem, 3.4vw, 2.75rem);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.services-proof__header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+.services-proof__note {
+  margin: 1.25rem 0 0;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.8125rem;
+}
+
+/* Responsive ------------------------------------------------------------- */
+@media (max-width: 940px) {
+  .services-hero__inner,
+  .services-cards__grid,
+  .services-corridors__grid {
+    grid-template-columns: 1fr;
+  }
+}

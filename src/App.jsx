@@ -2,49 +2,48 @@ import { useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/layout/Layout.jsx';
-import Home from './pages/Home.jsx';
-import Services from './pages/Services.jsx';
-import About from './pages/About.jsx';
-import Blog from './pages/Blog.jsx';
-import BlogArticle from './pages/BlogArticle.jsx';
-import Privacy from './pages/Privacy.jsx';
-import Terms from './pages/Terms.jsx';
-import NotFound from './pages/NotFound.jsx';
-import CoreLanding from './pages/CoreLanding.jsx';
-import { corePages } from './data/corePages.js';
+import LazyPage, { PAGE_READY_EVENT } from './pages/LazyPage.jsx';
 import SeoHead from './seo/SeoHead.jsx';
+
+function focusCurrentPage(hash) {
+  let focusTarget;
+
+  if (hash) {
+    let id = hash.slice(1);
+    try {
+      id = decodeURIComponent(id);
+    } catch {
+      // Keep the original hash when it is not valid percent-encoding.
+    }
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ block: 'start' });
+      focusTarget = section.querySelector('h1, h2') || section;
+    }
+  } else {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    focusTarget = document.querySelector('#main-content h1');
+  }
+
+  if (focusTarget instanceof HTMLElement) {
+    if (!focusTarget.hasAttribute('tabindex')) focusTarget.setAttribute('tabindex', '-1');
+    focusTarget.focus({ preventScroll: true });
+  }
+}
 
 function RouteFocus() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      let focusTarget;
+    // Runs on navigation and again once a lazily loaded page chunk has rendered.
+    const frame = window.requestAnimationFrame(() => focusCurrentPage(hash));
+    const onReady = () => focusCurrentPage(hash);
+    window.addEventListener(PAGE_READY_EVENT, onReady);
 
-      if (hash) {
-        let id = hash.slice(1);
-        try {
-          id = decodeURIComponent(id);
-        } catch {
-          // Keep the original hash when it is not valid percent-encoding.
-        }
-        const section = document.getElementById(id);
-        if (section) {
-          section.scrollIntoView({ block: 'start' });
-          focusTarget = section.querySelector('h1, h2') || section;
-        }
-      } else {
-        window.scrollTo({ top: 0, behavior: 'auto' });
-        focusTarget = document.querySelector('#main-content h1');
-      }
-
-      if (focusTarget instanceof HTMLElement) {
-        if (!focusTarget.hasAttribute('tabindex')) focusTarget.setAttribute('tabindex', '-1');
-        focusTarget.focus({ preventScroll: true });
-      }
-    });
-
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener(PAGE_READY_EVENT, onReady);
+    };
   }, [pathname, hash]);
 
   return null;
@@ -56,6 +55,7 @@ function SiteAnalytics() {
   return isLocalPreview ? null : <Analytics />;
 }
 
+// Keep this table in sync with pageNameForPath() in pages/pageLoaders.js.
 export default function App() {
   return (
     <>
@@ -63,17 +63,19 @@ export default function App() {
       <Layout>
         <RouteFocus />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogArticle />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          {corePages.map((page) => (
-            <Route path={page.path} element={<CoreLanding page={page} />} key={page.path} />
-          ))}
-          <Route path="*" element={<NotFound />} />
+          <Route path="/" element={<LazyPage name="Home" />} />
+          <Route path="/services" element={<LazyPage name="Services" />} />
+          <Route path="/about" element={<LazyPage name="About" />} />
+          <Route path="/blog" element={<LazyPage name="Blog" />} />
+          <Route path="/blog/:slug" element={<LazyPage name="BlogArticle" />} />
+          <Route path="/privacy" element={<LazyPage name="Privacy" />} />
+          <Route path="/terms" element={<LazyPage name="Terms" />} />
+          <Route path="/business-class-flights" element={<LazyPage name="Landing" />} />
+          <Route path="/business-class-flights-miami" element={<LazyPage name="Landing" />} />
+          <Route path="/business-class-flights/:slug" element={<LazyPage name="Landing" />} />
+          <Route path="/first-class-flights" element={<LazyPage name="Landing" />} />
+          <Route path="/services/:slug" element={<LazyPage name="Landing" />} />
+          <Route path="*" element={<LazyPage name="NotFound" />} />
         </Routes>
       </Layout>
       <SiteAnalytics />
