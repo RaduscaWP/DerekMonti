@@ -1,4 +1,5 @@
-// Converts the legacy Pexels JPGs into 16:9 WebP route-card images (two sizes) using the
+// Converts the Pexels source JPGs (not kept in git; re-download them from the URLs in
+// public/images/legacy/sources.json) into 16:9 WebP route-card images (two sizes) using the
 // Playwright Chromium already in devDependencies, so no native image library is needed.
 // Usage: node scripts/optimize-images.mjs   (set AUDIT_CHROME to a Chromium executable if the
 // default Playwright browser is not installed)
